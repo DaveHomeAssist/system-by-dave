@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en" data-theme="light">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-s67zz/uFPLEI6pigfjlwmWXgmYbt56ykAMxZ3cKs3qw='; style-src 'unsafe-inline'; img-src 'self' data:; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-LrEwoZk4Kyn/Lzo2Jre3CTmv1qB/8cJ1gZS2J4EcaFc='; style-src 'unsafe-inline'; img-src 'self' data:; base-uri 'none'; form-action 'none'">
 <meta name="description" content="Solve the daily garden crossword, grow plants and use wildcard seeds for a nearby clue.">
 <meta name="robots" content="noindex, follow">
 <link rel="canonical" href="https://systembydave.com/puzzle/">
@@ -109,7 +109,9 @@ canvas,.tiles{position:absolute;inset:0;width:100%;height:100%}
 .keyboard,.mobile-nav{display:none}.mobile-nav button{min-height:44px}
 @media (max-width:720px),(max-height:700px){.nursery{display:none}}
 footer{display:flex;justify-content:space-between;align-items:start;gap:12px;min-height:32px;color:var(--muted);font-size:11px;padding-bottom:5px}
-#notice{font-weight:700;color:var(--green)}
+.garden-notices{display:grid}
+#vine-notice,#notice{font-weight:700;color:var(--green)}
+#vine-notice:not(:empty)+#notice:not(:empty){margin-top:3px}
 dialog{color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:18px;width:min(500px,calc(100% - 30px));max-height:85dvh;box-shadow:0 15px 90px #1118}
 dialog::backdrop{background:#111a13a0}
 .help-content{padding:14px;line-height:1.5}
@@ -237,7 +239,7 @@ dialog::backdrop{background:#111a13a0}
         <div class="mobile-nav"><button id="keys-view" aria-pressed="true">Keyboard</button><button id="clues-view" aria-pressed="false">Clues</button></div>
       </div>
     </div>
-    <footer><span id="notice" role="status" aria-live="polite"></span><span class="desktop-tip">Type to fill · Space switches direction · Arrows move</span></footer>
+    <footer><div class="garden-notices"><span id="vine-notice" role="status" aria-live="polite" aria-atomic="true"></span><span id="notice" role="status" aria-live="polite"></span></div><span class="desktop-tip">Type to fill · Space switches direction · Arrows move</span></footer>
   </main>
 </div>
 <dialog id="instructions">
@@ -245,7 +247,7 @@ dialog::backdrop{background:#111a13a0}
     <div class="modal-top"><h2>How to play</h2><button class="quiet" aria-label="Close instructions">×</button></div>
     <ol>
       <li>The center word is planted for you. Select a tile or clue and type your answer. Tap a tile again, or press Space, to switch between Across and Down.</li>
-      <li>Correct answers bloom automatically. Solve two crossing answers with a shared theme to earn a golden wildcard seed.</li>
+      <li>Correct answers bloom automatically. Answers of eight or more letters grow vines that can reveal one letter in a nearby clue. Solve two crossing answers with a shared theme to earn a golden wildcard seed.</li>
       <li>Select a seed in the soil and plant it to reveal one letter in a nearby unsolved clue. The arrows slide it across soil until an edge or obstacle stops it. A move must leave a clue within reach.</li>
     </ol>
     <p>Use the date arrows to visit other gardens. Progress stays in this browser.</p>
@@ -523,109 +525,109 @@ dialog::backdrop{background:#111a13a0}
     ["mirror", "EVERGREEN", "EVE VOW EYE BRA EGG ARE ONE PIE TEN OPT BEANIE EVERGREEN VOYAGE EWE"]
   ];
   var clueBook = `
-AHA|I finally get it!|speech
-ALE|Malt drink with a long brewing tradition|food
-AREA|Space inside a boundary|math
-CALM|Like the air on a still night|weather night
-CON|The downside in a pros-and-cons list|speech
-DEGREE|One ninetieth of a right angle|math
-DEN|Home of one or more foxes|nature/wildlife
-DIN|Loud, persistent noise|sound
-DOES|Female deer, in a herd|nature/wildlife nature/outdoors
-GRID|Network of intersecting lines on graph paper|math
-HERE|Word paired with an arrow on a mall map|geography
-IRE|Anger, in three letters|emotion
-LINEAR|Like a graph drawn as a straight line|math science
-LISA|Second half of a famous Leonardo portrait title|visual-art
-MARIGOLDS|Orange or golden flowers often planted along vegetable beds|nature/plants nature/outdoors nature/wildlife
-MOONLIGHT|Sunshine reflected off Earth's natural satellite|science night
-NANO|Prefix for one billionth|science math
-NOTION|An idea or belief|psychology
-OHIO|State with a swallowtail-shaped flag|geography
-READER|Person following the words on this page|reading
-RIG|Fit a boat with sails and lines|tools
-SNAP|Sound of a dry twig giving way|sound
-STAR|Asterisk, informally|reading
-TEEN|Someone aged thirteen through nineteen|people
-WARM|How soil feels when the sun has been on it|weather nature/outdoors
-WAS|Past tense of is|speech
-ACT|Take a role onstage|performance
-ADS|Commercial breaks are filled with them|media
-AFRICA|Home of the Serengeti|geography nature/wildlife
-AGO|Five minutes in the past, five minutes ___|time
-AGREED|Reached the same conclusion|speech
-ALL|The whole lot|quantity
-APE|Chimp or gibbon|nature/wildlife nature/outdoors
-APOLLO|Greek god who played the lyre|mythology music
-ARE|You ___ here, on a map sign|speech
-ART|Paintings, for example|visual-art
-ASH|Tree with leaves that grow in opposite pairs|nature/plants nature/outdoors
-ASP|Venomous snake associated with Cleopatra|nature/wildlife
-ASPECT|Compass direction a hillside faces|geography nature/outdoors
-AWE|Wonder in the presence of something grand|emotion
-BAG|Flexible container with handles, often|storage
-BEANIE|Knit cap for a cold morning|winter clothing
-BIN|Container for sorted recycling|storage materials
-BOO|Short line for a Halloween ghost|speech folklore
-BOY|Male child|people
-BRA|Garment sized by band and cup|clothing
-COO|Sound from a contented dove|nature/wildlife speech
-DAB|Little touch of paint|visual-art materials
-DEBARK|Strip the outside off a log|nature/plants nature/outdoors
-DEW|Beads on the grass at dawn|weather nature/outdoors
-DEWPOINTS|Temperatures at which water vapor begins to condense|weather science nature/outdoors
-DRAGONFLY|Large-eyed insect that patrols a pond|nature/wildlife nature/outdoors
-EAR|An organ that catches sound or a cob with kernels|body nature/plants
-EAT|Have a bite|food
-EBB|What a tide does as it goes out|weather nature/outdoors
-EEL|Long fish that may hide in reef crevices|nature/wildlife nature/outdoors
-EGG|Whisked ingredient in traditional eggnog|food winter
-EGO|Sense of one's importance|emotion psychology
-ELF|A helper in Santa's workshop, in stories|folklore winter
-END|Either extremity of a line segment|math time
-ERA|Period such as the Bronze Age|time history
-EUROPE|Continent crossed by the Alps|geography nature/outdoors
-EVE|The night before Christmas, for one|time winter
-EVERGREEN|A tree that keeps its foliage year-round|nature/plants winter nature/outdoors
-EWE|Mother of a lamb|nature/wildlife
-EYE|What a birder keeps on the sky|body nature/outdoors
-FOE|Opposite of an ally|people
-GAS|State of matter like water vapor|science weather
-HONEYBEES|Pollinators that dance to direct others to food|nature/wildlife nature/plants nature/outdoors
-LADDER|What a fruit picker might climb|tools nature/outdoors
-MAP|What shows the trail back to camp|geography nature/outdoors
-MUSHROOMS|Fungi often spotted on a woodland walk|nature/outdoors decay food
-ONE|Number a solo has in it|quantity
-OPT|Choose, as at a decision point|speech
-ORC|A foe in Tolkien's Middle-earth|folklore
-PEA|Round green seed in a garden pod|food nature/plants nature/outdoors
-PIE|Mince ___, a Christmas table staple|food winter
-POLLINATE|Carry pollen to a flower so it can set seed|nature/wildlife nature/plants nature/outdoors
-POP|Music genre with a top-40 chart|music
-RAY|A shaft of sunlight|weather nature/outdoors
-RED|Color of a ripe strawberry|nature/plants colors
-RID|Get ___ of, as unwanted baggage|speech
-RIM|Circular outer edge of a wheel|shapes
-ROT|Break down, as old logs on a forest floor|decay nature/outdoors
-RUE|Bitter herb whose name also means regret|nature/plants nature/outdoors
-SEA|Large body of salt water|geography nature/outdoors
-SHEAVE|Grooved wheel inside a pulley|tools shapes
-SKY|Where you watch for changing weather|weather nature/outdoors
-SOIREE|Evening party, in French-derived usage|gatherings
-SPA|Resort with a hot spring, perhaps|nature/outdoors travel
-TEE|Peg under a golf ball|tools nature/outdoors
-TEN|Number of decimal digits from zero to nine|quantity
-THE|Common three-letter article|speech
-TIN|Metal coating on many steel cans|materials
-TOROID|Doughnut shape in geometry|shapes
-TOY|Plaything|people
-USE|Put to work|tools
-VIA|By way of|speech travel
-VOW|Solemn promise|speech gatherings
-VOYAGE|Long journey by sea or through space|travel
-WET|Like grass after a night of heavy dew|weather nature/outdoors
-WHO|Question word when the answer is a person|speech
-WRY|Dryly humorous|speech emotion
+AHA|Breakthrough syllables|speech
+ALE|Pint at a pub, perhaps|food
+AREA|What a square's side times itself gives you|math
+CALM|What a duck may look like above water|weather night
+CON|Slick operator's scheme|speech
+DEGREE|Meridian spacing unit|math
+DEN|Where a vixen might raise her kits|nature/wildlife
+DIN|Sound that makes conversation almost impossible|sound
+DOES|Some of a buck's herd mates|nature/wildlife nature/outdoors
+GRID|Pattern of a city with numbered streets and avenues|math
+HERE|Word heard in a roll call|geography
+IRE|What someone might draw by jumping the queue|emotion
+LINEAR|Like the relationship between miles and kilometers|math science
+LISA|Given name of the woman in the Louvre's most famous portrait|visual-art
+MARIGOLDS|Flowers often strung for Day of the Dead|nature/plants nature/outdoors nature/wildlife
+MOONLIGHT|Source of a faint shadow long after sunset, perhaps|science night
+NANO|Prefix on the scale of a billionth|science math
+NOTION|Half-formed idea, perhaps|psychology
+OHIO|Only state with a swallowtail flag|geography
+READER|One who finds a bookmark useful|reading
+RIG|Fix in advance, as a contest|tools
+SNAP|Sound from a conductor's fingers, perhaps|sound
+STAR|Possible upgrade from a supporting role|reading
+TEEN|One who's too old for the kids' menu but may still need a ride|people
+WARM|Getting closer, in a guessing game|weather nature/outdoors
+WAS|Verb in 'There once ___ a king'|speech
+ACT|One part of a playbill|performance
+ADS|What many a skip button lets you bypass|media
+AFRICA|Continent with coasts on the Atlantic and Indian oceans|geography nature/wildlife
+AGO|Word that turns 'two days' into a date in the past|time
+AGREED|Saw eye to eye|speech
+ALL|What one might bet when going for broke|quantity
+APE|Imitate without originality|nature/wildlife nature/outdoors
+APOLLO|NASA program named for a Greek god|mythology music
+ARE|Verb with 'we' or 'they'|speech
+ART|What a gallery hangs|visual-art
+ASH|What the last coals leave behind|nature/plants nature/outdoors
+ASP|Menace in a basket in a famous Shakespeare ending|nature/wildlife
+ASPECT|Which way a slope faces, to a geographer|geography nature/outdoors
+AWE|Feeling at the foot of a giant sequoia, perhaps|emotion
+BAG|Land, as a hard-to-get reservation|storage
+BEANIE|Headwear for a ski lodge, perhaps|winter clothing
+BIN|Destination for receipts headed to recycling|storage materials
+BOO|What a villain might get at a panto|speech folklore
+BOY|Role for a young actor playing Peter Pan, traditionally|people
+BRA|Garment with hooks that may be in front|clothing
+COO|Sound of affection, human or avian|nature/wildlife speech
+DAB|Small bit of paint on a palette|visual-art materials
+DEBARK|Get off a vessel, in nautical usage|nature/plants nature/outdoors
+DEW|First thing a lawn mower might scatter|weather nature/outdoors
+DEWPOINTS|Values a forecaster checks to gauge how muggy the air feels|weather science nature/outdoors
+DRAGONFLY|Pond hunter whose young live underwater|nature/wildlife nature/outdoors
+EAR|Something to lend without losing it|body nature/plants
+EAT|Take care of the leftovers, perhaps|food
+EBB|Withdraw, as the tide|weather nature/outdoors
+EEL|Long creature on an unagi menu|nature/wildlife nature/outdoors
+EGG|Something you might crack for a scramble|food winter
+EGO|What a loss might bruise|emotion psychology
+ELF|Small worker in a famously busy December workshop|folklore winter
+END|Where a relay's anchor hopes to arrive first|math time
+ERA|The Jazz Age, for one|time history
+EUROPE|Continent with both the Uffizi and the Prado|geography nature/outdoors
+EVE|Time for a last-minute gift wrap, perhaps|time winter
+EVERGREEN|Like a story editors can rerun year after year|nature/plants winter nature/outdoors
+EWE|One that may call to her lamb|nature/wildlife
+EYE|Part of a needle a thread must pass through|body nature/outdoors
+FOE|One at the other end of a feud|people
+GAS|State of matter that fills its container|science weather
+HONEYBEES|Insects whose waggle dance gives directions|nature/wildlife nature/plants nature/outdoors
+LADDER|Poolside exit, perhaps|tools nature/outdoors
+MAP|What you might unfold before taking the scenic route|geography nature/outdoors
+MUSHROOMS|What the stems and caps on a pizza might be|nature/outdoors decay food
+ONE|Number of winners after sudden death|quantity
+OPT|Settle on a choice|speech
+ORC|Fighter in Sauron's army|folklore
+PEA|One item in a princess's mattress test|food nature/plants nature/outdoors
+PIE|Dessert divided into wedges|food winter
+POLLINATE|Do a flower a favor while collecting nectar|nature/wildlife nature/plants nature/outdoors
+POP|What a pin does to a balloon|music
+RAY|Fish with a kite-shaped silhouette|weather nature/outdoors
+RED|Card that ends a soccer player's match|nature/plants colors
+RID|Relieve of a nuisance, with 'of'|speech
+RIM|Part of the hoop on a missed free throw|shapes
+ROT|What forgotten produce might do|decay nature/outdoors
+RUE|Wish one had acted differently|nature/plants nature/outdoors
+SEA|What an estuary opens into|geography nature/outdoors
+SHEAVE|Spinning part a pulley rope rides in|tools shapes
+SKY|Where a weather balloon heads|weather nature/outdoors
+SOIREE|Gathering whose name comes from the French for 'evening'|gatherings
+SPA|Stop for a mud wrap, perhaps|nature/outdoors travel
+TEE|Place to start a hole in golf|tools nature/outdoors
+TEN|Top mark on a judge's card, often|quantity
+THE|Word in front of 'Hague' or 'Bronx'|speech
+TIN|Metal whose atomic symbol is Sn|materials
+TOROID|Three-dimensional model of a ring doughnut|shapes
+TOY|Nursery floor obstacle, often|people
+USE|Get mileage out of|tools
+VIA|Through, on an itinerary|speech travel
+VOW|Words meant to outlast a ceremony|speech gatherings
+VOYAGE|Trip taken by a ship or a spacecraft|travel
+WET|In need of a towel, say|weather nature/outdoors
+WHO|Question asked before putting a name to a face|speech
+WRY|Like a remark delivered with an arched eyebrow|speech emotion
 `.trim();
   var entries = new Map(clueBook.split("\n").map((line) => {
     const [answer, clue, tagList] = line.split("|");
@@ -807,6 +809,17 @@ WRY|Dryly humorous|speech emotion
   var directionButtons = [...document.querySelectorAll("[data-direction]")];
   var slideButtons = [...document.querySelectorAll("[data-slide]")];
   var status = (message) => text("notice", message);
+  function showVineBonus() {
+    const vine = [...garden.plants].reverse().find((plant) => plant.kind === "vine" && plant.bridge !== void 0);
+    const statusNode = byId("vine-notice");
+    let message = "";
+    if (vine?.bridge !== void 0) {
+      const source = puzzle.slots[vine.slot];
+      const target = puzzle.slots[vine.bridge];
+      message = `Vine bonus: Your ${source.cells.length}-letter answer at ${source.number} ${source.direction} grew a vine and revealed a letter in ${target.number} ${target.direction}.`;
+    }
+    if (statusNode.textContent !== message) statusNode.textContent = message;
+  }
   var species = [
     ["clover", "Clover", "\u2663"],
     ["daisy", "Daisy", "\u273F"],
@@ -858,7 +871,7 @@ WRY|Dryly humorous|speech emotion
     const fresh = newGarden(puzzle);
     try {
       const cached = JSON.parse(read(saveKey()) ?? "null");
-      if (cached?.ink.length !== puzzle.soil.length || !cached.ink.every((letter, cell) => /^[A-Z]?$/.test(letter) && (!puzzle.soil[cell] || !letter)) || cached.solved[0] !== puzzle.seed || new Set(cached.solved).size !== cached.solved.length || cached.solved.some((id) => !puzzle.slots[id]?.cells.every((cell) => cached.ink[cell] === puzzle.letters[cell])) || cached.hints.some((cell) => puzzle.soil[cell] !== false || cached.ink[cell] !== puzzle.letters[cell]) || cached.plants.length !== cached.solved.length || cached.plants.some((plant, index) => plant.slot !== cached.solved[index] || !["clover", "daisy", "tulip", "sunflower", "vine"].includes(plant.kind)) || cached.seeds.length !== fresh.seeds.length || cached.seeds.some((seed, index) => seed.id !== fresh.seeds[index].id || seed.target !== fresh.seeds[index].target || String(seed.parents) !== String(fresh.seeds[index].parents) || typeof seed.spent !== "boolean" || puzzle.soil[seed.cell] !== true) || new Set(cached.seeds.filter((seed) => !seed.spent).map((seed) => seed.cell)).size !== cached.seeds.filter((seed) => !seed.spent).length) return fresh;
+      if (cached?.ink.length !== puzzle.soil.length || !cached.ink.every((letter, cell) => /^[A-Z]?$/.test(letter) && (!puzzle.soil[cell] || !letter)) || cached.solved[0] !== puzzle.seed || new Set(cached.solved).size !== cached.solved.length || cached.solved.some((id) => !puzzle.slots[id]?.cells.every((cell) => cached.ink[cell] === puzzle.letters[cell])) || cached.hints.some((cell) => puzzle.soil[cell] !== false || cached.ink[cell] !== puzzle.letters[cell]) || cached.plants.length !== cached.solved.length || cached.plants.some((plant, index) => plant.slot !== cached.solved[index] || !["clover", "daisy", "tulip", "sunflower", "vine"].includes(plant.kind) || plant.bridge !== void 0 && (plant.kind !== "vine" || !Number.isInteger(plant.bridge) || !puzzle.slots[plant.bridge])) || cached.seeds.length !== fresh.seeds.length || cached.seeds.some((seed, index) => seed.id !== fresh.seeds[index].id || seed.target !== fresh.seeds[index].target || String(seed.parents) !== String(fresh.seeds[index].parents) || typeof seed.spent !== "boolean" || puzzle.soil[seed.cell] !== true) || new Set(cached.seeds.filter((seed) => !seed.spent).map((seed) => seed.cell)).size !== cached.seeds.filter((seed) => !seed.spent).length) return fresh;
       return cached;
     } catch {
       return fresh;
@@ -978,6 +991,7 @@ WRY|Dryly humorous|speech emotion
     paint(canvas, puzzle, garden, slot, focus, selectedSeed, time);
   }
   function update() {
+    showVineBonus();
     const solved = garden.solved.length;
     const won = solved === puzzle.slots.length;
     const active = garden.seeds.filter((seed2) => activeSeed(puzzle, garden, seed2));
