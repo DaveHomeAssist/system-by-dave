@@ -3,7 +3,7 @@
 ## November 26, 2026. New Bethlehem retreat preview
 
 - Connected the welcome, visit details, registration and public contact to the retreat editor’s published release. Drafts stay in the private editor.
-- Added a temporary, unlisted retreat website at `/retreat/` for sharing by direct link. The preview now names New Bethlehem and explains whom the one-day Catholic retreat is for. The home page features the supplied devotional artwork at its original proportions. The About page introduces Sharon Delaney, links to her EWTN News author profile, and lists four of her National Catholic Register articles.
+- Added a temporary, unlisted retreat website at `/retreat/` for sharing by direct link. The preview now names New Bethlehem and explains whom the one-day Catholic retreat is for. The home page features the supplied devotional artwork at its original proportions. The About page introduces Sharon Delaney, links to her EWTN News author profile, and lists five of her National Catholic Register articles, including her 2023 report on the Carlo Acutis shrine in Brick, New Jersey.
 
 ## November 26, 2026. Envision web artwork and Notion Agents
 
