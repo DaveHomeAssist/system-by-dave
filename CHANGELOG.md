@@ -1,5 +1,10 @@
 # Changelog
 
+## November 27, 2026. Cross-Pollinate phone keyboard containment
+
+- Keeps every in-game QWERTY key, including `P`, inside narrow portrait screens so a Galaxy Note 20 player can finish with the familiar controls and current saved solve.
+- Contains the date card and Garden bed progress label. Browser checks cover 320, 375 and 412 CSS pixels with all 27 keys visible and clickable.
+
 ## November 27, 2026. AV console keyboard help
 
 - Press `?` in the AV console to open keyboard shortcut help and `Escape` to close it. The offline cache refreshes to include the updated console shell.
