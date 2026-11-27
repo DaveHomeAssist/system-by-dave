@@ -1,9 +1,23 @@
 {
   "schema": 1,
-  "sourceSha256": "4d69895d933acc7f9d44642f690b03c089581b360a75322040b17c8bdc66637d",
-  "publicSha256": "e16b9973c9fe9cd20ccc0e730cc0a637e96a32a3fe4b9277513a0e02d5367752",
-  "editions": 39,
+  "sourceSha256": "f62ad43ff774afcde3415c2f60c14304d7c9809e9883e55187b08217cd2e2b5d",
+  "publicSha256": "03bb00a55ef6ba522131f3ba506e22dece0bf772f0f332d9ec7eb5a884128c7b",
+  "editions": 40,
   "files": [
+    {
+      "name": "Edition 040.svg",
+      "id": 40,
+      "date": "2026-11-27",
+      "title": "SDI checkfield stress test",
+      "sha256": "12236a40ec6acbc58e4584180c4c9662d5dee61133695bce7ac71135bb39086a"
+    },
+    {
+      "name": "Edition 040.png",
+      "id": 40,
+      "date": "2026-11-27",
+      "title": "SDI checkfield stress test",
+      "sha256": "42af5500731a605243efefa81508996f035ffe35299a1b532ea39cd2bd0f7eec"
+    },
     {
       "name": "Edition 039.svg",
       "id": 39,
