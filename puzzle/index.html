@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en" data-theme="light">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-QRSIGX8+hKj87CtyE7rG7bPWr1ai3K715AB3pPPbKSs='; style-src 'unsafe-inline'; img-src 'self' data:; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-rGqj/noBiFAKsw2P/z0/zzvMHO1gKXmTfbDRtuBJNmw='; style-src 'unsafe-inline'; img-src 'self' data:; base-uri 'none'; form-action 'none'">
 <meta name="description" content="Solve the daily garden crossword, grow plants and use wildcard seeds for a nearby clue.">
 <meta name="robots" content="noindex, follow">
 <link rel="canonical" href="https://systembydave.com/puzzle/">
@@ -52,7 +52,8 @@ h1 span{color:var(--accent)}
 .date-actions{display:flex;flex-wrap:wrap;gap:8px}.date-actions button{min-height:44px}
 .play{min-height:0;display:grid;grid-template-columns:minmax(0,1.5fr) minmax(290px,1fr);gap:var(--gap)}
 .bed{min-height:0;display:grid;grid-template-rows:auto minmax(0,1fr) auto;background:var(--board);color:var(--boardText);border:1px solid #405642;border-radius:18px;padding:12px clamp(12px,1.75vw,24px);gap:8px;box-shadow:0 8px 24px var(--shadow)}
-.bed-top,.bed-foot{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.bed-top,.bed-foot{display:flex;justify-content:space-between;align-items:center;gap:8px;min-width:0}
+.bed-top>span:first-child{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .bed-actions{display:flex;align-items:center;gap:8px;flex-shrink:0}
 #replay{min-height:44px;padding:0 8px;border:1px solid #a8b695;border-radius:7px;background:transparent;color:inherit;font:700 11px var(--sans);white-space:nowrap}
 #replay:hover,#replay:focus-visible{background:#405545}
@@ -128,7 +129,7 @@ dialog::backdrop{background:#111a13a0}
 @media (min-width:2100px){.topbar{padding-inline:max(var(--gap),calc((100vw - 1720px)/2))} main{max-width:1720px}.play{grid-template-columns:minmax(0,1.45fr) minmax(460px,1fr)}.clue-list button{font-size:16px;padding-block:12px}}
 @media (max-width:720px) and (orientation:portrait){
  .topbar{height:46px}.mark{width:28px;height:28px;font-size:21px}.wide-label,.desktop-tip{display:none}.quiet{min-height:44px}
- main{gap:7px;padding:7px 8px 0}.eyebrow{font-size:8px;margin-bottom:3px}.mast{gap:4px;padding-inline:2px;align-items:center}h1{font-size:clamp(23px,7.4vw,47px);white-space:nowrap}
+ main{gap:7px;padding:7px 8px 0}.eyebrow{font-size:8px;margin-bottom:3px}.mast{gap:4px;padding-inline:2px;align-items:center;min-width:0}.mast>div:first-child{min-width:0;overflow:hidden}h1{font-size:clamp(20px,6.2vw,30px);white-space:nowrap}
  .date-box{gap:0;padding:2px}#choose-date{min-width:72px}.date-box span{font-size:6px}.date-box strong{font-size:12px}.day-btn{min-width:44px;height:44px}
  .play{grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(110px,1.6fr) minmax(200px,1fr);gap:7px}
  .bed{border-radius:11px;padding:6px 9px;gap:3px}.bed-top{font-size:13px}.bed-foot{gap:8px;font-size:9px}
@@ -137,9 +138,9 @@ dialog::backdrop{background:#111a13a0}
  .clues{display:none}.clue-top{padding:3px 8px}.clue-top h2{font-size:17px}.clue-list button{padding-block:5px}
  .mobile-nav{display:flex;justify-content:center;gap:18px;flex-shrink:0}
  .keyboard{display:flex;flex:1;flex-direction:column;justify-content:center;min-height:0;gap:3px}
- .key-row{display:flex;justify-content:center;gap:3px;flex:1;min-height:0;max-height:43px}
- .key-row button{width:9%;min-height:0;border:1px solid var(--line);background:var(--panel);border-radius:5px;padding:0;font-size:clamp(11px,4vw,16px);font-weight:750}
- .key-row:last-child button:last-child{width:14%}
+ .key-row{display:flex;justify-content:center;width:100%;gap:3px;flex:1;min-height:0;max-height:43px}
+ .key-row button{flex:1 1 0;width:auto;min-width:0;min-height:0;border:1px solid var(--line);background:var(--panel);border-radius:5px;padding:0;font-size:clamp(11px,4vw,16px);font-weight:750}
+ .key-row:last-child button:last-child{flex-grow:1.5;width:auto}
  .sidebar.show-clues .clues{display:flex}.sidebar.show-clues .keyboard{display:none}
  .sidebar:has(.seed-panel:not([hidden])) .keyboard,.sidebar:has(.seed-panel:not([hidden])) .clues{display:none}
  .seed-panel{flex:1;min-height:0;padding:4px 8px}
@@ -574,17 +575,26 @@ YEW|Evergreen with red cups surrounding its seeds
       return source.filter((entry) => !used.has(entry.answer) && pattern.every((char, offset) => !char || char === entry.answer[offset]));
     }
   };
-  function fillGrid(rows, bank, day2, anchor, minimumPairs = 4) {
+  function constructGrid(rows, bank, day2, anchor, options = {}) {
+    const started = performance.now();
     const { size, soil, slots } = extractGrid(rows);
-    const seed = slots.find((slot2) => slot2.cells.length === anchor.length && slot2.cells.includes(Math.floor(soil.length / 2)));
+    const starter = slots.find((slot2) => slot2.cells.length === anchor.length && slot2.cells.includes(Math.floor(soil.length / 2)));
     const first = bank.find((entry) => entry.answer === anchor);
-    if (!seed || !first) return null;
+    const minimumPairs = options.minimumPairs ?? 4;
+    const nodeBudget = options.nodeBudget ?? 2e4;
+    const timeoutMs = options.timeoutMs ?? 2e3;
+    if (!starter || !first || options.excludedFromStarter?.has(first.answer)) {
+      return { puzzle: null, nodes: 0, elapsedMs: performance.now() - started, stoppedBy: "unsatisfiable" };
+    }
     const index = new WordIndex(bank);
     const jitter = random(hash(day2));
     const letters = soil.map(() => "");
     const entries2 = [];
     const used = /* @__PURE__ */ new Set();
+    const targetAnswers = new Set(options.targets ?? []);
+    const targetSlots = /* @__PURE__ */ new Set();
     let nodes = 0;
+    let stoppedBy = "unsatisfiable";
     let pairs = [];
     function put(slot2, entry) {
       const previous = slot2.cells.map((cell) => letters[cell]);
@@ -593,27 +603,46 @@ YEW|Evergreen with red cups surrounding its seeds
       });
       entries2[slot2.id] = entry;
       used.add(entry.answer);
+      if (targetAnswers.has(entry.answer)) targetSlots.add(slot2.id);
       return () => {
         slot2.cells.forEach((cell, offset) => {
           letters[cell] = previous[offset];
         });
         delete entries2[slot2.id];
         used.delete(entry.answer);
+        targetSlots.delete(slot2.id);
       };
     }
+    function targetCanUse(slot2) {
+      return slot2.id !== starter.id && !slot2.crossings.some((cross) => targetSlots.has(cross.id));
+    }
     function search() {
-      if (++nodes > 2e4) return false;
+      if (performance.now() - started > timeoutMs) {
+        stoppedBy = "timeout";
+        return false;
+      }
+      if (++nodes > nodeBudget) {
+        stoppedBy = "node-budget";
+        return false;
+      }
       if (used.size === slots.length) {
+        if ([...targetAnswers].some((answer) => !used.has(answer))) return false;
         pairs = slots.flatMap((slot3) => slot3.crossings.filter((cross) => cross.id > slot3.id && sharedTag(entries2[slot3.id], entries2[cross.id])).map((cross) => [slot3.id, cross.id]));
-        return pairs.length >= minimumPairs;
+        if (pairs.length < minimumPairs) return false;
+        stoppedBy = "complete";
+        return true;
       }
       let best;
       let candidates = [];
       for (const slot3 of slots) {
         if (entries2[slot3.id]) continue;
-        const matches = index.match(slot3.cells.map((cell) => letters[cell]), used);
+        let matches = index.match(slot3.cells.map((cell) => letters[cell]), used);
+        const unplacedTargets = [...targetAnswers].filter((answer) => !used.has(answer));
+        const fittingTargets = matches.filter((entry) => unplacedTargets.includes(entry.answer) && targetCanUse(slot3));
+        if (fittingTargets.length) matches = fittingTargets;
+        else matches = matches.filter((entry) => !targetAnswers.has(entry.answer));
         if (!matches.length) return false;
-        if (!best || matches.length < candidates.length) {
+        if (!best || matches.length < candidates.length || matches.length === candidates.length && slot3.crossings.length > best.crossings.length || matches.length === candidates.length && slot3.crossings.length === best.crossings.length && slot3.id < best.id) {
           best = slot3;
           candidates = matches;
         }
@@ -623,17 +652,26 @@ YEW|Evergreen with red cups surrounding its seeds
       const ranked = candidates.map((entry) => ({
         entry,
         score: jitter() + slot2.crossings.reduce((total, cross) => total + (entries2[cross.id] ? relatedness(entry, entries2[cross.id]) : 0), 0)
-      })).sort((a, b) => b.score - a.score);
+      })).sort((a, b) => b.score - a.score || a.entry.answer.localeCompare(b.entry.answer));
       for (const { entry } of ranked) {
         const undo = put(slot2, entry);
         if (search()) return true;
         undo();
-        if (nodes > 2e4) break;
+        if (stoppedBy === "node-budget" || stoppedBy === "timeout") break;
       }
       return false;
     }
-    put(seed, first);
-    return search() ? { size, soil, slots, entries: entries2, letters, seed: seed.id, pairs, day: day2 } : null;
+    put(starter, first);
+    const complete = search();
+    return {
+      puzzle: complete ? { size, soil, slots, entries: entries2, letters, seed: starter.id, pairs, day: day2 } : null,
+      nodes,
+      elapsedMs: performance.now() - started,
+      stoppedBy
+    };
+  }
+  function fillGrid(rows, bank, day2, anchor, minimumPairs = 4) {
+    return constructGrid(rows, bank, day2, anchor, { minimumPairs }).puzzle;
   }
 
   // src/editions.ts
@@ -860,6 +898,17 @@ YES|RSVP that reserves a seat|speech
       return { cell, target };
     }
     return null;
+  }
+  function readGardenSave(puzzle2, raw) {
+    if (raw === null) return null;
+    const fresh = newGarden(puzzle2);
+    try {
+      const cached = JSON.parse(raw);
+      if (cached?.ink.length !== puzzle2.soil.length || !cached.ink.every((letter, cell) => /^[A-Z]?$/.test(letter) && (!puzzle2.soil[cell] || !letter)) || cached.solved[0] !== puzzle2.seed || new Set(cached.solved).size !== cached.solved.length || cached.solved.some((id) => !puzzle2.slots[id]?.cells.every((cell) => cached.ink[cell] === puzzle2.letters[cell])) || cached.hints.some((cell) => puzzle2.soil[cell] !== false || cached.ink[cell] !== puzzle2.letters[cell]) || cached.plants.length !== cached.solved.length || cached.plants.some((plant, index) => plant.slot !== cached.solved[index] || !["clover", "daisy", "tulip", "sunflower", "vine"].includes(plant.kind) || plant.bridge !== void 0 && (plant.kind !== "vine" || !Number.isInteger(plant.bridge) || !puzzle2.slots[plant.bridge])) || cached.seeds.length !== fresh.seeds.length || cached.seeds.some((seed, index) => seed.id !== fresh.seeds[index].id || seed.target !== fresh.seeds[index].target || String(seed.parents) !== String(fresh.seeds[index].parents) || typeof seed.spent !== "boolean" || puzzle2.soil[seed.cell] !== true) || new Set(cached.seeds.filter((seed) => !seed.spent).map((seed) => seed.cell)).size !== cached.seeds.filter((seed) => !seed.spent).length) return null;
+      return cached;
+    } catch {
+      return null;
+    }
   }
 
   // src/bank.ts
@@ -1312,14 +1361,7 @@ WRY|Like a remark delivered with an arched eyebrow|speech emotion
   var replayKey = () => `${originalKey()}:replay`;
   var saveKey = () => attempt === "replay" ? replayKey() : originalKey();
   function restore() {
-    const fresh = newGarden(puzzle);
-    try {
-      const cached = JSON.parse(read(saveKey()) ?? "null");
-      if (cached?.ink.length !== puzzle.soil.length || !cached.ink.every((letter, cell) => /^[A-Z]?$/.test(letter) && (!puzzle.soil[cell] || !letter)) || cached.solved[0] !== puzzle.seed || new Set(cached.solved).size !== cached.solved.length || cached.solved.some((id) => !puzzle.slots[id]?.cells.every((cell) => cached.ink[cell] === puzzle.letters[cell])) || cached.hints.some((cell) => puzzle.soil[cell] !== false || cached.ink[cell] !== puzzle.letters[cell]) || cached.plants.length !== cached.solved.length || cached.plants.some((plant, index) => plant.slot !== cached.solved[index] || !["clover", "daisy", "tulip", "sunflower", "vine"].includes(plant.kind) || plant.bridge !== void 0 && (plant.kind !== "vine" || !Number.isInteger(plant.bridge) || !puzzle.slots[plant.bridge])) || cached.seeds.length !== fresh.seeds.length || cached.seeds.some((seed, index) => seed.id !== fresh.seeds[index].id || seed.target !== fresh.seeds[index].target || String(seed.parents) !== String(fresh.seeds[index].parents) || typeof seed.spent !== "boolean" || puzzle.soil[seed.cell] !== true) || new Set(cached.seeds.filter((seed) => !seed.spent).map((seed) => seed.cell)).size !== cached.seeds.filter((seed) => !seed.spent).length) return fresh;
-      return cached;
-    } catch {
-      return fresh;
-    }
+    return readGardenSave(puzzle, read(saveKey())) ?? newGarden(puzzle);
   }
   function save() {
     store(saveKey(), JSON.stringify(garden));
