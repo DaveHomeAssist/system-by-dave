@@ -7,7 +7,7 @@
   <title>Contact | New Bethlehem</title>
   <meta name="robots" content="noindex">
   <meta name="theme-color" content="#f8f6f0">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src 'self'; style-src 'self'; script-src 'self'; base-uri 'none'; form-action 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src 'self'; style-src 'self'; script-src 'self'; connect-src https://davehomeassist.github.io/new-bethlehem-editor/retreat.json; base-uri 'none'; form-action 'none'">
   <link rel="canonical" href="https://systembydave.com/retreat/contact.html">
   <meta property="og:type" content="website">
   <meta property="og:title" content="Contact | New Bethlehem">
@@ -20,6 +20,7 @@
   <meta name="twitter:image" content="https://systembydave.com/retreat/assets/retreat-reflection.webp">
   <link rel="icon" href="assets/retreat-reflection.webp" type="image/webp">
   <script src="assets/theme.js" defer></script>
+  <script src="assets/details.js" defer></script>
   <link rel="stylesheet" href="assets/site.css">
 </head>
 <body id="top">
@@ -43,7 +44,7 @@
 <div class="wrap contact-grid">
 <div>
   <h1>Contact</h1>
-  <p>Contact information for New Bethlehem will be shared here when available.</p>
+  <div data-retreat="contact"><p>Contact information for New Bethlehem will be shared here when available.</p></div>
 </div>
 </div>
 </section>

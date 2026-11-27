@@ -7,7 +7,7 @@
   <title>New Bethlehem | A one-day Catholic retreat</title>
   <meta name="robots" content="noindex">
   <meta name="theme-color" content="#f8f6f0">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src 'self'; style-src 'self'; script-src 'self'; base-uri 'none'; form-action 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src 'self'; style-src 'self'; script-src 'self'; connect-src https://davehomeassist.github.io/new-bethlehem-editor/retreat.json; base-uri 'none'; form-action 'none'">
   <link rel="canonical" href="https://systembydave.com/retreat/">
   <meta property="og:type" content="website">
   <meta property="og:title" content="New Bethlehem | A one-day Catholic retreat">
@@ -20,6 +20,7 @@
   <meta name="twitter:image" content="https://systembydave.com/retreat/assets/retreat-reflection.webp">
   <link rel="icon" href="assets/retreat-reflection.webp" type="image/webp">
   <script src="assets/theme.js" defer></script>
+  <script src="assets/details.js" defer></script>
   <link rel="stylesheet" href="assets/site.css">
 </head>
 <body id="top">
@@ -42,7 +43,7 @@
 <section class="hero">
 <div class="wrap hero-grid">
 <div><span class="eyebrow">A one-day Catholic retreat</span><h1>New Bethlehem</h1>
-<p class="lead">If you are carrying grief or regret after an abortion, New Bethlehem offers you a day for prayer and reflection.</p>
+<p class="lead" data-retreat="welcome">If you are carrying grief or regret after an abortion, New Bethlehem offers you a day for prayer and reflection.</p>
 <div class="actions"><a class="button" href="retreats.html">Retreat details</a><a class="button ghost" href="experience.html">What to expect</a>
 </div>
 </div>
