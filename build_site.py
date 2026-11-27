@@ -306,6 +306,7 @@ def page_shell(current_path: str, title: str, description: str, body: str) -> st
           </main>
         <script src="{rel_url(current_path, 'assets/reference.js')}" defer></script>
         <script src="{root}js/sbd-public-nav.js" defer></script>
+        <script src="{root}js/sbd-shortcuts.js" defer></script>
 </body>
         </html>
         """
