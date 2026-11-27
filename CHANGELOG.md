@@ -1,5 +1,13 @@
 # Changelog
 
+## November 27, 2026. Console polish
+- All apps lists Rehearsal Capture once (under Show tools), shows each app's icon on its card, puts search in the top bar beside the title, and closes with an icon button like Add panel.
+- A new panel from Add panel opens at half the workspace when there is room (then a quarter, then 4x4), so it is big enough to use and to split side by side.
+- The console header says how many panels are open instead of "Empty workspace" once a panel is added.
+- Signal Flow's empty card sits above the canvas controls instead of covering them, and the Signal Flow rail shortcut is left aligned like the other rail entries.
+- The avbydave.com homepage keeps Blog, Console, Throwline and PixelForge in the header on tablets and phones (on their own row), and each Console department tile opens that department.
+- Registry version `v20261127-console-polish` rolls the offline cache.
+
 ## November 27, 2026. Envision cross device workspace
 
 - The private Studio shows the route from the current computer through Dominic to Walter, with project-source and image-runner states in one keyboard-accessible panel.

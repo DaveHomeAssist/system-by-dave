@@ -113,7 +113,8 @@ function descendants(element) {
 }
 
 function hasClass(element, className) {
-  return element.className.split(/\s+/).includes(className);
+  // SVG elements take their class through setAttribute, as in a real document.
+  return [element.className, element.getAttribute('class') || ''].join(' ').split(/\s+/).includes(className);
 }
 
 function elementsByClass(root, className) {
@@ -325,6 +326,13 @@ test('All apps and Customize dialogs preserve truthful status, focus, and explic
   assert.equal(cueForge.getAttribute('href'), 'https://systembydave.com/cueforge.html');
   assert.equal(elementsByAttribute(controller.allAppsDialog, 'data-rail-ref', 'external:arenaops').length, 0);
   assert.equal(action(controller.customizeDialog, 'external:arenaops', 'pin'), undefined);
+  assert.equal(elementsByAttribute(controller.allAppsDialog, 'data-rail-ref', 'external:rehearsal-capture').length, 1, 'Rehearsal Capture is listed once, under Show tools');
+  assert.equal(elementsByClass(avVideo, 'sbd-rail-dialog__card-icon').length, 1, 'console cards carry their icon');
+  const allAppsHeader = elementsByClass(controller.allAppsDialog, 'sbd-rail-dialog__header')[0];
+  assert.equal(elementsByClass(allAppsHeader, 'sbd-rail-dialog__search--bar').length, 1, 'All apps search sits in the top bar');
+  const allAppsClose = elementsByClass(allAppsHeader, 'sbd-rail-dialog__close')[0];
+  assert.equal(allAppsClose.getAttribute('aria-label'), 'Close All apps');
+  assert.equal(elementsByClass(allAppsClose, 'sbd-rail-dialog__close-icon').length, 1, 'close is an icon button');
   assert.equal(preferenceStorage.setCalls.length, 0);
 
   click(action(controller.allAppsDialog, 'rail', 'customize'));

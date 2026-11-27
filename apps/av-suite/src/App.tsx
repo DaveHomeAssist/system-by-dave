@@ -235,7 +235,7 @@ export function App() {
   };
   return <div className="suite-app" data-active-app={activeApp}>
     <header className="suite-header">
-      <div className="suite-identity"><span className="suite-mark" aria-hidden="true">AV</span><div><h1>{activeTitle}</h1><p className="suite-plan" title={activePack?.title}>{activePack ? `${activePack.title} · ${activePack.dirty ? "Unsaved" : "Saved"}` : activeTool ? "Specialist tool · own saved data" : "Empty workspace · add any panel"}</p></div></div>
+      <div className="suite-identity"><span className="suite-mark" aria-hidden="true">AV</span><div><h1>{activeTitle}</h1><p className="suite-plan" title={activePack?.title}>{activePack ? `${activePack.title} · ${activePack.dirty ? "Unsaved" : "Saved"}` : activeTool ? "Specialist tool · own saved data" : ws.panels.length ? `${ws.panels.length} ${ws.panels.length === 1 ? "panel" : "panels"} open` : "Empty workspace · add any panel"}</p></div></div>
       {context && <span className="suite-context" aria-label="Read-only show context">{context}</span>}
       <div className="suite-actions">
         <span className="suite-theme-toggle"><button type="button" aria-label={lightShown ? "Switch to dark mode" : "Switch to light mode"} title={lightShown ? "Dark mode" : "Light mode"} onClick={toggleLight}><svg aria-hidden="true" viewBox="0 0 24 24">{lightShown ? <path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z" /> : <><circle cx="12" cy="12" r="4" /><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" /></>}</svg></button></span>

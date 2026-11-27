@@ -131,6 +131,8 @@
   display: flex;
   width: 100%;
   padding: 6px;
+  /* Panel shortcuts such as Signal Flow are buttons, which center text by default. */
+  text-align: left;
   text-decoration: none;
 }
 

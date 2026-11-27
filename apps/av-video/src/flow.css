@@ -47,7 +47,8 @@
 .diagram-wire.wire-issue .react-flow__edge-path { stroke: var(--av-danger); stroke-dasharray: 5 4; }
 .diagram-wire.wire-traced .react-flow__edge-path { stroke: var(--av-accent); }
 .diagram-wire.wire-dimmed { opacity: .17; }
-.flow-empty { position: absolute; inset: 0; margin: auto; height: max-content; max-height: 100%; overflow: auto; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; gap: 12px; max-width: 430px; width: calc(100% - 50px); padding: 24px; text-align: center; background: var(--av-surface); border: 1px solid var(--av-line); border-radius: 10px; box-shadow: var(--av-shadow); }
+/* The empty card is centred in the space above the canvas controls row (16px margin + 44px buttons), so it never covers them. */
+.flow-empty { position: absolute; inset: 12px 12px 68px; margin: auto; height: max-content; max-height: calc(100% - 80px); overflow: auto; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; gap: 12px; max-width: 430px; width: auto; padding: 24px; text-align: center; background: var(--av-surface); border: 1px solid var(--av-line); border-radius: 10px; box-shadow: var(--av-shadow); }
 .flow-empty h3 { font-size: 24px; letter-spacing: -.5px; }
 .flow-empty p { font-size: 13px; }
 .flow-empty-symbol { font-size: 29px; color: var(--av-accent); letter-spacing: 10px; }
@@ -83,7 +84,7 @@
   .flow-canvas .react-flow__minimap { display: none; }
   .flow-canvas .react-flow__controls { margin: 8px 8px 18px; }
   .diagram-hint { font-size: 8px; left: 7px; top: 7px; max-width: calc(100% - 14px); }
-  .flow-empty { padding: 16px; gap: 9px; width: calc(100% - 28px); }
+  .flow-empty { inset: 8px 8px 70px; max-height: calc(100% - 78px); padding: 16px; gap: 9px; }
   .flow-empty h3 { font-size: 20px; }
   .flow-empty-symbol { display: none; }
   .flow-empty p { font-size: 11px; }
