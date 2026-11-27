@@ -19,3 +19,7 @@ Compatibility: ECP-1.0 revision 1.0, educational presentation consumer. The mode
 Persistent controls retain at least 44 by 44 CSS pixels. Narrow or short calendars page dates rather than squeezing a month into undersized targets. Short readers share a compact detail/pagination row; short lab panels page controls and guide text. Category filtering remains reachable through the compact Filter dialog outside the lab. Date, control and guide page state follows existing URL navigation. The browser probe checks target dimensions and complete date/control/guide coverage.
 
 The parent demos hub uses the existing public subject reader for Daily, Frame sync, Troubleshoot and About. It shares the archive's theme preference and keeps every existing paragraph, reference and demo destination. `node scripts/probe_engineering_entry.cjs` checks six sizes in both themes, all four panels and every content page, keyboard tabs, contrast, target sizes and the actual archive entry and return journey. It runs beside the archive probe in both PR and Pages gates.
+
+## AV by Dave Blog
+
+The blog gives AV by Dave readers the same edition library, calendar, diagrams and Signal lab at https://avbydave.com/blog/. Pages stages this view from the verified daily snapshot, so the existing authoring command and schedule feed both addresses. Edition data and card bytes are shared. The existing System by Dave archive continues to serve old edition links. Acceptance checks both routes, archive and asset parity, and the standard responsive reader checks.
