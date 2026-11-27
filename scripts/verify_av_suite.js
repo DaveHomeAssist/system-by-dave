@@ -222,7 +222,7 @@ function assertRailRegistryContracts(registry) {
     const stub = read(tool.href);
     if (!/<meta name="robots" content="noindex,follow">/.test(stub) || !stub.includes(`location.replace('/av/?app=${tool.retired}')`) || !/rel="canonical" href="https:\/\/avbydave\.com\/"/.test(stub)) fail(`Retired route ${tool.href} is not a noindex redirect stub into /av/?app=${tool.retired}.`);
   });
-  if (registry.tools.length !== 53 || registry.baseAssets.length !== 164 || registry.offlineAssets().length !== 183 || storageKeyCount !== 83) {
+  if (registry.tools.length !== 53 || registry.baseAssets.length !== 165 || registry.offlineAssets().length !== 184 || storageKeyCount !== 83) {
     fail(`AV application integration changed an inventory count unexpectedly (tools=${registry.tools.length}, baseAssets=${registry.baseAssets.length}, offlineAssets=${registry.offlineAssets().length}, storageKeys=${storageKeyCount}).`);
   }
   (registry.externals || []).forEach((external) => {
