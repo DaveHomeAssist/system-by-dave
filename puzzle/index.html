@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en" data-theme="light">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-FFaW1vEEh8pIxzP1ga0DkI/VZDbVOpEWTLIRq1K1q2o='; style-src 'unsafe-inline'; img-src 'self' data:; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-/+lYiEQIjV3Ub/UBthFwWRPWkzxl4zFXZQEV0Tj7oUQ='; style-src 'unsafe-inline'; img-src 'self' data:; base-uri 'none'; form-action 'none'">
 <meta name="description" content="Solve the daily garden crossword, grow plants and use wildcard seeds for a nearby clue.">
 <meta name="robots" content="noindex, follow">
 <link rel="canonical" href="https://systembydave.com/puzzle/">
@@ -285,6 +285,190 @@ dialog::backdrop{background:#111a13a0}
 </dialog>
 <script>"use strict";
 (() => {
+  // src/monthly.ts
+  var monthlyLayouts = [
+    "#BAY#####/#ORE#####/#GEL#####/###LEE###/###OWN###/###WET###/#####ILL#/#####RAY#/#####EYE#",
+    "#SUN#####/#ARE#####/#GNU#####/###RED###/###AGE###/###LOG###/#####ROW#/#####EWE#/#####END#",
+    "#WEB#####/#RYE#####/#YET#####/###TEA###/###EGG###/###ROE###/#####NEW#/#####DOE#/#####AND#",
+    "#SUN#####/#ARE#####/#GNU#####/###RAN###/###AGE###/###LOW###/#####ELK#/#####SEE#/#####TEN#",
+    "#FLY#####/#ROE#####/#OWL#####/###LEE###/###OWN###/###WET###/#####IRK#/#####RUE#/#####EGG#",
+    "#WEB#####/#ALE#####/#SKY#####/###OLD###/###NOR###/###DOE###/#####ACT#/#####MAR#/#####SPY#",
+    "#ICE#####/#NUN#####/#NET#####/###IVY###/###TIE###/###YEA###/#####RED#/#####LYE#/#####YEW#",
+    "#HAD#####/#ALE#####/#YES#####/##RIDES##/##TRIAL##/##SEDGE##/#####LET#/#####EVE#/#####SEE#",
+    "#GET#####/#EMU#####/#MAR#####/##INDIA##/##LIONS##/##SPECS##/#####HUB#/#####ERA#/#####SET#",
+    "#CAR#####/#ARE#####/#BRA#####/##EDGAR##/##SENSE##/##TRUST##/#####EAT#/#####SIR#/#####SLY#",
+    "#ALSO####/#DEER####/#STAG####/###SAY###/###ONE###/###NIL###/####SLOT#/####MOVE#/####SWAN#",
+    "##SAT####/##ERR####/##ATE####/###HAD###/###USE###/###RUN###/####RIP##/####EAR##/####SLY##",
+    "##COD####/##ARE####/##RID####/###GIG###/###ICE###/###NAN###/####TOP##/####EMU##/####DEN##",
+    "#BEAR####/#IDLE####/#OILS####/#STOP####/###WEB###/####CRAB#/####TILE#/####EDGE#/####DEAN#",
+    "KIT##AWL#/ERR##THY#/YEA##TOE#/##NOVEL##/##SPINE##/##LEEDS##/#TAN##ARK/#ATE##LIE/#BED##EGG"
+  ];
+  var monthlyClues = `
+AGE|What a tree's growth rings can help establish
+AGENDA|Order of business that may end in \u201CAny other business?\u201D
+ALERTS|What a disabled bell icon can silence
+ALGA|One tiny organism in a pond's green film
+ALLOW|Build room into a budget, with \u201Cfor\u201D
+ALSO|One more thing, in a word
+AND|What the ampersand stands for
+ARK|Boat with a mixed cargo in Genesis
+ARREST|Bring to a standstill, as a slide
+ARTHUR|King whose knights had no head of the table
+ASSESS|Size up before making a decision
+ASSURE|Give someone reason to stop worrying
+ATTEND|Be in the audience for
+AWL|Pointed tool a saddler might use
+BAT|Flying mammal that might roost in a belfry
+BAY|Where headlands make room for the sea
+BEAR|One for whom a picnic basket may count as takeout
+BED|Place reserved for sleepers or seedlings
+BEEN|Verb in \u201CWhere have you ___?\u201D
+BETTER|What a pinch of salt might make an underseasoned soup
+BEYOND|On the far side of, as a trail marker may be from a ridge
+BIOS|Short profiles in a concert program
+BOG|Soggy ground where peat can accumulate
+BRIDE|One walking up the aisle, perhaps
+CAB|Yellow ride you might hail in New York
+CAP|Twist-off top, perhaps
+CAR|Train unit with seats or cargo
+COD|Fish often served with chips in Britain
+CRAB|Shore resident that can scuttle sideways
+CUE|What an actor watches for in the wings
+DEAN|Campus official with a department or college to run
+DEDICATED|Like a bench bearing a memorial plaque
+DEER|Visitors a gardener may try to keep outside the fence
+DENIAL|Refusal to admit a claim is true
+DESIRE|What a Tennessee Williams streetcar was named for
+DID|Finished, as the Sunday crossword
+DREAMS|Some stories that end when you wake
+EAGLES|Birdies topped by a stroke apiece, in golf
+EDGAR|First name of the poet who wrote \u201CThe Raven\u201D
+EDGE|Where the water gives way to a bank, say
+EDIT|What a copy desk does to a draft
+ELK|Antlered animal also called a wapiti
+EMAILS|Replies that may arrive in an inbox
+EMU|Flightless bird on Australia's coat of arms
+ENTITY|A distinct thing, living or otherwise
+EON|An immense stretch of geologic time
+FLY|Cross the Channel without a bridge or a boat, perhaps
+GEL|Substance that holds a hairstyle in place
+GEM|Something a jeweler might cut to catch the light
+GET|Catch, as the meaning of a joke
+GIG|Booking for a band
+GNU|Antelope on the Serengeti migration
+HAD|Verb in \u201CWe ___ a deal\u201D
+HAY|What a rake gathers after a field dries
+HUB|Where the spokes of a wheel converge
+ICE|What a lake may acquire in midwinter
+IDLE|Sit with the engine running
+INCHES|Units counted by the foot
+INDIA|Country that includes much of the Western Ghats
+INN|Place with a room available for the night
+IRK|Rub the wrong way
+IVY|Climber that can cover a stone wall
+KEG|Container that might have a tap fitted
+KEY|What lets you start a locked car, traditionally
+KIT|Set of pieces for an assembly project
+LAY|Do what a hen is kept for
+LEE|Side sheltered from the prevailing wind
+LEEDS|Yorkshire city on the River Aire
+LIE|Claim a fact-checker could expose
+LIONS|Big cats that may hunt with their pride
+LOW|Call across a pasture, perhaps
+LYE|Caustic ingredient in traditional soapmaking
+MAR|Spoil the finish on
+MOVE|One turn at a chessboard
+NAN|One name for Grandma
+NET|What a goalkeeper stands in front of
+NEURAL|Related to the body's signal-carrying cells
+NEW|Still in the breaking-in stage
+NEWEST|Like the file sorted first when ordered by descending date
+NIL|What a team has scored in a shutout
+NOR|Word paired with \u201Cneither\u201D
+NOVEL|Something a first-time author may have in a drawer
+NUN|Member of a convent
+OILS|Paints that may take days to dry
+OLD|Having seen many birthdays
+OPENED|Gave access to, as a gate
+ORE|Rock worth processing for its metal
+ORGANISMS|Individual living things in an ecosystem
+ORIGIN|What a river and a family name both have
+OVA|Cells some animals deposit in clusters
+PRY|Get something open with leverage
+PUN|Joke that depends on a double meaning
+RAN|Took part in a footrace
+RESPECTED|Held in high regard
+RETAIL|Sell direct to the shopper
+RIDES|Attractions with height limits, perhaps
+RIP|Tear sharply along a seam
+ROE|What may be scattered over sushi
+ROW|Pull on oars
+RUG|Something a doormat might resemble indoors
+RUN|Operate, as a small shop
+SAG|Droop beneath a load
+SAT|Took a place at the table
+SAY|Have a voice in the decision
+SEA|Where an oyster bar gets much of its stock
+SEASON|Annual interval when particular fruit is ripe
+SEDGE|Grasslike plant often found in a marsh
+SEE|Take in with a glance
+SENSE|What a nose provides, for one
+SET|How the sun disappears for the evening
+SLEEVE|Part of a shirt you might roll up
+SLOT|Place reserved on a schedule
+SLY|Like a fox or a wink
+SPECS|Dimensions or tolerances on a drawing
+SPINE|Part of a book that faces out on a shelf
+SPY|One who watches without being seen
+STAG|Deer that might wear a fine rack
+STOP|What a red light tells a driver to do
+SUN|Star that makes a solar panel useful
+SWAN|Long-necked bird that may sail on a park pond
+TAB|Bill a diner might ask to settle
+THY|Possessive before \u201Ckingdom come\u201D
+TIE|What overtime can settle
+TILE|One small part of a mosaic
+TOE|Which part of the foot a dancer might balance on
+TOP|Summit of a hill
+TRANSLATE|Express a sentence in another language
+TREASURES|What a pirate might plot a route to
+TRIAL|Test that may call for a jury
+TRUST|Confidence that someone will come through
+TRY|Give it a shot
+TURNIP|Root vegetable with a purple shoulder, often
+URN|Vessel that may stand on a mantel
+VIE|Compete for the same prize
+WEB|Trap a spider spins
+WED|Make vows together
+WHOLESALE|In bulk, as goods sold to shopkeepers
+YEA|Vote from a supporter
+YEARLY|With a trip around the sun between installments
+YELLOW|Sunflower petal color, often
+YET|Word that leaves room for \u201Ceventually\u201D
+YEW|Evergreen with red cups surrounding its seeds
+`.trim();
+  var monthlyThemes = {
+    "nature/outdoors": "BOG BAY ORE LEE YELLOW WET LAY EWE FLY ROE OWL LOW ELK WEB SKY BEYOND DOE OLD DEW YEW IVY YEARLY TURNIP EMU LIONS INDIA DEER STAG SWAN SEASON ORGANISMS OVA COD ICE ORIGIN GENOME DEN BEAR CRAB ALGA EDGE",
+    "nature/life": "GNU NEURAL AGE EWE SUN LOG ELK SEASON ORGANISMS SWAN OVA GENOME ORIGIN COD EMU DEER STAG YEW",
+    "measurements": "AGE DEGREE INCHES SPECS",
+    "time": "AGE EON NEW NEWEST YEARLY OLD AGO END ERA",
+    "food": "BETTER ROE RYE TEA EGG KEG ALE OVA TURNIP SEA ATE TAB",
+    "gatherings": "AGENDA TEA WED NEW ARTHUR SAT ATE ATTEND OPENED",
+    "reading": "NOVEL SPINE TRANSLATE OPENED ATTEND WHOLESALE EDGAR READER BIOS EDIT THY",
+    "performance": "ACT DREAMS SPY GIG DEDICATED BIOS CUE",
+    "games": "TEE LET EAGLES SEE BAT SET MOVE SLOT NIL RAN TEN TIE VIE",
+    "judgment": "ASSESS SENSE TRUST SLY ASSURE READER",
+    "law": "ARREST CAR CAB TRIAL DENIAL",
+    "visual-art": "BIOS EDIT OILS TILE",
+    "nature/plants": "IVY YEW YELLOW HAY SEDGE SEASON ORGANISMS ALGA",
+    "weather": "DEW YEARLY ICE LEE INCHES",
+    "transport": "CAR CAB STOP IDLE KEY HUB RIDES",
+    "safety": "ALERTS RIDES TRIAL SEDGE",
+    "stories": "ARTHUR ERR SAT TREASURES DENIAL EAR SLY PRY DREAMS ACT SPY",
+    "tools": "KIT AWL KEY RIG PRY",
+    "work": "RUN USE EDIT RETAIL WHOLESALE SLEEVE"
+  };
+
   // src/puzzle.ts
   function extractGrid(rows) {
     const size = rows.length;
@@ -429,13 +613,15 @@ dialog::backdrop{background:#111a13a0}
   }
 
   // src/editions.ts
-  var editions = [
+  var starterEditions = [
     "#PEA#####/#OWL#####/#TEA#####/###SHE###/###KEN###/###ANT###/#####IMP#/#####RUE#/#####EGG#",
     "#FIG#####/#ATE#####/#TAN#####/##LOTUS##/##IMAGE##/##CEDAR##/#####NIB#/#####DAY#/#####ALE#",
     "PEA##ONE#/OWN##FOG#/DEN##FRO#/##ORBIT##/##TOUCH##/##AGREE##/#ATE##APE/#HER##SIR/#ADS##TEA",
     "#LAB#######/#ILL#######/#LOO#######/#YES#######/###SALEM###/###OPERA###/###METAL###/#######LOG#/#######AHA#/#######RIM#/#######DOE#",
     "##BIO######/##ERR######/##TIC######/##ASH######/####ACE####/####ROT####/####DOE####/######RYE##/######NAY##/######ALE##/######LED##"
-  ].map((edition) => edition.split("/"));
+  ];
+  var monthlyStart = starterEditions.length;
+  var editions = [...starterEditions, ...monthlyLayouts].map((edition) => edition.split("/"));
   var editionClues = `
 ACE|Card that can sit high or low|games
 ADO|Much ___ About Nothing|literature
@@ -772,12 +958,20 @@ WRY|Like a remark delivered with an arched eyebrow|speech emotion
   function readClues(book) {
     return new Map(book.split("\n").map((line) => {
       const [answer, clue, tagList] = line.split("|");
-      return [answer, { answer, clue, tags: tagList.split(" ") }];
+      return [answer, { answer, clue, tags: tagList ? tagList.split(" ") : [] }];
     }));
   }
   var entries = readClues(clueBook);
   var authoredEntries = new Map([...entries, ...readClues(editionClues)]);
-  var bankSize = authoredEntries.size;
+  var monthlyEntries = new Map([...authoredEntries, ...readClues(monthlyClues)]);
+  for (const [tag, answers] of Object.entries(monthlyThemes)) {
+    for (const answer of answers.split(" ")) {
+      const entry = monthlyEntries.get(answer);
+      if (!entry) throw new Error(`Unknown answer in monthly theme: ${answer}`);
+      if (!entry.tags.includes(tag)) monthlyEntries.set(answer, { ...entry, tags: [...entry.tags, tag] });
+    }
+  }
+  var bankSize = monthlyEntries.size;
   function legacyPuzzle(day2, scheduledPack, transpose) {
     const daysSinceEpoch = Math.floor(Date.parse(`${day2}T00:00:00Z`) / 864e5);
     const cycle2 = Math.floor(daysSinceEpoch / packs.length);
@@ -802,18 +996,33 @@ WRY|Like a remark delivered with an arched eyebrow|speech emotion
   var dayMs = 864e5;
   var cycleLength = 14;
   var largeDay = 7;
+  var smallEditions = [
+    [0, false],
+    [7, false],
+    [1, true],
+    [11, false],
+    [2, false],
+    [13, false],
+    [3, true],
+    [8, true],
+    [4, false],
+    [12, true],
+    [5, true],
+    [10, false],
+    [6, false],
+    [9, false],
+    [14, false]
+  ];
   var scheduledNine = [
-    ["edition", 0, false],
+    ...smallEditions.map(([index, transpose]) => ["edition", monthlyStart + index, transpose]),
+    ["edition", 0, true],
     ["legacy", 0, false],
     ["edition", 1, false],
     ["legacy", 2, false],
     ["edition", 2, false],
     ["legacy", 4, false],
-    ["edition", 0, true],
     ["legacy", 1, true],
-    ["edition", 1, true],
     ["legacy", 3, true],
-    ["edition", 2, true],
     ["legacy", 5, true],
     ["legacy", 6, false],
     ["legacy", 7, true]
@@ -834,7 +1043,7 @@ WRY|Like a remark delivered with an arched eyebrow|speech emotion
   }
   function puzzleForDay(day2) {
     const choice = scheduledGarden(day2);
-    const puzzle2 = choice?.[0] === "edition" ? authoredPuzzle(choice[1], choice[2], day2, authoredEntries) : legacyPuzzle(day2, choice?.[1], choice?.[2]);
+    const puzzle2 = choice?.[0] === "edition" ? authoredPuzzle(choice[1], choice[2], day2, choice[1] >= monthlyStart ? monthlyEntries : authoredEntries) : legacyPuzzle(day2, choice?.[1], choice?.[2]);
     if (planSeeds(puzzle2).length < 4) throw new Error(`No reachable seeds for ${day2}`);
     return puzzle2;
   }
