@@ -60,6 +60,12 @@
 .device-selection label { font-size: 11px; font-weight: 600; }
 .device-selection select { margin-top: 6px; font-size: 12px; }
 .device-selection .device-close { position: absolute; right: 2px; top: 2px; border: 0; background: transparent!important; width: 44px; font-size: 22px; }
+/* One top bar: the dialog's title and its only close. */
+.flow-workspace dialog .flow-dialog-bar { display: flex; align-items: center; gap: 10px; margin: -8px -8px 0 0; }
+.flow-workspace dialog .flow-dialog-bar h2 { flex: 1; min-width: 0; }
+.flow-workspace dialog .flow-dialog-close { flex: none; display: inline-grid; place-items: center; min-width: 44px; min-height: 44px; padding: 0; border-color: transparent; background: transparent; color: var(--av-text-2, var(--av-muted)); }
+.flow-workspace dialog .flow-dialog-close:hover { color: var(--av-text); border-color: var(--av-line-strong); }
+.flow-workspace dialog .flow-dialog-close svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; }
 .flow-workspace dialog label { display: flex; flex-direction: column; font-size: 12px; font-weight: 600; gap: 7px; margin-top: 16px; }
 @media(min-width:2000px) { .flow-canvas .react-flow__minimap { width: 240px; height: 150px; } }
 @container panel (max-width:979px) { .flow-heading { display: block; } .flow-heading span { display: block; margin-top: 5px; } .flow-route-format { display: none; } }

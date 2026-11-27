@@ -1,5 +1,8 @@
 # Changelog
 
+## November 27, 2026. Add device top bar
+- Signal Flow's Add device and Rename device dialogs have one top bar with the title and a close button. The bottom Cancel button is gone, so the dialog has one close.
+
 ## November 27, 2026. Console guide links
 - The console rail, its search and All apps open Console Spec Guide and the Sync & Signal Field Kit at `/console-guide/` and `/field-kit/`. They had resolved under `/av/` and returned a missing page.
 - Panel cards in All apps, such as Signal Flow on phone, fall back to the console at `/av/` instead of `/av/av/`.
