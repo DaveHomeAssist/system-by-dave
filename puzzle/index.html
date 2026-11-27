@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en" data-theme="light">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-LrEwoZk4Kyn/Lzo2Jre3CTmv1qB/8cJ1gZS2J4EcaFc='; style-src 'unsafe-inline'; img-src 'self' data:; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-irW5B/5mP3y7YJ1CPQdLILcOSNB1pMyF4Jid9hIrRXs='; style-src 'unsafe-inline'; img-src 'self' data:; base-uri 'none'; form-action 'none'">
 <meta name="description" content="Solve the daily garden crossword, grow plants and use wildcard seeds for a nearby clue.">
 <meta name="robots" content="noindex, follow">
 <link rel="canonical" href="https://systembydave.com/puzzle/">
@@ -47,6 +47,9 @@ h1 span{color:var(--accent)}
 .play{min-height:0;display:grid;grid-template-columns:minmax(0,1.5fr) minmax(290px,1fr);gap:var(--gap)}
 .bed{min-height:0;display:grid;grid-template-rows:auto minmax(0,1fr) auto;background:var(--board);color:var(--boardText);border:1px solid #405642;border-radius:18px;padding:12px clamp(12px,1.75vw,24px);gap:8px;box-shadow:0 8px 24px var(--shadow)}
 .bed-top,.bed-foot{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.bed-actions{display:flex;align-items:center;gap:8px;flex-shrink:0}
+#replay{min-height:44px;padding:0 8px;border:1px solid #a8b695;border-radius:7px;background:transparent;color:inherit;font:700 11px var(--sans);white-space:nowrap}
+#replay:hover,#replay:focus-visible{background:#405545}
 .bed-top{font:700 17px var(--serif)}
 .bed-icon{margin-right:5px;color:#dcd89f}
 #completion,#seed-count{font:700 11px var(--sans);color:#e6e8c5}
@@ -202,7 +205,7 @@ dialog::backdrop{background:#111a13a0}
     </div>
     <div class="play">
       <section class="bed" aria-label="Crossword garden">
-        <div class="bed-top"><span><span class="bed-icon" aria-hidden="true">✦</span> Garden bed</span><span id="completion"></span></div>
+        <div class="bed-top"><span><span class="bed-icon" aria-hidden="true">✦</span> <span id="attempt-label">Garden bed</span></span><div class="bed-actions"><span id="completion"></span><button id="replay" hidden>Replay</button></div></div>
         <div class="board-wrap">
           <div class="board" id="board">
             <canvas id="garden" aria-hidden="true"></canvas>
@@ -250,7 +253,7 @@ dialog::backdrop{background:#111a13a0}
       <li>Correct answers bloom automatically. Answers of eight or more letters grow vines that can reveal one letter in a nearby clue. Solve two crossing answers with a shared theme to earn a golden wildcard seed.</li>
       <li>Select a seed in the soil and plant it to reveal one letter in a nearby unsolved clue. The arrows slide it across soil until an edge or obstacle stops it. A move must leave a clue within reach.</li>
     </ol>
-    <p>Use the date arrows to visit other gardens. Progress stays in this browser.</p>
+    <p>Use the date arrows to visit other gardens. Finish a garden to unlock Replay, which saves separately from your original solve. Progress stays in this browser.</p>
     <button class="primary">Back to the garden</button>
   </form>
 </dialog>
@@ -845,6 +848,7 @@ WRY|Like a remark delivered with an arched eyebrow|speech emotion
   var clueNodes = /* @__PURE__ */ new Map();
   var slideDirections = { ArrowUp: "up", ArrowDown: "down", ArrowLeft: "left", ArrowRight: "right" };
   var day = today;
+  var attempt = "original";
   var puzzle;
   var garden;
   var slot;
@@ -853,7 +857,9 @@ WRY|Like a remark delivered with an arched eyebrow|speech emotion
   var clueDirection = "Across";
   var time = 0;
   var availableKinds = /* @__PURE__ */ new Set();
+  var sessionSaves = /* @__PURE__ */ new Map();
   function read(key) {
+    if (sessionSaves.has(key)) return sessionSaves.get(key) ?? null;
     try {
       return localStorage.getItem(key);
     } catch {
@@ -863,10 +869,15 @@ WRY|Like a remark delivered with an arched eyebrow|speech emotion
   function store(key, data) {
     try {
       localStorage.setItem(key, data);
+      sessionSaves.delete(key);
     } catch {
+      sessionSaves.set(key, data);
     }
   }
-  var saveKey = () => `cross-pollinate:v1:${day}`;
+  var originalKey = () => `cross-pollinate:v1:${day}`;
+  var viewKey = () => `${originalKey()}:view`;
+  var replayKey = () => `${originalKey()}:replay`;
+  var saveKey = () => attempt === "replay" ? replayKey() : originalKey();
   function restore() {
     const fresh = newGarden(puzzle);
     try {
@@ -896,6 +907,7 @@ WRY|Like a remark delivered with an arched eyebrow|speech emotion
   }
   function openDay(value) {
     day = value;
+    attempt = read(viewKey()) === "replay" ? "replay" : "original";
     puzzle = puzzleForDay(day);
     garden = restore();
     availableKinds = new Set(puzzle.slots.map((item) => plantKind(item.cells.length)));
@@ -909,7 +921,7 @@ WRY|Like a remark delivered with an arched eyebrow|speech emotion
     text("day-caption", value === today ? "TODAY\u2019S GARDEN" : "FROM THE ARCHIVE");
     text("day-label", new Intl.DateTimeFormat("en-US", { month: "long", day: "numeric", timeZone: "UTC" }).format(/* @__PURE__ */ new Date(`${day}T12:00:00Z`)));
     byId("next").disabled = value >= today;
-    status(garden.solved.length > 1 ? "" : "The center word is planted for you.");
+    status(attempt === "replay" && garden.solved.length === 1 ? "Your original solve is saved. This is a separate replay." : garden.solved.length > 1 ? "" : "The center word is planted for you.");
     buildTiles();
     fillClues();
     update();
@@ -992,6 +1004,10 @@ WRY|Like a remark delivered with an arched eyebrow|speech emotion
   }
   function update() {
     showVineBonus();
+    const replay = byId("replay");
+    replay.hidden = attempt === "original" && garden.solved.length !== puzzle.slots.length;
+    if (!replay.hidden) replay.textContent = attempt === "replay" ? "Original solve" : read(replayKey()) ? "Resume replay" : "Replay";
+    text("attempt-label", attempt === "replay" ? "Garden replay" : "Garden bed");
     const solved = garden.solved.length;
     const won = solved === puzzle.slots.length;
     const active = garden.seeds.filter((seed2) => activeSeed(puzzle, garden, seed2));
@@ -1190,6 +1206,10 @@ WRY|Like a remark delivered with an arched eyebrow|speech emotion
       writeLetter(event.key.toUpperCase());
     }
   });
+  byId("replay").addEventListener("click", () => {
+    store(viewKey(), attempt === "original" ? "replay" : "original");
+    openDay(day);
+  });
   byId("prev").addEventListener("click", () => stepDate(-1));
   byId("next").addEventListener("click", () => stepDate(1));
   byId("next-clue").addEventListener("click", () => cycle(1));
@@ -1217,6 +1237,7 @@ WRY|Like a remark delivered with an arched eyebrow|speech emotion
   hooks.render_game_to_text = () => JSON.stringify({
     mode: garden.solved.length === puzzle.slots.length ? "won" : "playing",
     day,
+    attempt,
     coordinates: "Zero-based cells, row-major from top left",
     grid: garden.ink.map((letter, cell) => puzzle.soil[cell] ? "#" : letter || ".").join("").match(/.{9}/g),
     focus,

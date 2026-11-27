@@ -1,5 +1,9 @@
 # Changelog
 
+## November 27, 2026. Cross-Pollinate replays
+
+- Replay a completed garden with the current clues. Replay progress saves separately so players can return to their original solve.
+
 ## November 26, 2026. Cross-Pollinate clues and vine bonuses
 
 - Revised the starter clues for more challenge without revealing their answers. When a solved long answer grows a vine that reveals a letter, the game identifies the clue that earned it and the clue it helped.
