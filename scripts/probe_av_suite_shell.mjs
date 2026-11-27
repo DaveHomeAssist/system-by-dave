@@ -320,7 +320,7 @@ try {
   // On a full mixed phone workspace, the menu must bring an existing department forward.
   await page.setViewportSize({ width: 375, height: 812 });
   await recallPanel(page, 'Audio Delay');
-  // Add panel opens new panels at 4x4, so four departments no longer fill the grid; replace through the panel's own menu.
+  // Replace through the panel's own menu, so the four departments keep their places on the grid.
   await page.getByRole('button', { name: 'Audio Delay options', exact: true }).click();
   await page.getByRole('menuitem', { name: 'Change panel…' }).click();
   await chooser.getByRole('button', { name: 'Audio', exact: true }).click();

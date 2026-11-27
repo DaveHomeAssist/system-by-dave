@@ -73,7 +73,10 @@ html.avd-locked[data-hp-tab="brief"] #brief { display: grid; }
 
 /* Console */
 .hp-depts { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(224px, 1fr)); gap: var(--space-2); min-width: 0; }
-.hp-depts li { display: flex; align-items: center; gap: var(--space-3); min-height: 64px; padding: 0 var(--space-4); border: 1px solid var(--hairline); border-radius: var(--radius-md); background: var(--surface); }
+.hp-depts li { display: flex; min-width: 0; }
+/* Each department opens that console. The tile is the link, so the whole box is the target. */
+.hp-depts a { box-sizing: border-box; display: flex; flex: 1; align-items: center; gap: var(--space-3); min-height: 64px; padding: 0 var(--space-4); border: 1px solid var(--hairline); border-radius: var(--radius-md); background: var(--surface); color: inherit; text-decoration: none; }
+.hp-depts a:hover { border-color: var(--ink-muted); background: var(--surface-raised); }
 
 /* Brief */
 .hp-brief { margin: 0; width: 100%; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: var(--space-5); border-top: 1px solid var(--hairline); }
@@ -99,18 +102,23 @@ html.avd-locked[data-hp-tab="brief"] #brief { display: grid; }
   .hp-panel { gap: var(--space-5); }
   .hp-fit__note { display: none; }
   .hp-fit__list li { padding: 6px 0; }
-  .hp-depts li { min-height: 52px; }
+  .hp-depts a { min-height: 52px; }
 }
 
-/* The header links fold away before they can crowd the one action; the section rail stays. */
+/* Below 1100px the header links move to their own row under the brand, so Blog, Console,
+   Throwline and PixelForge stay one tap away on every screen (never behind a menu). */
 @media (max-width: 1100px) {
-  .hp-shell .avd-site-header__nav { display: none; }
+  .hp-shell .avd-site-header { flex-wrap: wrap; row-gap: 0; }
+  .hp-shell .avd-site-header__nav { display: flex; order: 3; flex-basis: 100%; justify-content: flex-start; gap: 0; margin: 0 calc(var(--space-3) * -1); }
+  .hp-shell .avd-site-header__link { min-height: 44px; }
 }
 
 /* Phones: one column. The header links fold away (the section rail stays),
    and the one action moves to the bar at the bottom. */
 @media (max-width: 720px) {
-  .hp-shell .avd-site-header { min-height: 52px; padding: var(--space-1) var(--space-4); gap: var(--space-3); }
+  .hp-shell .avd-site-header { min-height: 52px; padding: var(--space-1) var(--space-4); gap: var(--space-3); row-gap: 0; }
+  .hp-shell .avd-site-header__nav { display: flex; justify-content: space-between; margin: 0 calc(var(--space-2) * -1); }
+  .hp-shell .avd-site-header__link { padding: 0 var(--space-2); }
   .hp-wide-only, .hp-wide-cell, .hp-tools__note, .hp-fit .avd-panel__head, .hp-brief__send, .hp-panel-foot { display: none; }
   .hp-split, .hp-split--even { grid-template-columns: minmax(0, 1fr); align-items: start; align-content: start; gap: var(--space-4); }
   .hp-fit, .hp-lines { align-self: start; }
@@ -118,7 +126,7 @@ html.avd-locked[data-hp-tab="brief"] #brief { display: grid; }
   .hp-lead { font-size: 16px; line-height: 24px; }
   .hp-fit__list li { border-bottom: 0; padding: var(--space-1) 0; }
   .hp-depts { display: flex; flex-wrap: wrap; }
-  .hp-depts li { min-height: 36px; padding: 0 10px; }
+  .hp-depts a { min-height: 44px; padding: 0 10px; }
   .hp-depts .avd-icon { display: none; }
   .hp-brief dd { display: none; }
   .hp-brief > div { padding: var(--space-2) 0; }
@@ -143,7 +151,7 @@ html.avd-locked[data-hp-tab="brief"] #brief { display: grid; }
   .hp-actions .avd-btn--quiet { display: none; }
   .hp-tabs .avd-tab { padding: 0 var(--space-1); font-size: 11px; letter-spacing: 0.02em; }
   .hp-depts { gap: 6px; }
-  .hp-depts li { min-height: 30px; padding: 0 var(--space-2); }
+  .hp-depts a { min-height: 44px; padding: 0 var(--space-2); }
   .hp-depts .avd-caps { font-size: 11px; letter-spacing: 0.04em; }
 }
 @media (max-width: 720px) and (max-height: 700px) {
@@ -161,7 +169,7 @@ html.avd-locked[data-hp-tab="brief"] #brief { display: grid; }
   html.avd-locked .hp-lead, html.avd-locked .hp-body { font-size: 14px; line-height: 20px; }
   html.avd-locked .avd-site-header { min-height: 52px; padding-top: var(--space-1); padding-bottom: var(--space-1); }
   html.avd-locked .hp-depts { display: flex; flex-wrap: wrap; }
-  html.avd-locked .hp-depts li { min-height: 44px; padding: 0 var(--space-3); }
+  html.avd-locked .hp-depts a { min-height: 44px; padding: 0 var(--space-3); }
   html.avd-locked .hp-brief dd { display: none; }
   html.avd-locked .hp-brief > div { padding: var(--space-2) 0; }
 }
@@ -169,7 +177,7 @@ html.avd-locked[data-hp-tab="brief"] #brief { display: grid; }
   html.avd-locked .hp-tape, html.avd-locked .hp-brief, html.avd-locked #console .hp-body, html.avd-locked .hp-wide-only { display: none; }
   html.avd-locked .hp-h1 { font-size: 24px; max-width: none; }
   html.avd-locked .hp-h2 { font-size: 20px; line-height: 26px; }
-  html.avd-locked .hp-depts li { min-height: 36px; }
+  html.avd-locked .hp-depts a { min-height: 44px; }
   html.avd-locked .hp-depts .avd-icon { display: none; }
   html.avd-locked .hp-line { padding: 0; }
 }

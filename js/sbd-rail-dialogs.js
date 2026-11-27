@@ -180,6 +180,20 @@
     return element;
   }
 
+  function iconElement(documentRef,paths,className){
+    var svg=typeof documentRef.createElementNS==='function'?documentRef.createElementNS('http://www.w3.org/2000/svg','svg'):documentRef.createElement('svg');
+    svg.setAttribute('viewBox','0 0 24 24');
+    svg.setAttribute('aria-hidden','true');
+    svg.setAttribute('focusable','false');
+    svg.setAttribute('class',className);
+    array(paths).forEach(function(data){
+      var path=typeof documentRef.createElementNS==='function'?documentRef.createElementNS('http://www.w3.org/2000/svg','path'):documentRef.createElement('path');
+      path.setAttribute('d',data);
+      svg.appendChild(path);
+    });
+    return svg;
+  }
+
   function guideEntry(guide){
     return {
       ref:'guide:'+guide.id,
@@ -205,7 +219,7 @@
       return railRuntime().resolveRef((item.kind==='tool'?'tool:':'console:')+item.id,registry);
     }).filter(Boolean);
     featured.forEach(function(entry,index){var item=(registry.featured||[])[index];if(item&&item.blurb&&!entry.description) entry.description=item.blurb;});
-    return [
+    var sections=[
       {id:'featured',label:'Featured',entries:featured},
       {id:'departments',label:'Departments',entries:(menu.departments||[]).map(function(id){return railRuntime().resolveRef('console:'+id,registry);}).filter(Boolean)},
       {id:'tools',label:'Show tools',entries:(menu.showTools||[]).map(function(id){return railRuntime().resolveRef(id.indexOf(':')===-1?'tool:'+id:id,registry);}).filter(Boolean)},
@@ -213,6 +227,12 @@
       {id:'learn',label:'Learn',entries:(menu.learn||[]).map(function(id){var guide=registry.guideById?registry.guideById(id):null;return guide?guideEntry(guide):null;}).filter(Boolean)},
       {id:'other',label:'Other apps',entries:(menu.otherTools||[]).map(function(id){return railRuntime().resolveRef('tool:'+id,registry);}).filter(Boolean).concat(array(registry.externals).map(function(item){return railRuntime().resolveRef('external:'+item.id,registry);}).filter(Boolean))}
     ];
+    /* Other apps lists only what no earlier group already shows, so an app such
+       as Rehearsal Capture (Show tools) appears once. */
+    var listed={};
+    sections.slice(0,-1).forEach(function(section){section.entries.forEach(function(entry){listed[entry.ref]=true;});});
+    sections[sections.length-1].entries=sections[sections.length-1].entries.filter(function(entry){if(listed[entry.ref]) return false;listed[entry.ref]=true;return true;});
+    return sections;
   }
 
   function pinnableCatalog(registry){
@@ -261,7 +281,8 @@
     close.type='button';
     close.className='sbd-rail-dialog__close';
     close.setAttribute('aria-label','Close '+title);
-    close.textContent='Close';
+    close.setAttribute('title','Close');
+    close.appendChild(iconElement(documentRef,['M6 6l12 12','M18 6 6 18'],'sbd-rail-dialog__close-icon'));
     header.appendChild(heading);
     header.appendChild(close);
 
@@ -316,6 +337,8 @@
     });
     return {
       dialog:dialog,
+      header:header,
+      heading:heading,
       body:body,
       status:status,
       show:show,
@@ -397,6 +420,7 @@
         card.setAttribute('role','note');
         card.setAttribute('aria-label',entry.label+'. '+entryType(entry)+'.');
       }
+      if(array(entry.icon).length) card.appendChild(iconElement(documentRef,entry.icon,'sbd-rail-dialog__card-icon'));
       card.appendChild(textElement(documentRef,'strong','sbd-rail-dialog__card-title',entry.label));
       card.appendChild(textElement(documentRef,'span','sbd-rail-dialog__type',entry.description||(entry.source&&(entry.source.desc||entry.source.blurb))||entryType(entry)));
       if(entry.badge) card.appendChild(textElement(documentRef,'span','sbd-rail-dialog__badge',entry.badge));
@@ -430,7 +454,10 @@
           searchList.appendChild(row);
         });
       });
-      fragment.push(search,searchList);
+      /* Search sits in the dialog's top bar beside the title and close, as in Add panel. */
+      search.className+=' sbd-rail-dialog__search--bar';
+      allApps.header.replaceChildren(allApps.heading,search,allApps.closeButton);
+      fragment.push(searchList);
       if(phone){
         var chips=documentRef.createElement('div');
         chips.className='sbd-rail-dialog__chips';

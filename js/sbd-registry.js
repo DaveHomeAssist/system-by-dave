@@ -399,7 +399,7 @@
 
   root.SBD_REGISTRY={
     /* Bump on any registry/tool asset change — rolls the service-worker cache. */
-    version:'v20261126-console-links',
+    version:'v20261127-console-polish',
     phases:PHASES,
     tools:TOOLS,
     recommended:RECOMMENDED,

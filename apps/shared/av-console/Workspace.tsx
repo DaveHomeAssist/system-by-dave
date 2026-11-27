@@ -11,8 +11,10 @@ import { clone, COLS, deleteView, findSpace, firstFree, fits, nudge, Panel, Pane
 export type Mode = "phone" | "tablet" | "desktop";
 export type PanelRender = { body: ReactNode; context?: string; title?: string; actions?: ReactNode };
 type Chooser = { mode: "add" | "replace" | "nospace"; rect?: Rect; panelId?: string; left: number; top: number; auto?: boolean };
-/* A new panel from "Add panel" opens at this size (or its own minimum, if larger) in the first free spot. */
-const ADD_SIZE = { w: 4, h: 4 };
+/* A new panel from "Add panel" takes the largest of these sizes (each raised to the panel's own
+   minimum) that fits in a free spot: half the workspace when it is empty, so the panel is big enough
+   to use and to split, then a quarter, then the old 4x4 tile, then its minimum. */
+const ADD_SIZES = [{ w: 6, h: 8 }, { w: 6, h: 4 }, { w: 4, h: 4 }];
 type Menu = { kind: "panel" | "view"; id: string; left: number; top: number; sub?: "move" | "rename" };
 type Drag = { id: string; kind: "move" | "resize"; px: number; py: number; orig: Panel; rect?: Rect; valid?: boolean };
 
@@ -212,7 +214,8 @@ export function ConsoleWorkspace({ ws, label, quick, render, onViewsChange, noti
     if (existing) { ws.setFocus(existing.id); notify(`${d?.name || type} is already open in this view. It now has focus.`); close(); return; }
     if (!c.rect) return;
     const minW = d?.minW || 1, minH = d?.minH || 1;
-    const sized = c.auto ? findSpace(panels, { w: Math.min(COLS, Math.max(minW, ADD_SIZE.w)), h: Math.min(ROWS, Math.max(minH, ADD_SIZE.h)) }) || findSpace(panels, { w: Math.min(COLS, minW), h: Math.min(ROWS, minH) }) : null;
+    const sizes = [...ADD_SIZES.map(z => ({ w: Math.min(COLS, Math.max(minW, z.w)), h: Math.min(ROWS, Math.max(minH, z.h)) })), { w: Math.min(COLS, minW), h: Math.min(ROWS, minH) }];
+    const sized = c.auto ? sizes.reduce<Rect | null>((found, z) => found || findSpace(panels, z), null) : null;
     const rect = sized || { ...c.rect, w: Math.max(c.rect.w, Math.min(d?.minW || 1, COLS - c.rect.x)), h: Math.max(c.rect.h, Math.min(d?.minH || 1, ROWS - c.rect.y)) };
     const target = fits(rect, panels) ? rect : c.rect;
     const id = `p-${uid()}`; splitUndo.current = null;
