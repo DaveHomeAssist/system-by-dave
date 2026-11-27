@@ -27,6 +27,7 @@ const state = {
   drafts: new Map(),
   get dirty() { return this.drafts.size > 0; },
   presets: [],
+  coordinator: null,
 };
 const uuid = () => crypto.randomUUID();
 const path = (suffix) => '/projects/' + state.project.id + suffix;
@@ -163,9 +164,10 @@ async function dashboard() {
   const w =
     data.workers.find((x) => x.online && x.profiles.length) || data.workers.find((x) => x.online);
   state.worker = w;
+  state.coordinator = data.coordinator;
   $('pause-worker').disabled = !w;
   $('pause-worker').textContent = w?.paused ? 'Resume worker' : 'Pause worker';
-  $('worker').textContent = w
+  const workerText = w
     ? w.paused
       ? 'Walter paused'
       : w.engine === 'Local engine offline'
@@ -174,6 +176,15 @@ async function dashboard() {
           ? 'Walter rendering'
           : 'Walter online'
     : 'Walter offline';
+  $('worker').textContent = data.coordinator?.online ? workerText : 'Dominic unavailable';
+  $('computers').classList.toggle('offline', !data.coordinator?.online || !w);
+  $('computer-local-state').textContent = 'Connected to the private Studio';
+  $('computer-dominic-state').textContent = data.coordinator?.online
+    ? 'Project source online'
+    : 'Project source unavailable';
+  $('computer-walter-state').textContent = workerText;
+  $('computer-dominic').classList.toggle('offline', !data.coordinator?.online);
+  $('computer-walter').classList.toggle('offline', !w);
   $('pending').textContent = data.pending;
   if (changed || !$('project-grid').childElementCount) projectCards();
 }
@@ -919,6 +930,11 @@ act($('theme'), () => {
   document.documentElement.dataset.theme = dark ? 'dark' : 'light';
   $('theme').textContent = dark ? 'Light' : 'Dark';
   remember('envision.personal.theme', dark ? 'dark' : 'light');
+});
+act($('computers'), () => $('computers-dialog').showModal());
+act($('computers-close'), () => $('computers-dialog').close());
+$('computers-dialog').addEventListener('click', (event) => {
+  if (event.target === $('computers-dialog')) $('computers-dialog').close();
 });
 if (recall('envision.personal.theme') === 'dark') $('theme').click();
 let searchTimer;

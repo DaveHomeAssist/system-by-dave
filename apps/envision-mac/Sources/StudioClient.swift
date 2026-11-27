@@ -38,7 +38,7 @@ private final class SameOrigin: NSObject, URLSessionTaskDelegate {
     }
 }
 
-struct ProjectRow: Decodable, Identifiable {
+struct ProjectRow: Codable, Identifiable {
     let id: String
     let name: String
     let kind: String

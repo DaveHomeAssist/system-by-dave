@@ -85,10 +85,95 @@ header {
   transform: rotate(-17deg);
 }
 #worker {
-  margin-left: auto;
   color: var(--signal);
   font-size: 13px;
   font-weight: 650;
+}
+.machine-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+  min-height: 38px;
+  padding-inline: 11px;
+  border-color: color-mix(in srgb, var(--line) 76%, var(--accent));
+  background: color-mix(in srgb, var(--surface) 88%, var(--accent) 12%);
+}
+.status-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #2f8f65;
+  box-shadow: 0 0 0 3px color-mix(in srgb, #2f8f65 18%, transparent);
+}
+.machine-trigger.offline .status-dot {
+  background: #b45b35;
+  box-shadow: 0 0 0 3px color-mix(in srgb, #b45b35 18%, transparent);
+}
+.machine-trigger.offline #worker {
+  color: #a94f2b;
+}
+:root[data-theme='dark'] .machine-trigger.offline #worker {
+  color: #f0a17e;
+}
+.computer-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+.computer-heading h2 {
+  margin: 2px 0 0;
+}
+#computers-dialog {
+  width: min(816px, calc(100vw - 32px));
+}
+.machine-route {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 18px;
+}
+.machine-card {
+  position: relative;
+  min-height: 128px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  overflow: hidden;
+}
+.machine-card::after {
+  content: '';
+  position: absolute;
+  inset: auto 14px 13px;
+  height: 2px;
+  background: #2f8f65;
+  opacity: .78;
+}
+.machine-card.offline::after {
+  background: #b45b35;
+}
+.machine-card b {
+  display: block;
+  margin-top: 18px;
+  font-size: 16px;
+}
+.machine-card p {
+  margin: 5px 0 16px;
+  color: var(--muted);
+  line-height: 1.35;
+}
+.machine-index {
+  color: var(--muted);
+  font: 700 11px/1 ui-monospace, SFMono-Regular, Menlo, monospace;
+  letter-spacing: .12em;
+}
+.machine-note {
+  max-width: 61ch;
+  margin: 16px 0 0;
+  color: var(--muted);
+  line-height: 1.45;
 }
 nav {
   gap: 4px;
@@ -842,6 +927,20 @@ dialog::backdrop {
   }
   header button {
     padding: 5px;
+  }
+  .machine-trigger {
+    max-width: 186px;
+  }
+  .machine-trigger #worker {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .machine-route {
+    grid-template-columns: 1fr;
+  }
+  .machine-card {
+    min-height: 101px;
   }
   .brand i {
     width: 17px;

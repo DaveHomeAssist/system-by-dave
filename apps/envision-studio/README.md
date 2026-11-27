@@ -4,6 +4,8 @@ Envision runs image generation on a Windows GPU and keeps projects, revisions, p
 
 On Apple Silicon, the standalone app opens on image generation and offers native PNG export and offline image comparison. [Envision Studio for Mac](../envision-mac/README.md).
 
+Open **Computers** in the header to see the active route. The current device connects to Dominic, which owns project and revision data. Walter is the image runner. The panel reports availability without exposing either machine's private address.
+
 ## Choosing and saving an image direction
 
 On **Create**, type an image direction or open **Recall direction**. Choose a sample rendered on Walter, the saved project direction, or the selected artwork's prompt. A blank canvas also opens the examples. Edit the wording and choose **Save direction** to keep it with the project, or **Generate on Walter** to render it.
@@ -105,6 +107,7 @@ The installer keeps the previous container for rollback and restores it automati
 - Run `node probe-briefs.cjs` with Playwright and Chromium against the public kit. Set `ENVISION_PUBLIC_BASE` to the site's origin and optionally set `ENVISION_BRIEF_EVIDENCE` to an existing screenshot directory. The probe uses temporary browser storage for image, revision and saved flyer examples.
 - Run `node probe-create-directions.cjs` with `ENVISION_ORIGIN` set to a disposable loopback coordinator. It creates fixture projects and checks draft recovery, a competing save, browser history and a lost render acknowledgement. Chromium covers 320, 375, 680 and 1440 CSS pixels. WebKit covers 375. Set `ENVISION_EVIDENCE` to an existing screenshot directory to keep the picker views.
 - Run `node probe-web-export.cjs` with `ENVISION_ORIGIN` and `ENVISION_REVIEW_PROJECT` pointing to a disposable coordinator and a project with two or more images. It checks framing changes, retry, keyboard dismissal, file naming, byte identity and project preservation.
+- Run `node probe-computers.cjs` against a disposable coordinator. It checks the authority copy, keyboard close and viewport containment at 1440 × 900 and 375 × 812.
 - The pilot has one SDXL Turbo profile, one active job per GPU worker, five native sizes and batches of up to four. Outputs use source dimensions, feed 1080 × 1350, story 1080 × 1920, lobby 1920 × 1080 or a custom canvas up to 4096 px per side. Export dimensions can exceed native generation dimensions.
 - New images and revisions use the model's Turbo noise schedule. Update the Windows worker when updating the coordinator. The queue assigns each job to a worker supporting its recorded workflow. [ComfyUI SDXL Turbo example](https://comfyanonymous.github.io/ComfyUI_examples/sdturbo/)
 - The studio samples device-wide GPU memory. The engine receipt includes its version, model checksum, workflow digest, seed, engine execution time, queue wait and total elapsed. A hardware reboot or model change needs its own timing and recovery check.

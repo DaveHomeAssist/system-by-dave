@@ -23,8 +23,9 @@
     <a class="skip" href="#workspace">Skip to workspace</a>
     <header>
       <a class="brand" href="/" aria-label="Envision home"><i aria-hidden="true"></i>Envision</a>
-      <span id="worker">Checking Walter</span
-      ><button id="theme" aria-label="Switch theme">Dark</button>
+      <button id="computers" class="machine-trigger" aria-haspopup="dialog">
+        <span class="status-dot" aria-hidden="true"></span><span id="worker">Checking computers</span>
+      </button><button id="theme" aria-label="Switch theme">Dark</button>
     </header>
     <nav aria-label="Studio">
       <button data-tab="projects" aria-current="page">Projects</button
@@ -374,6 +375,27 @@
       </section>
     </main>
     <footer><span id="message" role="status" aria-live="polite">Opening studio…</span></footer>
+    <dialog id="computers-dialog" aria-labelledby="computers-title">
+      <div class="computer-heading">
+        <div><p class="eyebrow">Workspace route</p><h2 id="computers-title">Computers</h2></div>
+        <button type="button" id="computers-close">Close</button>
+      </div>
+      <div class="machine-route" aria-label="Envision computer route">
+        <section class="machine-card" id="computer-local">
+          <span class="machine-index" aria-hidden="true">01</span>
+          <div><b>This computer</b><p id="computer-local-state">Connected to the private Studio</p></div>
+        </section>
+        <section class="machine-card" id="computer-dominic">
+          <span class="machine-index" aria-hidden="true">02</span>
+          <div><b>Dominic</b><p id="computer-dominic-state">Checking project source</p></div>
+        </section>
+        <section class="machine-card" id="computer-walter">
+          <span class="machine-index" aria-hidden="true">03</span>
+          <div><b>Walter</b><p id="computer-walter-state">Checking image runner</p></div>
+        </section>
+      </div>
+      <p class="machine-note">Projects and revisions stay on Dominic. Walter renders images. Envision for Mac can keep chosen projects and artwork available offline.</p>
+    </dialog>
     <dialog id="proof-dialog" aria-labelledby="proof-label">
       <div class="proof-heading">
         <h2 id="proof-label"></h2>

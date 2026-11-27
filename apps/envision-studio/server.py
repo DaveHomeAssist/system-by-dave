@@ -293,7 +293,12 @@ def create_app(root, owner, worker_key, origin):
             pending = c.execute(
                 "SELECT count(*) FROM jobs WHERE state IN ('running','queued')"
             ).fetchone()[0]
-        return jsonify(projects=projects, workers=workers, pending=pending)
+        return jsonify(
+            projects=projects,
+            workers=workers,
+            pending=pending,
+            coordinator={"id": "dominic", "name": "Dominic", "online": True, "role": "Project source"},
+        )
 
     @app.post(BASE + "/projects")
     def create():

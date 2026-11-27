@@ -1,5 +1,10 @@
 # Changelog
 
+## November 27, 2026. Envision cross device workspace
+
+- The private Studio shows the route from the current computer through Dominic to Walter, with project-source and image-runner states in one keyboard-accessible panel.
+- Envision Studio 1.1.0 for Mac can keep chosen projects and their selected artwork in a private, read-only offline cache. Cached projects remain visible when Dominic is unavailable and refresh after reconnection.
+
 ## November 27, 2026. Console white gaffer palette and light toggle
 - The AV by Dave console uses the white gaffer look in all four palettes: black, paint pen white and aluminum gray from the AV by Dave tokens (Gaffer dark, Call Sheet light). The AV badge, primary buttons, selected rail entries and panel outlines use the ink color instead of rust or orange. Status colors are unchanged.
 - A sun and moon button beside Menu switches light and dark in one tap. White and Black swap with each other, and Follow system stays in Menu > Appearance. The choice is the shared `av-theme-mode.v1`, so the homepage follows it.

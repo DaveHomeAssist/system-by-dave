@@ -32,6 +32,7 @@ struct PromptReplacement: Identifiable {
 @MainActor final class Workspace: ObservableObject {
     static let shared = Workspace()
     private let defaults: UserDefaults
+    private let offlineCache: OfflineProjectCache
     @Published private(set) var client: StudioClient?
     @Published var area: WorkArea = .generate
     @Published var connectionSheet = false
@@ -46,6 +47,8 @@ struct PromptReplacement: Identifiable {
     @Published var jobs: [Job] = []
     @Published var workerStatus = "Connecting"
     @Published var reachable = false
+    @Published private(set) var offlineProjectIDs = Set<String>()
+    @Published private(set) var usingOfflineCopy = false
     @Published var busy = false
     @Published var notice = ""
     @Published var issue: String?
@@ -56,9 +59,13 @@ struct PromptReplacement: Identifiable {
     private var restoringDraft = false
     private var lastResult: String?
 
-    init(defaults: UserDefaults = .standard, comparisonStorage: ComparisonStorage = .onThisMac) {
+    init(defaults: UserDefaults = .standard, comparisonStorage: ComparisonStorage = .onThisMac,
+         offlineCache: OfflineProjectCache = .onThisMac) {
         self.defaults = defaults
+        self.offlineCache = offlineCache
         comparison = Comparison(defaults: defaults, storage: comparisonStorage)
+        offlineProjectIDs = offlineCache.ids()
+        projects = offlineCache.rows()
         if let saved = defaults.string(forKey: "StudioOrigin"), let origin = try? StudioOrigin(saved) {
             activate(origin)
         } else {
@@ -70,6 +77,8 @@ struct PromptReplacement: Identifiable {
     var selected: Artwork? { artworks.first { $0.id == selectedID } }
     var projectJobs: [Job] { jobs.filter { $0.project == projectID } }
     var pendingCount: Int { projectJobs.filter(\.pending).count }
+    var activeProjectIsOffline: Bool { offlineProjectIDs.contains(projectID) }
+    var offlineProjectCount: Int { offlineProjectIDs.count }
     private var lastProjectKey: String { "project:" + (client?.origin.url.absoluteString ?? "") }
     private var draftKey: String { lastProjectKey + ":draft:" + projectID }
 
@@ -101,7 +110,8 @@ struct PromptReplacement: Identifiable {
         client = StudioClient(origin)
         reachable = false
         workerStatus = "Connecting"
-        projects = []
+        offlineProjectIDs = offlineCache.ids()
+        projects = offlineCache.rows()
         jobs = []
         artworks = []
         projectBrief = ""
@@ -109,11 +119,13 @@ struct PromptReplacement: Identifiable {
         selectedID = ""
         studioURL = nil
         lastResult = nil
+        usingOfflineCopy = false
         projectID = defaults.string(forKey: lastProjectKey) ?? ""
         if let firstConnectionDraft, defaults.data(forKey: draftKey) == nil {
             draft = firstConnectionDraft
             defaults.removeObject(forKey: "project::draft:")
         } else { restoreDraft() }
+        loadOfflineProject(projectID)
     }
     func connect(_ address: String) async {
         do {
@@ -142,6 +154,7 @@ struct PromptReplacement: Identifiable {
             draft = unassigned
             defaults.removeObject(forKey: lastProjectKey + ":draft:")
         } else { restoreDraft() }
+        loadOfflineProject(id)
         Task { await refreshArt() }
     }
     func refresh() async {
@@ -154,9 +167,11 @@ struct PromptReplacement: Identifiable {
             let recent: [Job] = try await api.read("jobs")
             guard api === client, requestedProject == projectID, !busy, !Task.isCancelled else { return }
             projects = state.projects.filter { !$0.archived }
+            offlineProjectIDs = offlineCache.ids()
             jobs = recent
             if workerStatus == "Dominic unavailable" { notice = "" }
             reachable = true
+            usingOfflineCopy = false
             let workers = state.workers.filter { $0.online && ($0.profiles ?? []).contains("sdxl-turbo-local") && ($0.workflows ?? ["turbo-v1"]).contains("turbo-v2") }
             if workers.isEmpty { workerStatus = "Walter offline · jobs wait" }
             else if workers.allSatisfy({ $0.paused == true }) { workerStatus = "Walter paused" }
@@ -168,7 +183,12 @@ struct PromptReplacement: Identifiable {
             guard api === client, !Task.isCancelled else { return }
             reachable = false
             workerStatus = "Dominic unavailable"
-            notice = "Check Tailscale and the studio address. Your prompt is saved on this Mac."
+            projects = offlineCache.rows()
+            offlineProjectIDs = offlineCache.ids()
+            loadOfflineProject(projectID)
+            notice = offlineProjectIDs.isEmpty
+                ? "Check Tailscale and the studio address. Your prompt is saved on this Mac."
+                : "Dominic is unavailable. Showing read-only projects kept on this Mac."
         }
     }
     func refreshArt() async {
@@ -187,8 +207,76 @@ struct PromptReplacement: Identifiable {
                 selectedID = artworks.first?.id ?? ""
             }
             lastResult = result
+            usingOfflineCopy = false
+            if offlineProjectIDs.contains(id) { await refreshOfflineCopy(api: api, project: id) }
         } catch {
-            if api === client && id == projectID && !Task.isCancelled { notice = "Could not refresh the artwork. \(error.localizedDescription)" }
+            if api === client && id == projectID && !Task.isCancelled {
+                if !loadOfflineProject(id) { notice = "Could not refresh the artwork. \(error.localizedDescription)" }
+            }
+        }
+    }
+
+    @discardableResult private func loadOfflineProject(_ id: String) -> Bool {
+        guard !id.isEmpty, let cached = offlineCache.snapshot(id) else { return false }
+        projectBrief = cached.0.data?.brief ?? ""
+        artworks = cached.0.versions
+        selectedID = cached.0.versions.contains(where: { $0.id == cached.1 })
+            ? cached.1 : (cached.0.versions.first?.id ?? "")
+        usingOfflineCopy = true
+        return true
+    }
+    func cachedArtwork(_ art: Artwork) -> Data? {
+        offlineCache.artwork(project: projectID, hash: art.hash)
+    }
+    func selectArtwork(_ id: String) {
+        guard artworks.contains(where: { $0.id == id }) else { return }
+        selectedID = id
+        if offlineProjectIDs.contains(projectID), let api = client, reachable {
+            Task { await refreshOfflineCopy(api: api, project: projectID) }
+        }
+    }
+    func toggleOfflineProject() async {
+        guard let project = activeProject, !busy else { return }
+        if offlineProjectIDs.contains(project.id) {
+            do {
+                try offlineCache.remove(project.id)
+                offlineProjectIDs = offlineCache.ids()
+                notice = "Removed the offline copy from this Mac."
+                if usingOfflineCopy {
+                    projects.removeAll { $0.id == project.id }
+                    chooseProject("")
+                }
+            } catch { issue = "Could not remove the offline copy. \(error.localizedDescription)" }
+            return
+        }
+        guard let api = client, reachable, let selected else {
+            issue = "Connect to Dominic and choose artwork before keeping this project offline."
+            return
+        }
+        busy = true
+        defer { busy = false }
+        do {
+            let bytes = try await api.image(project: project.id, artwork: selected)
+            try offlineCache.save(project: project, brief: projectBrief, artworks: artworks,
+                                  selected: selected, bytes: bytes)
+            offlineProjectIDs = offlineCache.ids()
+            notice = "Kept \(project.name) and \(selected.label) offline on this Mac."
+        } catch { issue = "Could not keep the project offline. \(error.localizedDescription)" }
+    }
+    private func refreshOfflineCopy(api: StudioClient, project id: String) async {
+        guard api === client, id == projectID, let project = activeProject, let selected else { return }
+        do {
+            let bytes: Data
+            if let stored = offlineCache.artwork(project: id, hash: selected.hash) { bytes = stored }
+            else { bytes = try await api.image(project: id, artwork: selected) }
+            guard api === client, id == projectID, offlineProjectIDs.contains(id), !Task.isCancelled else { return }
+            try offlineCache.save(project: project, brief: projectBrief, artworks: artworks,
+                                  selected: selected, bytes: bytes)
+            offlineProjectIDs = offlineCache.ids()
+        } catch {
+            if api === client && id == projectID && !Task.isCancelled {
+                notice = "The live project opened, but its offline copy could not refresh."
+            }
         }
     }
     func createProject(_ name: String) async {

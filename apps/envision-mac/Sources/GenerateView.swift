@@ -2,9 +2,10 @@ import AppKit
 import SwiftUI
 
 struct NetworkArtwork: View {
-    let api: StudioClient
+    let api: StudioClient?
     let project: String
     let art: Artwork
+    let cached: Data?
     var thumbnail = false
     @ViewState private var pixels: NSImage?
     @ViewState private var failed = false
@@ -16,16 +17,41 @@ struct NetworkArtwork: View {
                 Label("Preview unavailable", systemImage: "photo").foregroundStyle(.secondary)
             } else { ProgressView().controlSize(.small) }
         }
-        .task(id: "\(api.origin.url)|\(project)|\(art.hash)|\(thumbnail)") {
+        .task(id: "\(api?.origin.url.absoluteString ?? "offline")|\(project)|\(art.hash)|\(thumbnail)|\(cached?.count ?? 0)") {
             pixels = nil
             failed = false
             do {
-                let data = try await api.image(project: project, artwork: art, thumbnail: thumbnail)
+                let data: Data
+                if let cached { data = cached }
+                else if let api { data = try await api.image(project: project, artwork: art, thumbnail: thumbnail) }
+                else { throw StudioError("Artwork is not stored on this Mac.") }
                 guard !Task.isCancelled else { return }
                 pixels = NSImage(data: data)
                 failed = pixels == nil
             } catch { if !Task.isCancelled { failed = true } }
         }
+    }
+}
+
+private struct ComputerRouteStrip: View {
+    @ObservedObject var model: Workspace
+    var body: some View {
+        HStack(spacing: 7) {
+            route("This Mac", model.offlineProjectCount == 1 ? "1 offline project" : "\(model.offlineProjectCount) offline projects", "laptopcomputer", true)
+            route("Dominic", model.reachable ? "Project source online" : "Project source unavailable", "externaldrive.connected.to.line.below", model.reachable)
+            route("Walter", model.workerStatus.replacingOccurrences(of: "Walter ", with: ""), "cpu", model.workerStatus == "Walter ready" || model.workerStatus == "Walter rendering")
+        }.accessibilityElement(children: .contain)
+    }
+    private func route(_ name: String, _ detail: String, _ icon: String, _ online: Bool) -> some View {
+        HStack(spacing: 7) {
+            Image(systemName: icon).foregroundStyle(online ? Color.accentColor : Color.secondary)
+            VStack(alignment: .leading, spacing: 1) {
+                Text(name).font(.caption.bold())
+                Text(detail).font(.caption2).foregroundStyle(.secondary).lineLimit(1)
+            }
+        }.padding(.horizontal, 9).padding(.vertical, 7)
+            .background(Color(nsColor: .controlBackgroundColor), in: RoundedRectangle(cornerRadius: 7))
+            .overlay(RoundedRectangle(cornerRadius: 7).strokeBorder(Color.secondary.opacity(0.22)))
     }
 }
 
@@ -50,6 +76,7 @@ struct GenerateView: View {
                     .font(.callout).foregroundStyle(.secondary)
                 Button("Queue") { model.showStudio("queue") }
             }
+            ComputerRouteStrip(model: model)
             HSplitView {
                 ScrollView {
                     VStack(alignment: .leading, spacing: 16) {
@@ -61,6 +88,17 @@ struct GenerateView: View {
                                     ForEach(model.projects) { project in Text(project.name).tag(project.id) }
                                 }.labelsHidden()
                                 Button("New…") { model.newProjectSheet = true }.disabled(!model.reachable)
+                            }
+                            if model.activeProject != nil {
+                                HStack {
+                                    Button(model.activeProjectIsOffline ? "Remove offline copy" : "Keep offline") {
+                                        Task { await model.toggleOfflineProject() }
+                                    }.disabled(model.busy || (!model.activeProjectIsOffline && (!model.reachable || model.selected == nil)))
+                                    if model.usingOfflineCopy {
+                                        Label("Read-only offline copy", systemImage: "externaldrive")
+                                            .font(.caption).foregroundStyle(.secondary)
+                                    }
+                                }
                             }
                         }
                         VStack(alignment: .leading, spacing: 6) {
@@ -172,8 +210,9 @@ struct GenerateView: View {
                     }
                     ZStack {
                         RoundedRectangle(cornerRadius: 9).fill(Color(nsColor: .underPageBackgroundColor))
-                        if let art = model.selected, let api = model.client {
-                            NetworkArtwork(api: api, project: model.projectID, art: art).padding(8)
+                        if let art = model.selected {
+                            NetworkArtwork(api: model.reachable ? model.client : nil, project: model.projectID,
+                                           art: art, cached: model.cachedArtwork(art)).padding(8)
                         } else if let sample = Self.sample {
                             Image(nsImage: sample).resizable().scaledToFit().accessibilityLabel("Refraction study, generated on Walter")
                         } else { Image(systemName: "camera.aperture").font(.system(size: 64)).foregroundStyle(.secondary) }
@@ -197,14 +236,15 @@ struct GenerateView: View {
                     } else {
                         Text("Refraction study · Generated on Walter").font(.caption).foregroundStyle(.secondary)
                     }
-                    if model.artworks.count > 1, let api = model.client {
+                    if model.artworks.count > 1 {
                         ScrollView(.horizontal) {
                             HStack(spacing: 7) {
                                 ForEach(model.artworks.prefix(24)) { art in
                                     Button {
-                                        model.selectedID = art.id
+                                        model.selectArtwork(art.id)
                                     } label: {
-                                        NetworkArtwork(api: api, project: model.projectID, art: art, thumbnail: true)
+                                        NetworkArtwork(api: model.reachable ? model.client : nil, project: model.projectID,
+                                                       art: art, cached: model.cachedArtwork(art), thumbnail: true)
                                             .frame(width: 68, height: 56).padding(3)
                                             .overlay(RoundedRectangle(cornerRadius: 5).strokeBorder(model.selectedID == art.id ? Color.accentColor : Color.secondary.opacity(0.3), lineWidth: model.selectedID == art.id ? 2 : 1))
                                     }.buttonStyle(.plain).accessibilityLabel("Select \(art.label)").help(art.label)
