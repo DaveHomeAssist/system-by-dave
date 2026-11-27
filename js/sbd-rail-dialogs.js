@@ -230,6 +230,7 @@
     /* Other apps lists only what no earlier group already shows, so an app such
        as Rehearsal Capture (Show tools) appears once. */
     var listed={};
+    array(menu.hiddenFromAllApps).forEach(function(ref){listed[ref]=true;});
     sections.slice(0,-1).forEach(function(section){section.entries.forEach(function(entry){listed[entry.ref]=true;});});
     sections[sections.length-1].entries=sections[sections.length-1].entries.filter(function(entry){if(listed[entry.ref]) return false;listed[entry.ref]=true;return true;});
     return sections;

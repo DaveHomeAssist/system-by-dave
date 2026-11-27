@@ -355,7 +355,10 @@
       {kind:'tool',id:'gear-reference',blurb:'Offline field sheets'}
     ],
     learn:['frame-sync','fault-finding','field-kit'],
-    otherTools:['ontrack']
+    otherTools:[],
+    /* Dave asked (Nov 27) to keep these out of All apps; they stay pinnable
+       from Customize and reachable by their own links. */
+    hiddenFromAllApps:['tool:ontrack','external:housevideo']
   };
   var RECENT_KEY='sbd.avSuite.recent.v1';
 
@@ -399,7 +402,7 @@
 
   root.SBD_REGISTRY={
     /* Bump on any registry/tool asset change — rolls the service-worker cache. */
-    version:'v20261127-console-polish',
+    version:'v20261127-all-apps-trim',
     phases:PHASES,
     tools:TOOLS,
     recommended:RECOMMENDED,
