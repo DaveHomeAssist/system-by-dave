@@ -1,5 +1,9 @@
 # Changelog
 
+## November 27, 2026. OnTrack keyboard navigation
+
+- Added a first-focus skip link and keyboard navigation between Library, Sets, Debrief and Data, with a visible focus indicator and an announced selected tab.
+
 ## November 27, 2026. OnTrack and House Video out of All apps
 
 - The console's All apps dialog no longer lists OnTrack or House Video / FMP. Both stay in the registry, can still be pinned from Customize, and keep their own links.
