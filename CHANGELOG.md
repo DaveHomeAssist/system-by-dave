@@ -1,5 +1,10 @@
 # Changelog
 
+## November 27, 2026. Console guide links
+- The console rail, its search and All apps open Console Spec Guide and the Sync & Signal Field Kit at `/console-guide/` and `/field-kit/`. They had resolved under `/av/` and returned a missing page.
+- Panel cards in All apps, such as Signal Flow on phone, fall back to the console at `/av/` instead of `/av/av/`.
+- The console registry generation is `v20261126-console-links`, so offline copies pick up the change.
+
 ## November 27, 2026. Cross-Pollinate four-week rotation
 
 - Adds 15 original 9×9 crosswords. The daily calendar now runs for 28 days before a filled grid repeats, with 26 small puzzles and two 11×11 editions.

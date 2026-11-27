@@ -574,7 +574,7 @@
           if(hit.kind==='panel'&&typeof options.onOpenPanel==='function'){options.onOpenPanel(hit.type);return;}
           if(hit.kind==='guide'&&hit.href){
             if(hit.external) root.open?root.open(hit.href,'_blank','noopener'):(root.location.href=hit.href);
-            else if(root.location) root.location.href=hit.href;
+            else if(root.location) root.location.href=typeof options.resolveHref==='function'?(options.resolveHref({ref:hit.ref,namespace:'guide',href:hit.href})||hit.href):hit.href;
             return;
           }
           var entry=resolveRef(hit.ref,registry);

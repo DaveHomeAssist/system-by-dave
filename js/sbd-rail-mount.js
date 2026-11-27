@@ -48,7 +48,12 @@
 
     function resolvedHref(entry){
       var result=route(entry.ref);
-      return result.ok?result.href:entry.href;
+      if(result.ok) return result.href;
+      if(entry&&entry.namespace==='guide'&&typeof dialogs.resolveSiteHref==='function'){
+        var site=dialogs.resolveSiteHref(entry.href,{baseUrl:baseUrl,sourceUrl:sourceUrl});
+        if(site.ok) return site.href;
+      }
+      return entry.href;
     }
 
     function selectionEvent(entry){
