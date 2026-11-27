@@ -14,6 +14,16 @@ try {
  assert.ok(metrics.gridTop<=160,JSON.stringify(metrics));
  assert.ok(metrics.canvasHeight/metrics.panelHeight>.75,JSON.stringify(metrics));
  if (process.env.AV_MENU_EVIDENCE) await page.screenshot({path:process.env.AV_MENU_EVIDENCE});
+ // One tap light toggle beside Menu, on the Gaffer and Call Sheet palette: the accent is the ink, not orange.
+ const toggle=page.locator('.suite-theme-toggle button');
+ const before=await page.evaluate(()=>document.documentElement.dataset.avTheme);
+ await toggle.click();
+ const after=await page.evaluate(()=>document.documentElement.dataset.avTheme);
+ assert.notEqual(after,before);
+ assert.ok(['light','dark','white','black'].includes(after));
+ assert.equal(await page.evaluate(()=>localStorage.getItem('av-theme-mode.v1')),after);
+ const accent=await page.evaluate(()=>getComputedStyle(document.documentElement).getPropertyValue('--av-accent').trim().toLowerCase());
+ assert.ok(['#141412','#f2f0e9'].includes(accent),`console accent is the ink, not ${accent}`);
  await suiteTopic(page,'Appearance');
  await page.getByLabel('Palette',{exact:true}).selectOption('light');
  await page.getByRole('button',{name:'Back to Menu',exact:true}).click();
