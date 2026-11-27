@@ -265,6 +265,24 @@ function verifyNamesAndPrivacy(entries) {
   });
 }
 
+function verifyEnvisionDirections() {
+  const publicDir = path.join(ROOT, 'envision/directions');
+  const privateDir = path.join(ROOT, 'apps/envision-studio/web/directions');
+  const catalog = {};
+  vm.runInNewContext(read('envision/directions/catalog.js'), catalog);
+  const expected = ['catalog.js', ...catalog.EnvisionDirections.map((study) => study.id + '.webp')].sort();
+  for (const dir of [publicDir, privateDir]) {
+    if (JSON.stringify(fs.readdirSync(dir).sort()) !== JSON.stringify(expected))
+      fail('Envision direction files differ from the catalog in ' + path.relative(ROOT, dir));
+  }
+  for (const name of expected) {
+    const a = path.join(publicDir, name), b = path.join(privateDir, name);
+    if (!fs.existsSync(a) || !fs.existsSync(b) || !fs.readFileSync(a).equals(fs.readFileSync(b)))
+      fail('Envision public and private direction bundles differ for ' + name);
+  }
+}
+
+verifyEnvisionDirections();
 verifyNavigation();
 const entries = sitemapEntries();
 verifyMetadata(entries);

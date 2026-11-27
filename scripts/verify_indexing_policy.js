@@ -100,7 +100,9 @@ const fieldKitListed = sitemapRoutes.has('/field-kit/');
 // the run-review/ forward from its first address, and its pinned upstream viewer under
 // apps/rehearsal-capture/upstream/ (docs/rehearsal-capture.md, 2026-11-26).
 // The public Recipe Journal mirror is intentionally outside the sitemap.
-const expectedUnlisted = fieldKitListed ? 228 : 229;
+// The six temporary Retreat Series preview pages are direct access only.
+// Cross-Pollinate adds one direct-link playtest route at /puzzle/.
+const expectedUnlisted = fieldKitListed ? 235 : 236;
 if (unlisted.length !== expectedUnlisted) fail(`Expected ${expectedUnlisted} tracked routes outside the sitemap; found ${unlisted.length}.`);
 SBD_REGISTRY.tools.filter((tool) => tool.tag === 'Application').forEach((tool) => {
   const route = `/${tool.href}`;

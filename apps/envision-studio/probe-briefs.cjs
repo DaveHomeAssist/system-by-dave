@@ -26,6 +26,16 @@ async function run() {
       await page.goto(new URL('/envision/', base).href);
       assert.equal(await page.locator('#mode').inputValue(), 'image');
       assert.equal(await page.locator('#format').inputValue(), 'square');
+      const studies = await page.evaluate(() => globalThis.EnvisionDirections);
+      assert.equal(studies.length, 3);
+      for (const study of studies) {
+        await page.locator('#preset').selectOption(study.id);
+        const thumb = page.locator('#direction-art');
+        await thumb.evaluate((img) => img.decode());
+        assert.equal(await thumb.evaluate((img) => img.naturalWidth), 640);
+        assert.ok((await thumb.getAttribute('src')).endsWith(study.id + '.webp'));
+        assert.equal(await page.locator('#art-crop').getAttribute('aria-label'), study.alt);
+      }
       assert.equal(await page.locator('#copy-details').isVisible(), false);
 
       await page.locator('#project-name').fill('Paper study');
@@ -83,9 +93,21 @@ async function run() {
         assert.match(await page.locator('#prompt-output').inputValue(), /deep-sea/);
         await page.locator('#mode').selectOption('image');
         await page.locator('#preset').selectOption('subject');
+        assert.ok(await page.locator('#art-crop').isHidden());
         await page.locator('#direction').fill('');
         assert.equal(await page.locator('#direction').evaluate(el => el.checkValidity()), false);
         assert.equal(await page.locator('#export-current').isVisible(), false);
+        await page.locator('#preset').selectOption(studies[0].id);
+        await page.locator('[name="title"]').fill('Folded paper test');
+        await page.locator('#save-event').click();
+        await page.reload();
+        await page.locator('#tab-saved').click();
+        await page.getByRole('button', {name: 'Open Folded paper test'}).click();
+        assert.equal(await page.locator('#preset').inputValue(), studies[0].id);
+        await page.getByRole('button', {name: 'Build prompt'}).click();
+        const sampleBrief = await download(page, page.locator('#export-current'));
+        assert.equal(sampleBrief.data.kind, 'image');
+        assert.ok(sampleBrief.data.prompt.includes(studies[0].prompt));
       }
       await context.close();
       console.log('Public image and flyer brief flow passed at ' + width + ' CSS pixels.');

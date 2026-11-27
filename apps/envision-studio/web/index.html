@@ -14,6 +14,9 @@
     <meta property="og:description" content="Private image generation, revisions and show layouts." />
     <meta name="twitter:card" content="summary" />
     <link rel="stylesheet" href="/ui/studio.css" />
+    <script defer src="/ui/directions/catalog.js"></script>
+    <script defer src="/ui/create-directions.js"></script>
+    <script defer src="/ui/web-export.js"></script>
     <script defer src="/ui/studio.js"></script>
   </head>
   <body>
@@ -74,6 +77,10 @@
                 <img id="art" alt="Selected artwork" /><span id="no-art"
                   >Choose a reference or generate your first image.</span
                 >
+                <button id="empty-directions" class="direction-cover" type="button" hidden>
+                  <img id="direction-cover-image" alt="" />
+                  <span>Browse prompt examples</span>
+                </button>
                 <figcaption><b id="art-caption"></b><span id="art-details"></span></figcaption>
               </figure>
               <figure id="second-frame" hidden>
@@ -106,6 +113,19 @@
                     placeholder="Describe the subject, framing, light, and finish."
                   ></textarea>
                 </label>
+                <div class="tools direction-tools">
+                  <button type="button" id="save-brief" disabled>Save direction</button>
+                  <button type="button" id="recall-direction">Recall direction</button>
+                  <small id="direction-state" role="status"></small>
+                </div>
+                <div id="direction-conflict" hidden>
+                  <p>The saved direction changed on another device.</p>
+                  <details><summary>Read the saved direction</summary><p id="other-direction"></p></details>
+                  <div class="tools">
+                    <button type="button" id="take-saved-direction">Use saved direction</button>
+                    <button type="button" id="keep-direction-draft">Keep my draft</button>
+                  </div>
+                </div>
                 <div class="row">
                   <label
                     >Render size<select id="render-size">
@@ -156,7 +176,6 @@
                     <button type="button" id="apply-preset">Apply preset</button
                     ><button type="button" id="save-preset">Save preset</button>
                   </div>
-                  <button type="button" id="save-brief">Save project direction</button>
                 </details>
               </div>
               <div id="mask-actions" hidden>
@@ -208,7 +227,7 @@
                   <button id="use-art" class="primary">Use as background</button
                   ><button id="favorite">Favorite</button><button id="rename-art">Rename</button><button id="revise-art">Revise</button
                   ><button id="replay">Reuse settings</button
-                  ><button id="download-art">Download PNG</button>
+                  ><button id="download-art">Download PNG</button><button id="web-export">Export for web</button>
                 </div>
                 <details>
                   <summary>Generation record</summary>
@@ -372,6 +391,43 @@
           <button id="proof-close" autofocus>Close</button>
         </div>
       </div>
+    </dialog>
+    <dialog id="direction-dialog" aria-labelledby="direction-heading">
+      <div class="direction-dialog-heading">
+        <h2 id="direction-heading">Recall a direction</h2>
+        <button type="button" id="close-directions">Close</button>
+      </div>
+      <div class="tools" id="stored-directions">
+        <button type="button" id="recall-brief">Saved project direction</button>
+        <button type="button" id="recall-art">Selected artwork direction</button>
+      </div>
+      <div class="direction-gallery" id="direction-gallery"></div>
+    </dialog>
+    <dialog id="web-dialog" aria-labelledby="web-title">
+      <div class="web-heading">
+        <h2 id="web-title">Export for web</h2>
+        <button type="button" id="web-close">Close</button>
+      </div>
+      <p id="web-source"></p>
+      <form id="web-form">
+        <div class="web-frame"><img id="web-preview" hidden alt="Preview of the image to download" /></div>
+        <div class="web-options">
+          <label>Format<select id="web-format" required></select></label>
+          <label>Framing<select id="web-framing">
+            <option value="center">Crop to center</option>
+            <option value="top">Crop toward top</option><option value="bottom">Crop toward bottom</option>
+            <option value="left">Crop toward left</option><option value="right">Crop toward right</option>
+            <option value="contain">Keep whole image</option>
+          </select></label>
+        </div>
+        <label for="web-name">File name</label>
+        <div class="web-name"><input id="web-name" required maxlength="100" autocomplete="off" aria-describedby="web-extension" /><span id="web-extension"></span></div>
+        <p id="web-status" role="status"></p>
+        <div class="tools">
+          <button type="button" id="web-retry" hidden>Retry preview</button>
+          <button type="submit" id="web-download" class="primary" disabled>Download image</button>
+        </div>
+      </form>
     </dialog>
     <dialog id="name-dialog" aria-labelledby="dialog-title">
       <form method="dialog">

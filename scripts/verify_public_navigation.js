@@ -29,6 +29,7 @@ const CORE_HEADERS = new Map([
   ['profile/index.html', 'Dave']
 ]);
 const STANDALONE_RETURNS = [
+  'puzzle/index.html',
   'switcher/index.html',
   'switcher/guide/index.html',
   'switcher/guide/atem-hd8-iso-guide-offline.html',
@@ -47,6 +48,7 @@ const STANDALONE_RETURNS = [
   'thephilly/index.html'
 ];
 const REQUIRED_SKIP_LINKS = new Map([
+  ['puzzle/index.html', 'main'],
   ['systembydave/index.html', 'main'],
   ['systembydave/index-md.html', 'main'],
   ['systembydave/routing.html', 'main'],

@@ -9,6 +9,7 @@ import zipfile
 from pathlib import Path
 
 from PIL import Image, ImageDraw
+from PIL.PngImagePlugin import PngInfo
 
 from server import create_app, export_loop
 from store import png
@@ -68,6 +69,57 @@ class Studio(unittest.TestCase):
         )
         self.post("/worker/claim", {"id": "runner", "profiles": []}, OWNER, (403,))
 
+    def test_web_artwork_downloads(self):
+        source = Image.new("RGBA", (60, 120), "red")
+        ImageDraw.Draw(source).rectangle((0, 60, 59, 119), fill="blue")
+        metadata = PngInfo()
+        metadata.add_text("parameters", "private test direction")
+        buffer = io.BytesIO()
+        source.save(buffer, "PNG", pnginfo=metadata)
+        asset = self.asset(buffer.getvalue())
+        url = self.api + self.project + "/versions/" + asset["id"] + "/web-asset"
+        before = self.get(self.project)
+        profiles = self.get("/artwork-formats")["formats"]
+        self.assertEqual([(p["id"], p["width"], p["height"]) for p in profiles],
+                         [("square", 480, 480), ("card", 640, 360), ("share", 1200, 630)])
+        for p in profiles:
+            with self.subTest(format=p["id"]):
+                response = self.http.get(url, query_string={"format": p["id"], "framing": "contain"}, headers=OWNER)
+                self.assertEqual(response.status_code, 200)
+                self.assertEqual(response.mimetype, p["mime"])
+                self.assertIn("private, no-store", response.headers["Cache-Control"])
+                self.assertIn("Test Show." + p["extension"], response.headers["Content-Disposition"])
+                self.assertNotIn(b"private test direction", response.data)
+                result = Image.open(io.BytesIO(response.data))
+                self.assertEqual(result.size, (p["width"], p["height"]))
+                self.assertNotIn("xmp", result.info)
+                self.assertFalse(result.getexif())
+                edge = result.convert("RGBA").getpixel((0, 0))
+                if p["extension"] == "jpg":
+                    self.assertEqual(edge, (255, 255, 255, 255))
+                else:
+                    self.assertEqual(edge[3], 0)
+        for framing, component in (("top", 0), ("bottom", 2)):
+            r = self.http.get(url, headers=OWNER, query_string={"format": "card", "framing": framing})
+            color = Image.open(io.BytesIO(r.data)).convert("RGB").getpixel((320, 180))
+            self.assertGreater(color[component], 225)
+        self.assertEqual(before, self.get(self.project))
+
+    def test_web_artwork_scope_and_options(self):
+        data = image((60, 40), "green")
+        artwork = self.asset(data)["id"]
+        mask = self.asset(data, "mask")["id"]
+        other = self.post("/projects", {"name": "Another image", "kind": "image"})["id"]
+        def route(pid, vid):
+            return self.api + "/projects/" + pid + "/versions/" + vid + "/web-asset"
+        url = route(self.pid, artwork)
+        for identity in ({}, WORKER, OWNER | {"Tailscale-User-Login": "other@test"}):
+            self.assertEqual(self.http.get(url + "?format=square", headers=identity).status_code, 403)
+        for pid, vid in ((other, artwork), (self.pid, mask), (self.pid, "missing")):
+            self.assertEqual(self.http.get(route(pid, vid) + "?format=square", headers=OWNER).status_code, 404)
+        for options in ({}, {"format": "large"}, {"format": "square", "framing": "unknown"}):
+            self.assertEqual(self.http.get(url, headers=OWNER, query_string=options).status_code, 400)
+
     def test_optimistic_save_and_history(self):
         p = self.get(self.project)
         d = p["data"]
@@ -80,6 +132,46 @@ class Studio(unittest.TestCase):
             self.assertEqual(
                 self.app.config["STORE"].project(c, self.pid, 1)["data"]["name"], "Test Show"
             )
+
+    def test_direction_assets_have_portable_media_types_and_owner_access(self):
+        for name in ("catalog.js", "folded-paper.webp", "fiber-lights.webp", "botanical-print.webp"):
+            with self.subTest(name=name):
+                route = "/ui/directions/" + name
+                self.assertEqual(self.http.get(route).status_code, 403)
+                with self.http.get(route, headers=OWNER) as response:
+                    self.assertEqual(response.status_code, 200)
+                    expected_type = "text/javascript" if name == "catalog.js" else "image/webp"
+                    self.assertEqual(response.mimetype, expected_type)
+                    self.assertTrue(response.cache_control.private)
+                    self.assertTrue(response.cache_control.no_store)
+                    if name.endswith(".webp"):
+                        with Image.open(io.BytesIO(response.data)) as thumbnail:
+                            self.assertEqual((thumbnail.format, thumbnail.size), ("WEBP", (640, 360)))
+
+    def test_save_direction_preserves_other_edits_and_rejects_stale_replacements(self):
+        endpoint = self.api + self.project + "/brief"
+
+        def save(brief, expected, headers=OWNER):
+            return self.http.patch(
+                endpoint, headers=headers, json={"brief": brief, "expectedBrief": expected}
+            )
+
+        first = self.get(self.project)
+        old = first["data"].get("brief", "")
+        data = {**first["data"], "tags": ["Edited elsewhere"]}
+        whole = self.http.patch(
+            self.api + self.project, headers=OWNER, json={"data": data, "revision": first["revision"]}
+        )
+        self.assertEqual(whole.status_code, 200)
+        self.assertEqual(save("folded paper", old, WORKER).status_code, 403)
+        changed = save(" folded paper ", old)
+        self.assertEqual(changed.status_code, 200)
+        self.assertEqual(self.get(self.project)["data"], {**data, "brief": "folded paper"})
+        self.assertEqual(save("folded paper", old).json, changed.json)
+        self.assertEqual(save("new draft", old).status_code, 409)
+        self.assertEqual(save("x" * 6001, "folded paper").status_code, 400)
+        self.assertEqual(save("", "folded paper").json["brief"], "")
+        self.assertEqual(self.get(self.project)["data"]["tags"], data["tags"])
 
     def test_artwork_rename_is_scoped_and_survives_editable_export(self):
         asset = self.asset(image((48, 32), "#334455"))

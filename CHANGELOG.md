@@ -1,5 +1,37 @@
 # Changelog
 
+## November 27, 2026. Cross-Pollinate layout rotation
+
+- Rotates distinct 9×9 crossword patterns and adds an occasional 11×11 garden. The date arrows and date chooser preview grid size. Earlier puzzle dates and saves remain compatible.
+
+## November 27, 2026. Cross-Pollinate replays
+
+- Replay a completed garden with the current clues. Replay progress saves separately so players can return to their original solve.
+
+## November 26, 2026. Cross-Pollinate clues and vine bonuses
+
+- Revised the starter clues for more challenge without revealing their answers. When a solved long answer grows a vine that reveals a letter, the game identifies the clue that earned it and the clue it helped.
+
+## November 26, 2026. Cross-Pollinate playtest
+
+- Play the daily garden crossword at `/puzzle/`. Solve crossing words to grow the garden and earn wildcard seeds. The preview is available by direct link.
+
+## November 26, 2026. New Bethlehem retreat preview
+
+- Connected the welcome, visit details, registration and public contact to the retreat editor’s published release. Drafts stay in the private editor.
+- Added a temporary, unlisted retreat website at `/retreat/` for sharing by direct link. The preview now names New Bethlehem and explains whom the one-day Catholic retreat is for. The home page features the supplied devotional artwork at its original proportions. The About page introduces Sharon Delaney, links to her EWTN News author profile, and lists five of her National Catholic Register articles, including her 2023 report on the Carlo Acutis shrine in Brick, New Jersey.
+
+## November 26, 2026. Envision web artwork and Notion Agents
+
+- Export a selected Library image as a square thumbnail, wide card or link preview. Choose its framing and file name, then download the image shown in the preview.
+- The Notion Agents catalog opens with four workflow choices. Each portrait links directly to its setup details and contact action. The Tools card shows the catalog, and shared links use a desk illustration rendered on Walter.
+
+## November 26, 2026. Envision image directions
+
+- Choose a folded paper, fiber light or botanical print study in the public builder and private studio. Walter rendered each sample from the prompt it supplies. The folded paper study also appears in Envision link previews.
+- Recall a saved project or artwork direction, keep unsaved wording through reload in the same tab, and resolve a competing save before replacing it. Back and Forward revisit studio workspaces.
+- A render request keeps its project identity across navigation and can retry an unacknowledged submission after reload using the same job key.
+
 ## November 26, 2026. Project directory artwork and Envision names
 
 - Search the Tools directory by name or subject, combine a search with a category, and return to those results with Back. The results scroll beneath the controls in both themes.
