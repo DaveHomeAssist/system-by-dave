@@ -25,6 +25,20 @@
     catch(error){return null;}
   }
 
+  // Guide and panel links in the registry are written relative to the site
+  // root. Resolve them against that root, not the current page, so a page
+  // under a folder such as /av/ never turns them into /av/<link>.
+  function resolveSiteHref(href,options){
+    if(!href) return {ok:false,code:'not-navigable'};
+    var base=routeBase(options);
+    if(!base) return {ok:false,code:'invalid-base'};
+    var url;
+    try{url=new URL(href,base);}
+    catch(error){return {ok:false,code:'invalid-destination'};}
+    if(url.protocol!=='http:'&&url.protocol!=='https:') return {ok:false,code:'unsafe-protocol'};
+    return {ok:true,code:'resolved',href:url.href};
+  }
+
   function sourceContext(sourceUrl,base){
     var context={};
     if(!sourceUrl) return context;
@@ -358,7 +372,7 @@
     function routeOptions(){return {registry:registry,baseUrl:options.baseUrl,sourceUrl:options.sourceUrl};}
 
     function allAppsCard(entry){
-      var route=entry.namespace==='guide'?{ok:!!entry.href,href:entry.href}:(entry.namespace==='panel'?{ok:true,href:'av/'}:resolveRoute(entry.ref,routeOptions()));
+      var route=entry.namespace==='guide'?resolveSiteHref(entry.href,routeOptions()):(entry.namespace==='panel'?resolveRoute('toolbox',routeOptions()):resolveRoute(entry.ref,routeOptions()));
       var card=documentRef.createElement(route.ok?'a':'div');
       card.className='sbd-rail-dialog__card'+(route.ok?'':' is-status');
       card.setAttribute('data-rail-ref',entry.ref);
@@ -624,6 +638,7 @@
     version:'sbd.rail.dialogs.v1',
     draftEventName:DRAFT_CHANGE_EVENT,
     resolveRoute:resolveRoute,
+    resolveSiteHref:resolveSiteHref,
     readDraftState:readDraftState,
     createDraftObserver:createDraftObserver,
     create:createDialogs

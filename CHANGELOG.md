@@ -1,12 +1,25 @@
 # Changelog
 
-## November 27, 2026. Cross-Pollinate second grid
+## November 27, 2026. Console white gaffer palette and light toggle
+- The AV by Dave console uses the white gaffer look in all four palettes: black, paint pen white and aluminum gray from the AV by Dave tokens (Gaffer dark, Call Sheet light). The AV badge, primary buttons, selected rail entries and panel outlines use the ink color instead of rust or orange. Status colors are unchanged.
+- A sun and moon button beside Menu switches light and dark in one tap. White and Black swap with each other, and Follow system stays in Menu > Appearance. The choice is the shared `av-theme-mode.v1`, so the homepage follows it.
+- The console's browser chrome colors match the new palette. Other AV tools keep Warm Paper and Stage Slate.
 
-- A fresh grid is the default for November 27 UTC. Open the date picker to return to the first grid and its saved solve or replay. Each grid saves progress separately.
+## November 27, 2026. Add device top bar
+- Signal Flow's Add device and Rename device dialogs have one top bar with the title and a close button. The bottom Cancel button is gone, so the dialog has one close.
+
+## November 27, 2026. Console guide links
+- The console rail, its search and All apps open Console Spec Guide and the Sync & Signal Field Kit at `/console-guide/` and `/field-kit/`. They had resolved under `/av/` and returned a missing page.
+- Panel cards in All apps, such as Signal Flow on phone, fall back to the console at `/av/` instead of `/av/av/`.
+- The console registry generation is `v20261126-console-links`, so offline copies pick up the change.
 
 ## November 27, 2026. Cross-Pollinate four-week rotation
 
 - Adds 15 original 9×9 crosswords. The daily calendar now runs for 28 days before a filled grid repeats, with 26 small puzzles and two 11×11 editions.
+
+## November 27, 2026. Cross-Pollinate second grid
+
+- A fresh grid is the default for November 27 UTC. Open the date picker to return to the first grid and its saved solve or replay. Each grid saves progress separately.
 
 ## November 27, 2026. Cross-Pollinate layout rotation
 

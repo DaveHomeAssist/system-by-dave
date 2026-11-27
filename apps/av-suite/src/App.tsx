@@ -175,6 +175,12 @@ export function App() {
     for (const meta of Array.from(document.querySelectorAll<HTMLMetaElement>("meta[data-av-theme-color]"))) meta.media = value === "system" ? (["light", "dark"].includes(meta.dataset.avThemeColor || "") ? `(prefers-color-scheme: ${meta.dataset.avThemeColor})` : "not all") : meta.dataset.avThemeColor === value ? "all" : "not all";
     try { localStorage.setItem("av-theme-mode.v1", value); } catch { setStatus({ app: "", text: "Theme changed for this visit; browser preferences could not be saved.", error: true }); }
   }
+  /* One tap between light and dark, beside Menu. White and Black swap with each other; Follow system stays in Appearance. */
+  const shownPalette: Palette = theme === "system" ? systemPalette : theme;
+  const lightShown = shownPalette === "light" || shownPalette === "white";
+  function toggleLight() {
+    changeTheme(shownPalette === "white" ? "black" : shownPalette === "black" ? "white" : lightShown ? "dark" : "light");
+  }
   function toggleFocus() {
     const next = !focusMode;
     document.documentElement.dataset.avFocus = next ? "true" : "false"; setFocusMode(next);
@@ -232,6 +238,7 @@ export function App() {
       <div className="suite-identity"><span className="suite-mark" aria-hidden="true">AV</span><div><h1>{activeTitle}</h1><p className="suite-plan" title={activePack?.title}>{activePack ? `${activePack.title} · ${activePack.dirty ? "Unsaved" : "Saved"}` : activeTool ? "Specialist tool · own saved data" : "Empty workspace · add any panel"}</p></div></div>
       {context && <span className="suite-context" aria-label="Read-only show context">{context}</span>}
       <div className="suite-actions">
+        <span className="suite-theme-toggle"><button type="button" aria-label={lightShown ? "Switch to dark mode" : "Switch to light mode"} title={lightShown ? "Dark mode" : "Light mode"} onClick={toggleLight}><svg aria-hidden="true" viewBox="0 0 24 24">{lightShown ? <path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z" /> : <><circle cx="12" cy="12" r="4" /><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" /></>}</svg></button></span>
         <TopicMenu label="Menu" topics={[
           { name: "Project", description: "Save, export and edit history", content: <>{activePack?.actions}
             <button type="button" className="primary" disabled={!activePack || activePack.blocked} onClick={() => void activePack?.save()}>Save{activePack?.dirty ? " •" : ""}</button>

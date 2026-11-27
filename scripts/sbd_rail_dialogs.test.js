@@ -192,6 +192,22 @@ test('typed route resolution carries context only to eligible internal destinati
   assert.equal(dialogs.resolveRoute('tool:cueforge', options).code, 'unknown-reference');
 });
 
+test('guide and panel links resolve from the site root on pages inside a folder', () => {
+  const { dialogs, registry } = loadRuntime();
+  const options = { registry, baseUrl: 'https://avbydave.com/', sourceUrl: 'https://avbydave.com/av/' };
+  assert.equal(dialogs.resolveSiteHref('console-guide/', options).href, 'https://avbydave.com/console-guide/');
+  assert.equal(dialogs.resolveSiteHref('field-kit/', options).href, 'https://avbydave.com/field-kit/');
+  assert.equal(dialogs.resolveSiteHref('https://systembydave.com/demos/', options).href, 'https://systembydave.com/demos/');
+  assert.equal(dialogs.resolveSiteHref('javascript:alert(1)', options).code, 'unsafe-protocol');
+  assert.equal(dialogs.resolveSiteHref('', options).ok, false);
+  for (const guide of registry.guides || []) {
+    if (!guide.href) continue;
+    const resolved = new URL(dialogs.resolveSiteHref(guide.href, options).href);
+    assert.equal(resolved.pathname.startsWith('/av/'), guide.href.startsWith('av/'), `${guide.id} must not land under /av/`);
+  }
+  assert.equal(new URL(dialogs.resolveRoute('toolbox', options).href).pathname, '/av/', 'panel cards fall back to the console, not /av/av/');
+});
+
 test('draft reads validate the direct console key without writing or trusting the index', () => {
   const { dialogs, registry } = loadRuntime();
   const storage = new MemoryStorage({
