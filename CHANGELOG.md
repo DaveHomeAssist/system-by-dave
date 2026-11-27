@@ -1,5 +1,9 @@
 # Changelog
 
+## November 27, 2026. AV console keyboard help
+
+- Press `?` in the AV console to open keyboard shortcut help and `Escape` to close it. The offline cache refreshes to include the updated console shell.
+
 ## November 27, 2026. OnTrack keyboard navigation
 
 - Added a first-focus skip link and keyboard navigation between Library, Sets, Debrief and Data, with a visible focus indicator and an announced selected tab.

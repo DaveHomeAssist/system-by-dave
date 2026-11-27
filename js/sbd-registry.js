@@ -403,7 +403,7 @@
 
   root.SBD_REGISTRY={
     /* Bump on any registry/tool asset change — rolls the service-worker cache. */
-    version:'v20261127-keyboard-shortcuts-main',
+    version:'v20261127-av-console-shortcuts',
     phases:PHASES,
     tools:TOOLS,
     recommended:RECOMMENDED,
