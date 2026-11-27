@@ -1,8 +1,8 @@
 {
   "schema": 1,
-  "sourceSha256": "f62ad43ff774afcde3415c2f60c14304d7c9809e9883e55187b08217cd2e2b5d",
-  "publicSha256": "03bb00a55ef6ba522131f3ba506e22dece0bf772f0f332d9ec7eb5a884128c7b",
-  "editions": 40,
+  "sourceSha256": "710b4e68e9c1d17a1a7fcb8d2c8d118fc0e1c4f7e03baa4150b0be582fc458af",
+  "publicSha256": "178aefb56d19adecd3e14c6b9b789bfcdb4fc662e5b4666fc3e2d31d78e01058",
+  "editions": 41,
   "files": [
     {
       "name": "Edition 040.svg",
@@ -17,6 +17,20 @@
       "date": "2026-11-27",
       "title": "SDI checkfield stress test",
       "sha256": "42af5500731a605243efefa81508996f035ffe35299a1b532ea39cd2bd0f7eec"
+    },
+    {
+      "name": "Edition 041.svg",
+      "id": 41,
+      "date": "2026-11-26",
+      "title": "SDI Auto can choose Level A",
+      "sha256": "b05db312d896b7fbe8d24f87ba4b427068e7fd9af5a80460fff5c8af548f799b"
+    },
+    {
+      "name": "Edition 041.png",
+      "id": 41,
+      "date": "2026-11-26",
+      "title": "SDI Auto can choose Level A",
+      "sha256": "b4ca5a84c3c47ad55e5ada8e09afd99543336556acd6cd77154d265fc16ae29e"
     },
     {
       "name": "Edition 039.svg",

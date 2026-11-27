@@ -367,6 +367,25 @@ noscript {position:fixed;inset:0;z-index:200;background:var(--surface);color:var
     }
   },
   {
+    "id": 41,
+    "date": "2026-11-26",
+    "track": "SDI, HDMI, DisplayPort, and signal transport",
+    "trackShort": "Transport",
+    "title": "SDI Auto can choose Level A",
+    "fact": "When an AJA 12GM converts a single 12G-SDI input to four 3G-SDI outputs, its Auto 3G-SDI mode selects Level A. The device also supports an explicit Level B Dual Link output setting for that conversion.",
+    "why": "A downstream input configured for Level B Dual Link may reject the feed even when all four cables are connected and the picture format is correct.",
+    "takeaway": "Check the downstream Level A or Level B Dual Link setting before patching. Set the converter to match and verify the format at the far end on all four links.",
+    "sourceLabel": "AJA 12GM Manual v1.16, 3G-SDI Mode",
+    "sourceUrl": "https://www.aja.com/support/item-download/9586/AJA_12GM_Manual_v1.16.pdf",
+    "basis": "Manufacturer documentation",
+    "current": false,
+    "illustration": {
+      "caption": "With a single 12G-SDI input and quad 3G-SDI output, the AJA 12GM selects Level A in Auto mode.",
+      "body": "<rect width=\"240\" height=\"400\" rx=\"8\" class=\"canvas\"/><text x=\"18\" y=\"30\" class=\"diagram-index\">41</text><text x=\"52\" y=\"30\" class=\"diagram-heading\">12G TO QUAD 3G</text><rect x=\"20\" y=\"62\" width=\"200\" height=\"64\" rx=\"8\" class=\"panel\"/><text x=\"36\" y=\"101\">1 × 12G-SDI input</text><path d=\"M120 126v33\" class=\"wire\"/><rect x=\"20\" y=\"159\" width=\"200\" height=\"72\" rx=\"8\" class=\"panel\"/><text x=\"36\" y=\"187\" class=\"diagram-heading\">AJA 12GM</text><text x=\"36\" y=\"211\">3G mode: Auto</text><path d=\"M72 231v36 M104 231v36 M136 231v36 M168 231v36\" class=\"wire\"/><rect x=\"20\" y=\"267\" width=\"200\" height=\"72\" rx=\"8\" class=\"panel\"/><text x=\"36\" y=\"295\">4 × 3G-SDI outputs</text><text x=\"36\" y=\"321\" class=\"note\">Level A</text>",
+      "viewBox": "0 0 240 400"
+    }
+  },
+  {
     "id": 39,
     "date": "2026-11-15",
     "track": "Genlock, timecode, synchronization, and latency",
