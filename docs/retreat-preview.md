@@ -2,7 +2,7 @@
 
 Publish the six supplied retreat pages for review at [New Bethlehem](https://systembydave.com/retreat/). Visitors arrive from the shared URL and move between the welcome, retreat details, experience, retreat introduction, FAQs, and contact pages.
 
-Keep the preview out of the main site navigation and sitemap, and set each page to noindex. The URL is public and requires no sign-in. The retreat details page will carry the date, location, and registration information once confirmed. The public pages are static. Four pages load the approved visitor fields from the retreat editor’s GitHub Pages release. The existing Pages workflow publishes the folder with the site.
+Keep the preview out of the main site navigation and sitemap, and set each page to noindex. The URL is public and requires no sign-in. The retreat details page will carry the date, location, and registration information once confirmed. The public pages are static. Four pages load the approved visitor fields from the retreat editor’s GitHub Pages release. Each publication also produces readable HTML for those pages when scripting is off. If the data request fails, visitors can open the published document directly. The existing Pages workflow publishes the folder with the site.
 
 The preview introduces New Bethlehem as a one-day Catholic retreat for women experiencing grief or regret after an abortion. The home page features the supplied portrait artwork at its original proportions. The existing landscape asset remains the link preview.
 
