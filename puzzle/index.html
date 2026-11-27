@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en" data-theme="light">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-/+lYiEQIjV3Ub/UBthFwWRPWkzxl4zFXZQEV0Tj7oUQ='; style-src 'unsafe-inline'; img-src 'self' data:; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-QRSIGX8+hKj87CtyE7rG7bPWr1ai3K715AB3pPPbKSs='; style-src 'unsafe-inline'; img-src 'self' data:; base-uri 'none'; form-action 'none'">
 <meta name="description" content="Solve the daily garden crossword, grow plants and use wildcard seeds for a nearby clue.">
 <meta name="robots" content="noindex, follow">
 <link rel="canonical" href="https://systembydave.com/puzzle/">
@@ -49,6 +49,7 @@ h1 span{color:var(--accent)}
 #date-form label{display:block;margin-top:12px}
 #garden-date{display:block;min-height:44px;width:100%;border:1px solid var(--line);background:var(--paper);color:var(--ink);border-radius:8px;padding:8px;font:inherit}
 #date-preview{min-height:1.5em;font-weight:700;color:var(--green)}
+.date-actions{display:flex;flex-wrap:wrap;gap:8px}.date-actions button{min-height:44px}
 .play{min-height:0;display:grid;grid-template-columns:minmax(0,1.5fr) minmax(290px,1fr);gap:var(--gap)}
 .bed{min-height:0;display:grid;grid-template-rows:auto minmax(0,1fr) auto;background:var(--board);color:var(--boardText);border:1px solid #405642;border-radius:18px;padding:12px clamp(12px,1.75vw,24px);gap:8px;box-shadow:0 8px 24px var(--shadow)}
 .bed-top,.bed-foot{display:flex;justify-content:space-between;align-items:center;gap:8px}
@@ -268,7 +269,10 @@ dialog::backdrop{background:#111a13a0}
     <label for="garden-date">Puzzle date</label>
     <input type="date" id="garden-date" required>
     <p id="date-preview" role="status" aria-live="polite"></p>
-    <button class="primary" id="open-puzzle">Open puzzle</button>
+    <div class="date-actions">
+      <button class="primary" id="open-puzzle">Open puzzle</button>
+      <button class="quiet" type="button" id="open-first-grid" hidden>Open first grid</button>
+    </div>
   </form>
 </dialog>
 <dialog id="instructions">
@@ -286,6 +290,7 @@ dialog::backdrop{background:#111a13a0}
 <script>"use strict";
 (() => {
   // src/monthly.ts
+  var november27Layout = "#SLIP####/#HIDE####/#EVER####/#DEAF####/###LOG###/####RUGS#/####MILE#/####EDEN#/####RENT#";
   var monthlyLayouts = [
     "#BAY#####/#ORE#####/#GEL#####/###LEE###/###OWN###/###WET###/#####ILL#/#####RAY#/#####EYE#",
     "#SUN#####/#ARE#####/#GNU#####/###RED###/###AGE###/###LOG###/#####ROW#/#####EWE#/#####END#",
@@ -304,8 +309,8 @@ dialog::backdrop{background:#111a13a0}
     "KIT##AWL#/ERR##THY#/YEA##TOE#/##NOVEL##/##SPINE##/##LEEDS##/#TAN##ARK/#ATE##LIE/#BED##EGG"
   ];
   var monthlyClues = `
-AGE|What a tree's growth rings can help establish
 AGENDA|Order of business that may end in \u201CAny other business?\u201D
+AGE|What a tree's growth rings can help establish
 ALERTS|What a disabled bell icon can silence
 ALGA|One tiny organism in a pond's green film
 ALLOW|Build room into a budget, with \u201Cfor\u201D
@@ -334,6 +339,7 @@ CAR|Train unit with seats or cargo
 COD|Fish often served with chips in Britain
 CRAB|Shore resident that can scuttle sideways
 CUE|What an actor watches for in the wings
+DEAF|Unable to hear the pin drop, perhaps
 DEAN|Campus official with a department or college to run
 DEDICATED|Like a bench bearing a memorial plaque
 DEER|Visitors a gardener may try to keep outside the fence
@@ -342,6 +348,7 @@ DESIRE|What a Tennessee Williams streetcar was named for
 DID|Finished, as the Sunday crossword
 DREAMS|Some stories that end when you wake
 EAGLES|Birdies topped by a stroke apiece, in golf
+EDEN|Setting with a fruit tree that was off limits
 EDGAR|First name of the poet who wrote \u201CThe Raven\u201D
 EDGE|Where the water gives way to a bank, say
 EDIT|What a copy desk does to a draft
@@ -350,16 +357,21 @@ EMAILS|Replies that may arrive in an inbox
 EMU|Flightless bird on Australia's coat of arms
 ENTITY|A distinct thing, living or otherwise
 EON|An immense stretch of geologic time
+EVER|Word that makes \u201Cbest\u201D a claim about all of history
 FLY|Cross the Channel without a bridge or a boat, perhaps
 GEL|Substance that holds a hairstyle in place
 GEM|Something a jeweler might cut to catch the light
 GET|Catch, as the meaning of a joke
 GIG|Booking for a band
+GLEN|Low ground between hills in the Highlands
 GNU|Antelope on the Serengeti migration
+GUIDE|One you might follow off the beaten path
 HAD|Verb in \u201CWe ___ a deal\u201D
 HAY|What a rake gathers after a field dries
+HIDE|Cover a birdwatcher may sit inside
 HUB|Where the spokes of a wheel converge
 ICE|What a lake may acquire in midwinter
+IDEAL|Hard to improve upon, at least in theory
 IDLE|Sit with the engine running
 INCHES|Units counted by the foot
 INDIA|Country that includes much of the Western Ghats
@@ -370,19 +382,21 @@ KEG|Container that might have a tap fitted
 KEY|What lets you start a locked car, traditionally
 KIT|Set of pieces for an assembly project
 LAY|Do what a hen is kept for
-LEE|Side sheltered from the prevailing wind
 LEEDS|Yorkshire city on the River Aire
+LEE|Side sheltered from the prevailing wind
 LIE|Claim a fact-checker could expose
 LIONS|Big cats that may hunt with their pride
+LIVE|Like a broadcast that has no time for retakes
 LOW|Call across a pasture, perhaps
 LYE|Caustic ingredient in traditional soapmaking
 MAR|Spoil the finish on
+MILE|What a runner aims to cover in under four minutes
 MOVE|One turn at a chessboard
 NAN|One name for Grandma
 NET|What a goalkeeper stands in front of
 NEURAL|Related to the body's signal-carrying cells
-NEW|Still in the breaking-in stage
 NEWEST|Like the file sorted first when ordered by descending date
+NEW|Still in the breaking-in stage
 NIL|What a team has scored in a shutout
 NOR|Word paired with \u201Cneither\u201D
 NOVEL|Something a first-time author may have in a drawer
@@ -394,27 +408,33 @@ ORE|Rock worth processing for its metal
 ORGANISMS|Individual living things in an ecosystem
 ORIGIN|What a river and a family name both have
 OVA|Cells some animals deposit in clusters
+PERFORMER|One who may need only a stool and a spotlight
 PRY|Get something open with leverage
 PUN|Joke that depends on a double meaning
 RAN|Took part in a footrace
+RENT|Payment that usually comes before the keys
 RESPECTED|Held in high regard
 RETAIL|Sell direct to the shopper
 RIDES|Attractions with height limits, perhaps
 RIP|Tear sharply along a seam
 ROE|What may be scattered over sushi
 ROW|Pull on oars
+RUGS|Floor coverings you can roll up and take with you
 RUG|Something a doormat might resemble indoors
 RUN|Operate, as a small shop
 SAG|Droop beneath a load
 SAT|Took a place at the table
 SAY|Have a voice in the decision
-SEA|Where an oyster bar gets much of its stock
 SEASON|Annual interval when particular fruit is ripe
+SEA|Where an oyster bar gets much of its stock
 SEDGE|Grasslike plant often found in a marsh
 SEE|Take in with a glance
 SENSE|What a nose provides, for one
+SENT|Like a message that's left the outbox
 SET|How the sun disappears for the evening
+SHED|Place to go looking for a spare trowel
 SLEEVE|Part of a shirt you might roll up
+SLIP|Lose one's footing on black ice, perhaps
 SLOT|Place reserved on a schedule
 SLY|Like a fox or a wink
 SPECS|Dimensions or tolerances on a drawing
@@ -441,12 +461,16 @@ VIE|Compete for the same prize
 WEB|Trap a spider spins
 WED|Make vows together
 WHOLESALE|In bulk, as goods sold to shopkeepers
-YEA|Vote from a supporter
 YEARLY|With a trip around the sun between installments
+YEA|Vote from a supporter
 YELLOW|Sunflower petal color, often
 YET|Word that leaves room for \u201Ceventually\u201D
 YEW|Evergreen with red cups surrounding its seeds
 `.trim();
+  var november27Themes = {
+    "nature/outdoors": "HIDE SHED LOG MILE EDEN GUIDE GLEN SLIP",
+    "performance": "LIVE PERFORMER"
+  };
   var monthlyThemes = {
     "nature/outdoors": "BOG BAY ORE LEE YELLOW WET LAY EWE FLY ROE OWL LOW ELK WEB SKY BEYOND DOE OLD DEW YEW IVY YEARLY TURNIP EMU LIONS INDIA DEER STAG SWAN SEASON ORGANISMS OVA COD ICE ORIGIN GENOME DEN BEAR CRAB ALGA EDGE",
     "nature/life": "GNU NEURAL AGE EWE SUN LOG ELK SEASON ORGANISMS SWAN OVA GENOME ORIGIN COD EMU DEER STAG YEW",
@@ -620,8 +644,9 @@ YEW|Evergreen with red cups surrounding its seeds
     "#LAB#######/#ILL#######/#LOO#######/#YES#######/###SALEM###/###OPERA###/###METAL###/#######LOG#/#######AHA#/#######RIM#/#######DOE#",
     "##BIO######/##ERR######/##TIC######/##ASH######/####ACE####/####ROT####/####DOE####/######RYE##/######NAY##/######ALE##/######LED##"
   ];
-  var monthlyStart = starterEditions.length;
-  var editions = [...starterEditions, ...monthlyLayouts].map((edition) => edition.split("/"));
+  var november27Edition = starterEditions.length;
+  var monthlyStart = november27Edition + 1;
+  var editions = [...starterEditions, november27Layout, ...monthlyLayouts].map((edition) => edition.split("/"));
   var editionClues = `
 ACE|Card that can sit high or low|games
 ADO|Much ___ About Nothing|literature
@@ -963,14 +988,20 @@ WRY|Like a remark delivered with an arched eyebrow|speech emotion
   }
   var entries = readClues(clueBook);
   var authoredEntries = new Map([...entries, ...readClues(editionClues)]);
-  var monthlyEntries = new Map([...authoredEntries, ...readClues(monthlyClues)]);
-  for (const [tag, answers] of Object.entries(monthlyThemes)) {
-    for (const answer of answers.split(" ")) {
-      const entry = monthlyEntries.get(answer);
-      if (!entry) throw new Error(`Unknown answer in monthly theme: ${answer}`);
-      if (!entry.tags.includes(tag)) monthlyEntries.set(answer, { ...entry, tags: [...entry.tags, tag] });
+  function tagEntries(book, themes) {
+    const tagged = new Map(book);
+    for (const [tag, answers] of Object.entries(themes)) {
+      for (const answer of answers.split(" ")) {
+        const entry = tagged.get(answer);
+        if (!entry) throw new Error(`Unknown answer in theme: ${answer}`);
+        if (!entry.tags.includes(tag)) tagged.set(answer, { ...entry, tags: [...entry.tags, tag] });
+      }
     }
+    return tagged;
   }
+  var newClues = new Map([...authoredEntries, ...readClues(monthlyClues)]);
+  var monthlyEntries = tagEntries(newClues, monthlyThemes);
+  var november27Entries = tagEntries(newClues, november27Themes);
   var bankSize = monthlyEntries.size;
   function legacyPuzzle(day2, scheduledPack, transpose) {
     const daysSinceEpoch = Math.floor(Date.parse(`${day2}T00:00:00Z`) / 864e5);
@@ -991,6 +1022,7 @@ WRY|Like a remark delivered with an arched eyebrow|speech emotion
     if (!seed) throw new Error("Missing center crossing");
     return { ...puzzle2, seed: seed.id };
   }
+  var secondGridDate = "2026-11-27";
   var layoutRotationStart = "2026-11-28";
   var start = Date.parse(layoutRotationStart);
   var dayMs = 864e5;
@@ -1028,6 +1060,7 @@ WRY|Like a remark delivered with an arched eyebrow|speech emotion
     ["legacy", 7, true]
   ];
   function scheduledGarden(day2) {
+    if (day2 === secondGridDate) return ["edition", november27Edition, false];
     const offset = Math.floor((Date.parse(day2) - start) / dayMs);
     if (offset < 0) return void 0;
     const cycle2 = Math.floor(offset / cycleLength);
@@ -1041,9 +1074,13 @@ WRY|Like a remark delivered with an arched eyebrow|speech emotion
     const choice = scheduledGarden(day2);
     return choice?.[0] === "edition" ? editionSize(choice[1]) : template.length;
   }
-  function puzzleForDay(day2) {
-    const choice = scheduledGarden(day2);
-    const puzzle2 = choice?.[0] === "edition" ? authoredPuzzle(choice[1], choice[2], day2, choice[1] >= monthlyStart ? monthlyEntries : authoredEntries) : legacyPuzzle(day2, choice?.[1], choice?.[2]);
+  function clueBookForEdition(index) {
+    if (index === november27Edition) return november27Entries;
+    return index >= monthlyStart ? monthlyEntries : authoredEntries;
+  }
+  function puzzleForDay(day2, firstGrid2 = false) {
+    const choice = firstGrid2 && day2 === secondGridDate ? void 0 : scheduledGarden(day2);
+    const puzzle2 = choice?.[0] === "edition" ? authoredPuzzle(choice[1], choice[2], day2, clueBookForEdition(choice[1])) : legacyPuzzle(day2, choice?.[1], choice?.[2]);
     if (planSeeds(puzzle2).length < 4) throw new Error(`No reachable seeds for ${day2}`);
     return puzzle2;
   }
@@ -1240,6 +1277,7 @@ WRY|Like a remark delivered with an arched eyebrow|speech emotion
   var clueNodes = /* @__PURE__ */ new Map();
   var slideDirections = { ArrowUp: "up", ArrowDown: "down", ArrowLeft: "left", ArrowRight: "right" };
   var day = today;
+  var firstGrid = false;
   var attempt = "original";
   var puzzle;
   var garden;
@@ -1266,7 +1304,10 @@ WRY|Like a remark delivered with an arched eyebrow|speech emotion
       sessionSaves.set(key, data);
     }
   }
-  var originalKey = () => `cross-pollinate:v1:${day}`;
+  var originalKey = () => {
+    const dateKey = `cross-pollinate:v1:${day}`;
+    return day === secondGridDate && !firstGrid ? `${dateKey}:new-grid` : dateKey;
+  };
   var viewKey = () => `${originalKey()}:view`;
   var replayKey = () => `${originalKey()}:replay`;
   var saveKey = () => attempt === "replay" ? replayKey() : originalKey();
@@ -1304,7 +1345,10 @@ WRY|Like a remark delivered with an arched eyebrow|speech emotion
   function previewDate() {
     const valid = dateInput.validity.valid;
     text("date-preview", valid ? `${formatSize(gridSizeForDay(dateInput.value))} crossword` : "Choose today or an earlier date.");
+    const twoGrids = valid && dateInput.value === secondGridDate;
     byId("open-puzzle").disabled = !valid;
+    text("open-puzzle", twoGrids ? "Open new grid" : "Open puzzle");
+    byId("open-first-grid").hidden = !twoGrids;
   }
   function updateDateArrows() {
     for (const [id, offset, label] of [["prev", -1, "Previous garden"], ["next", 1, "Next garden"]]) {
@@ -1316,10 +1360,11 @@ WRY|Like a remark delivered with an arched eyebrow|speech emotion
       button.setAttribute("aria-label", button.disabled ? label : `${label}, ${size} by ${size}`);
     }
   }
-  function openDay(value) {
+  function openDay(value, useFirstGrid = false) {
     day = value;
+    firstGrid = useFirstGrid && day === secondGridDate;
     attempt = read(viewKey()) === "replay" ? "replay" : "original";
-    puzzle = puzzleForDay(day);
+    puzzle = puzzleForDay(day, firstGrid);
     tiles.style.setProperty("--grid-size", String(puzzle.size));
     document.querySelector("main").dataset.gridSize = String(puzzle.size);
     garden = restore();
@@ -1331,7 +1376,7 @@ WRY|Like a remark delivered with an arched eyebrow|speech emotion
     focus = slot.cells.find((cell) => !locked(puzzle, garden, cell)) ?? slot.cells[0];
     clueDirection = slot.direction;
     selectedSeed = "";
-    text("day-caption", `${value === today ? "TODAY" : "ARCHIVE"} \xB7 ${formatSize(puzzle.size)}`);
+    text("day-caption", `${firstGrid ? "FIRST GRID" : value === today ? "TODAY" : "ARCHIVE"} \xB7 ${formatSize(puzzle.size)}`);
     text("day-label", dateFormat.format(/* @__PURE__ */ new Date(`${day}T12:00:00Z`)));
     updateDateArrows();
     status(attempt === "replay" && garden.solved.length === 1 ? "Your original solve is saved. This is a separate replay." : garden.solved.length > 1 ? "" : "The center word is planted for you.");
@@ -1621,7 +1666,7 @@ WRY|Like a remark delivered with an arched eyebrow|speech emotion
   });
   byId("replay").addEventListener("click", () => {
     store(viewKey(), attempt === "original" ? "replay" : "original");
-    openDay(day);
+    openDay(day, firstGrid);
   });
   dateInput.max = today;
   byId("choose-date").addEventListener("click", () => {
@@ -1637,6 +1682,11 @@ WRY|Like a remark delivered with an arched eyebrow|speech emotion
     if (!dateInput.validity.valid) return;
     picker.close();
     openDay(dateInput.value);
+  });
+  byId("open-first-grid").addEventListener("click", () => {
+    if (dateInput.value !== secondGridDate) return;
+    picker.close();
+    openDay(secondGridDate, true);
   });
   byId("prev").addEventListener("click", () => stepDate(-1));
   byId("next").addEventListener("click", () => stepDate(1));
