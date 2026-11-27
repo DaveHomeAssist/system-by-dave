@@ -150,6 +150,7 @@
     './av-suite-worker.js',
     './js/sbd-registry.js',
     './js/av-suite-context.js',
+    './js/sbd-shortcuts.js',
     './js/sbd-nav.js',
     './js/sbd-public-nav.js',
     './js/av-theme.js',
@@ -359,7 +360,7 @@
 
   root.SBD_REGISTRY={
     /* Bump on any registry/tool asset change — rolls the service-worker cache. */
-    version:'v20261122-chooser-bar',
+    version:'v20261127-keyboard-shortcuts',
     phases:PHASES,
     tools:TOOLS,
     recommended:RECOMMENDED,
