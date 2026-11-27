@@ -1,5 +1,9 @@
 # Changelog
 
+## November 27, 2026. Cross-Pollinate second grid
+
+- A fresh grid is the default for November 27 UTC. Open the date picker to return to the first grid and its saved solve or replay. Each grid saves progress separately.
+
 ## November 27, 2026. Cross-Pollinate four-week rotation
 
 - Adds 15 original 9×9 crosswords. The daily calendar now runs for 28 days before a filled grid repeats, with 26 small puzzles and two 11×11 editions.
