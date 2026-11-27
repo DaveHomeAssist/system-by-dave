@@ -236,9 +236,33 @@ def create_app(root, owner, worker_key, origin):
             error="Studio could not complete this request. Reopen the project and retry."
         ), 500
 
+    def workspace_rail():
+        # Optional private deployment input, mounted read-only with the coordinator config.
+        path = Path(os.environ.get("ENVISION_WORKER_KEY_FILE", "/config/worker.key")).parent / "workspace-rail.json"
+        try:
+            return json.loads(path.read_text(encoding="utf-8"))
+        except FileNotFoundError:
+            return None
+
     @app.get("/")
     def home():
-        return send_from_directory(WEB, "index.html")
+        rail = workspace_rail()
+        if rail is None:
+            return send_from_directory(WEB, "index.html")
+        html = (WEB / "index.html").read_text(encoding="utf-8")
+        return Response(
+            html.replace("</head>", '<link rel="stylesheet" href="/ui/workspace-rail.css" />\n</head>', 1)
+                .replace("<body>", "<body>" + rail["markup"], 1),
+            mimetype="text/html",
+        )
+
+    @app.get("/ui/workspace-rail.<extension>")
+    def workspace_rail_asset(extension):
+        types = {"css": "text/css", "js": "text/javascript"}
+        need(extension in types, "Unknown workspace rail asset.", 404)
+        rail = workspace_rail()
+        need(rail is not None, "Workspace rail unavailable.", 404)
+        return Response(rail[extension], mimetype=types[extension])
 
     @app.get("/ui/<name>")
     def ui(name):

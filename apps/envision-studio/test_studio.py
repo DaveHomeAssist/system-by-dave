@@ -6,6 +6,7 @@ import threading
 import time
 import unittest
 import zipfile
+from unittest.mock import patch
 from pathlib import Path
 
 from PIL import Image, ImageDraw
@@ -74,6 +75,29 @@ class Studio(unittest.TestCase):
             {"id": "dominic", "name": "Dominic", "online": True, "role": "Project source"},
         )
         self.assertNotIn("origin", state["coordinator"])
+
+    def test_workspace_rail_is_optional_and_owner_gated(self):
+        config = Path(self.dir.name) / "workspace-rail.json"
+        css = "/ui/workspace-rail.css"
+        js = "/ui/workspace-rail.js"
+        with patch.dict("os.environ", {"ENVISION_WORKER_KEY_FILE": str(config.with_name("worker.key"))}):
+            with self.http.get("/", headers=OWNER) as page:
+                self.assertNotIn(css, page.get_data(as_text=True))
+            self.assertEqual(self.http.get(css, headers=OWNER).status_code, 404)
+            config.write_text(json.dumps({
+                "markup": '<nav><script src="/ui/workspace-rail.js"></script></nav>',
+                "css": "nav { display: grid; }",
+                "js": "void 0;",
+            }), encoding="utf-8")
+            page = self.http.get("/", headers=OWNER)
+            self.assertEqual(page.status_code, 200)
+            self.assertIn(css, page.get_data(as_text=True))
+            self.assertIn(js, page.get_data(as_text=True))
+            for url, mime in ((css, "text/css"), (js, "text/javascript")):
+                self.assertEqual(self.http.get(url).status_code, 403)
+                asset = self.http.get(url, headers=OWNER)
+                self.assertEqual(asset.status_code, 200)
+                self.assertEqual(asset.mimetype, mime)
 
     def test_web_artwork_downloads(self):
         source = Image.new("RGBA", (60, 120), "red")
