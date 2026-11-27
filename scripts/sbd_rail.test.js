@@ -127,7 +127,7 @@ test('missing preferences read the exact ten-console defaults without writing', 
   assert.equal(storage.data.unrelated, 'keep');
 });
 
-test('saved preferences dedupe exact refs, retain unknown refs, and reject status-only refs', () => {
+test('saved preferences dedupe exact refs and retain unknown refs', () => {
   const { rail, registry } = loadRuntime();
   const stored = {
     version: 1,
@@ -139,8 +139,8 @@ test('saved preferences dedupe exact refs, retain unknown refs, and reject statu
   assert.equal(state.status, 'saved');
   assert.deepEqual(Array.from(state.pinned), ['console:audio', 'tool:throwline', 'console:future', 'external:arenaops']);
   assert.deepEqual(Array.from(state.visibleRefs), ['console:audio', 'tool:throwline']);
-  assert.deepEqual(Array.from(state.suppressedRefs), ['console:future']);
-  assert.deepEqual(Array.from(state.rejectedRefs), ['external:arenaops']);
+  assert.deepEqual(Array.from(state.suppressedRefs), ['console:future', 'external:arenaops']);
+  assert.deepEqual(Array.from(state.rejectedRefs), []);
   assert.deepEqual(storage.setCalls, []);
 });
 
@@ -157,24 +157,24 @@ test('explicit edits keep unresolved refs after visible refs and never alias IDs
 
   assert.equal(store.move('console:av-video', 0).ok, true);
   assert.deepEqual(JSON.parse(storage.data['sbd.rail.v1']).pinned, [
-    'console:av-video', 'console:audio', 'console:future'
+    'console:av-video', 'console:audio', 'console:future', 'external:arenaops'
   ]);
 
   assert.equal(store.pin('console:lighting', 1).ok, true);
   assert.deepEqual(JSON.parse(storage.data['sbd.rail.v1']).pinned, [
-    'console:av-video', 'console:lighting', 'console:audio', 'console:future'
+    'console:av-video', 'console:lighting', 'console:audio', 'console:future', 'external:arenaops'
   ]);
 
   assert.equal(store.unpin('console:audio').ok, true);
   assert.deepEqual(JSON.parse(storage.data['sbd.rail.v1']).pinned, [
-    'console:av-video', 'console:lighting', 'console:future'
+    'console:av-video', 'console:lighting', 'console:future', 'external:arenaops'
   ]);
 
   assert.equal(store.pin('tool:cueforge').code, 'not-pinnable');
   assert.equal(store.pin('external:arenaops').code, 'not-pinnable');
   assert.equal(store.pin('external:cueforge', 0).ok, true);
   assert.deepEqual(JSON.parse(storage.data['sbd.rail.v1']).pinned, [
-    'external:cueforge', 'console:av-video', 'console:lighting', 'console:future'
+    'external:cueforge', 'console:av-video', 'console:lighting', 'console:future', 'external:arenaops'
   ]);
   assert.equal(storage.data.unrelated, 'keep');
 });
@@ -400,4 +400,73 @@ test('responsive stylesheet encodes the settled breakpoints and accessibility fo
   assert.match(css, /safe-area-inset-bottom/);
   assert.match(css, /\.sbd-rail__entry\.is-planned:focus-visible[\s\S]*overflow-wrap: anywhere;/);
   assert.match(css, /@media print/);
+
+  const collapsedStart = css.indexOf('@media (max-width: 1439px)');
+  const wideStart = css.indexOf('@media (min-width: 1440px)');
+  assert.ok(collapsedStart >= 0 && wideStart > collapsedStart);
+  const collapsed = css.slice(collapsedStart, wideStart);
+  const wide = css.slice(wideStart);
+  assert.match(collapsed, /\.sbd-rail__badge\s*\{[\s\S]*clip-path:\s*inset\(50%\);/);
+  assert.match(collapsed, /\.sbd-rail__entry:has\(\.sbd-rail__badge\)::after[\s\S]*width:\s*6px;[\s\S]*height:\s*6px;/);
+  assert.match(collapsed, /\.sbd-rail__section \+ \.sbd-rail__section\s*\{[\s\S]*border-top:\s*1px solid var\(--av-line,/);
+  assert.doesNotMatch(wide, /\.sbd-rail__badge/);
+  assert.doesNotMatch(wide, /\.sbd-rail__section \+ \.sbd-rail__section/);
+});
+
+test('default rail gives every entry its own icon and puts badges in the tooltip', () => {
+  const { rail, registry } = loadRuntime();
+  const document = new FakeDocument();
+  const container = new FakeElement('div', document);
+  const rendered = rail.render(container, { registry });
+  const entries = elementsByClass(rendered.shell, 'sbd-rail__entry');
+  function iconPaths(entry) {
+    const icon = entry.children.find((child) => child.getAttribute('class') === 'sbd-rail__icon' || hasClass(child, 'sbd-rail__icon'));
+    assert.ok(icon, `${entry.getAttribute('data-rail-ref')} has an icon`);
+    return icon.children.map((path) => path.getAttribute('d')).join('|');
+  }
+  const signatures = entries.map((entry) => ({
+    ref: entry.getAttribute('data-rail-ref'),
+    paths: iconPaths(entry)
+  }));
+  const seen = new Map();
+  signatures.forEach((item) => {
+    assert.ok(item.paths, `${item.ref} has an icon`);
+    assert.equal(seen.has(item.paths), false, `${item.ref} shares an icon with ${seen.get(item.paths)}`);
+    seen.set(item.paths, item.ref);
+  });
+
+  const byRef = Object.fromEntries(signatures.map((item) => [item.ref, item.paths]));
+  const generic = 'M4 4h16v16H4z|M8 9h8|M8 13h5';
+  const external = 'M10 5H5v14h14v-5|M13 3h8v8|M21 3 11 13';
+  assert.equal(byRef['tool:throwline'], 'M3 5h18v10H3z|M8 19h8|M12 15v4|M9 9h6');
+  assert.equal(byRef['tool:led-wall-calculator'], 'M3 3h8v8H3z|M13 3h8v8h-8z|M3 13h8v8H3z|M13 13h8v8h-8z');
+  assert.equal(byRef['panel:video:flow'], 'M6 3a3 3 0 1 0 0 6 3 3 0 0 0 0-6z|M6 15a3 3 0 1 0 0 6 3 3 0 0 0 0-6z|M18 9a3 3 0 1 0 0 6 3 3 0 0 0 0-6z|M8.5 6.5l7 4|M8.5 17.5l7-4');
+  assert.equal(byRef['guide:console-spec'], 'M4 19.5A2.5 2.5 0 0 1 6.5 17H20|M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z');
+  assert.equal(byRef['tool:teleprompter'], 'M3 6h18v10H3z|M8 20h8|M12 16v4|M7 10h10|M7 13h6');
+  assert.equal(byRef['tool:show-timer'], 'M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20z|M12 6v6l4 2');
+  assert.equal(byRef['tool:cue-sheet'], 'M8 6h13|M8 12h13|M8 18h13|M3 6h.01|M3 12h.01|M3 18h.01');
+  assert.equal(byRef['tool:pixelforge'], 'M3 3h7v7H3z|M14 3h7v7h-7z|M3 14h7v7H3z|M17 14v7|M14 17h7');
+  assert.equal(byRef['tool:stageplotter'], 'M3 3h18v18H3z|M3 9h18|M9 9v12');
+  assert.equal(byRef['tool:gear-reference'], 'M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z|M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z');
+  assert.equal(byRef['guide:frame-sync'], 'M3 12a9 9 0 0 1 15.5-6.4L21 8|M21 3v5h-5|M21 12a9 9 0 0 1-15.5 6.4L3 16|M8 16H3v5');
+  assert.equal(byRef['guide:fault-finding'], 'M11 5a6 6 0 1 0 0 12 6 6 0 0 0 0-12z|m21 21-4.3-4.3');
+  assert.equal(byRef['guide:field-kit'], 'M5 12.55a11 11 0 0 1 14.08 0|M8.53 16.11a6 6 0 0 1 6.95 0|M12 20h.01');
+  ['tool:throwline', 'guide:console-spec', 'guide:field-kit', 'guide:frame-sync'].forEach((ref) => {
+    assert.notEqual(byRef[ref], generic, ref);
+  });
+  assert.notEqual(byRef['guide:field-kit'], external);
+  assert.equal(byRef['external:rehearsal-capture'], external);
+  assert.equal(rail.resolveRef('tool:ontrack', registry).icon.join('|'), generic);
+
+  const fieldKit = entries.find((entry) => entry.getAttribute('data-rail-ref') === 'guide:field-kit');
+  const spec = entries.find((entry) => entry.getAttribute('data-rail-ref') === 'guide:console-spec');
+  const frameSync = entries.find((entry) => entry.getAttribute('data-rail-ref') === 'guide:frame-sync');
+  assert.equal(fieldKit.getAttribute('title'), 'Sync & Signal Field Kit · $12');
+  assert.equal(spec.getAttribute('title'), 'Console Spec Guide · GUIDE');
+  assert.equal(fieldKit.getAttribute('target'), null);
+  assert.equal(frameSync.getAttribute('target'), '_blank');
+  assert.match(frameSync.getAttribute('rel'), /noopener/);
+  assert.equal(frameSync.getAttribute('title'), 'Frame-sync demo');
+  const calculator = entries.find((entry) => entry.getAttribute('data-rail-ref') === 'console:av-calculator');
+  assert.equal(iconPaths(calculator), registry.consoles.find((item) => item.id === 'av-calculator').icon.join('|'));
 });

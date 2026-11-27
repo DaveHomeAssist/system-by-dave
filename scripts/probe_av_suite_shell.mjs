@@ -45,7 +45,7 @@ const IDENTITIES = [
   ['console:show-ops', 'Show Ops', 'Operations'],
   ['console:front-office', 'Front Office', 'Desk'],
   ['console:shop', 'The Shop', 'Work'],
-  ['console:infrastructure', 'Infrastructure', 'Systems'],
+  ['console:infrastructure', 'Power, Network & Cable', 'Systems'],
   ['console:lighting', 'Lighting', 'Patch'],
   ['console:av-video', 'AV Video', 'Routing'],
   ['console:av-calculator', 'AV Calculator', 'Audio'],
@@ -207,13 +207,15 @@ try {
   await page.getByRole('button', { name: 'Inspector options' }).click();
   await page.getByRole('menuitem', { name: 'Change panel…' }).click();
   const chooser = page.getByRole('dialog', { name: 'Add panel' });
-  assert.deepEqual((await chooser.getByRole('group', { name: 'Panel categories' }).locator('button').allTextContents()).slice(0, 3), ['AV Video', 'Audio', 'Show Control'], 'chooser groups panels by application');
-  assert.equal(await chooser.getByRole('group', { name: 'Panel categories' }).locator('button').count(), 12, 'the ten native departments plus Tools and Gear 3D groups are offered');
-  assert.equal(await chooser.getByRole('button', { name: 'Gear 3D', exact: true }).count(), 1, 'remote gear viewers are offered as a Gear 3D group');
-  assert.equal(await chooser.getByRole('button', { name: 'Tools', exact: true }).count(), 1, 'specialist tools are offered as a Tools group');
+  const groupNames = () => chooser.getByRole('group', { name: 'Panel categories' }).locator('button').evaluateAll(buttons => buttons.map(button => button.dataset.group));
+  assert.deepEqual((await groupNames()).slice(0, 3), ['AV Video', 'Audio', 'Show Control'], 'chooser groups panels by application');
+  assert.equal((await groupNames()).length, 11, 'the ten departments plus Show tools; Gear 3D sits inside Equipment Lab');
+  assert.equal(await chooser.getByRole('button', { name: 'Gear 3D', exact: true }).count(), 0, 'Gear 3D is no longer its own group');
+  assert.equal(await chooser.getByRole('button', { name: 'Show tools', exact: true }).count(), 1, 'specialist tools are offered as Show tools');
+  assert.equal(await chooser.locator('.console-featured button').count(), 6, 'the featured row lists six panels');
   // Two steps: the group tiles come first, then the picked group's panels replace them.
   assert.equal(await chooser.locator('.console-choices button').count(), 0, 'no panel choices before a group is picked');
-  assert.equal(await chooser.locator('.console-groups button[aria-current="true"]').textContent(), 'AV Video', 'the active application is marked');
+  assert.equal(await chooser.locator('.console-groups button[aria-current="true"]').getAttribute('data-group'), 'AV Video', 'the active application is marked');
   await chooser.getByRole('button', { name: 'Front Office', exact: true }).click();
   assert.equal(await chooser.getByRole('group', { name: 'Panel categories' }).count(), 0, 'the other groups leave once one is picked');
   assert.equal(await chooser.locator('.console-chooser-bar h3').textContent(), 'Front Office');
@@ -224,7 +226,7 @@ try {
   await page.waitForFunction(() => document.activeElement?.dataset.group === 'Front Office'); // focus returns to the group just left
   await chooser.getByRole('button', { name: 'Front Office', exact: true }).click();
   await chooser.getByRole('button', { name: 'Back', exact: true }).click();
-  assert.equal(await chooser.getByRole('group', { name: 'Panel categories' }).locator('button').count(), 12, 'Back restores every group');
+  assert.equal(await chooser.getByRole('group', { name: 'Panel categories' }).locator('button').count(), 11, 'Back restores every group');
   await chooser.getByRole('searchbox', { name: 'Search panels' }).fill('fixture');
   assert.ok(await chooser.locator('.console-choices button').filter({ hasText: 'Fixtures' }).count() >= 1, 'search lists matches across groups');
   await chooser.getByRole('searchbox', { name: 'Search panels' }).fill('');
@@ -318,8 +320,9 @@ try {
   // On a full mixed phone workspace, the menu must bring an existing department forward.
   await page.setViewportSize({ width: 375, height: 812 });
   await recallPanel(page, 'Audio Delay');
-  await page.locator('.console-tools').getByRole('button', { name: /Add panel/ }).click();
-  await chooser.getByRole('button', { name: 'Replace the focused panel', exact: true }).click();
+  // Replace through the panel's own menu, so the four departments keep their places on the grid.
+  await page.getByRole('button', { name: 'Audio Delay options', exact: true }).click();
+  await page.getByRole('menuitem', { name: 'Change panel…' }).click();
   await chooser.getByRole('button', { name: 'Audio', exact: true }).click();
   await chooser.locator('.console-choices button').filter({ hasText: 'Inputs' }).click();
   assert.equal(await page.locator('.console-panel').getAttribute('data-app'), 'Audio', 'phone selection supersedes the previous department quick-bar choice');
@@ -434,9 +437,8 @@ try {
       } else await menuPage.locator('.console-tools').getByRole('button', { name: /Add panel/ }).click();
     };
     await openMenu();
-    const groups = await menu.getByRole('group', { name: 'Panel categories' }).locator('button').allTextContents();
-    assert.equal(groups.length, 12);
-    const framed = new Set(['Tools', 'Gear 3D']);
+    const groups = await menu.getByRole('group', { name: 'Panel categories' }).locator('button').evaluateAll(buttons => buttons.map(button => button.dataset.group));
+    assert.equal(groups.length, 11);
     for (const group of groups) {
       await menu.getByRole('button', { name: group, exact: true }).click();
       const count = await menu.locator('.console-choices button').count();
@@ -445,7 +447,10 @@ try {
         await menu.locator('.console-choices button').nth(index).click();
         assert.equal(await menuPage.locator('.console-panel').count(), 1, `${group}: replacement stays in the same slot`);
         assert.equal(await menuPage.locator('.console-panel').getAttribute('data-app'), group);
-        assert.equal(await menuPage.locator('iframe').count(), framed.has(group) ? 1 : 0, framed.has(group) ? `${group}: a specialist choice renders its own page as a chrome-less panel` : `${group}: every choice renders natively`);
+        const frames = await menuPage.locator('iframe').count();
+        if (group === 'Show tools') assert.equal(frames, 1, `${group}: a specialist choice renders its own page as a chrome-less panel`);
+        else if (group === 'Equipment Lab') assert.ok(frames === 0 || frames === 1, `${group}: native panels stay native and 3D models stay framed`);
+        else assert.equal(frames, 0, `${group}: every choice renders natively`);
         assert.equal(await menuPage.locator('.console-panel .console-body').isVisible(), true);
         panelCount++;
       }
@@ -488,7 +493,7 @@ try {
         await frontOffice.focus();
         await addPage.keyboard.press('Enter');
         await addPage.waitForFunction(() => document.activeElement?.closest('.console-choices') !== null);
-        assert.deepEqual(await addChooser.locator('.console-choices strong').allTextContents(), ['Jobs', 'Clients', 'Venues', 'Job updates', 'Document']);
+        assert.deepEqual(await addChooser.locator('.console-choices strong').allTextContents(), ['Jobs', 'Clients', 'Venues', 'Job updates', 'Project']);
         assert.ok(await addChooser.locator('.console-choices').evaluate(el => el.clientHeight >= 44), `Add list has a usable visible row at ${width}x${height} ${theme}`);
         for (let index = 0; index < 5; index++) {
           if (index) await addPage.keyboard.press('Tab');
@@ -568,7 +573,7 @@ try {
   } finally { await unusableContext.close(); }
   console.log('Site storage refused: the console opens five applications with a notice and visible write failures; an unusable browser gets a plain message.');
   assert.deepEqual(errors, []);
-  console.log(`AV Suite shell verification passed: all ${panelCount} individual menu choices across ten native departments, seven specialist panels and two Gear 3D viewers, mixed panels and reloads, full Video menu with modules disabled, legacy layout bytes preserved, isolated saves, specialist pages as chrome-less panels, and all four named palettes at eight sizes.`);
+  console.log(`AV Suite shell verification passed: all ${panelCount} individual menu choices across ten departments, Show tools and Equipment Lab 3D models, mixed panels and reloads, full Video menu with modules disabled, legacy layout bytes preserved, isolated saves, specialist pages as chrome-less panels, and all four named palettes at eight sizes.`);
 } catch (error) {
   if (process.env.AV_SUITE_EVIDENCE) {
     await mkdir(process.env.AV_SUITE_EVIDENCE, { recursive: true });

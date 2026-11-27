@@ -1,0 +1,186 @@
+1. PROJECT SUMMARY
+
+Objective: Harden the System by Dave Envision layout editor so valid AfterJinx and Signal Assembly flyer projects remain compatible while malformed layouts, oversized images, rendering failures, inaccessible naming, and unreliable exports fail safely and clearly.
+
+Key Outcomes:
+- Existing nnc-layout-1 files for AfterJinx, Signal Assembly, and Signal Assembly Fire open, edit, save, reopen, and export at 615 by 768 pixels without visual regressions.
+- Invalid layer geometry, null layers, unsupported images, and unsafe decoded image dimensions are rejected before the active project or canvas is changed.
+- Failed imports, logo replacements, and exports preserve the last usable project, retain the unsaved-work warning, and display a specific recovery message.
+- Long text remains readable through deterministic wrapping and font fitting, and the canvas accessible name always identifies the active event.
+- Automated unit and browser tests cover all twelve audited failure paths, and the complete repository and live-release verification gates pass.
+
+Assumptions:
+- The primary implementation target is envision/layout/editor.js because it is the file audited in the most recent request and its live SHA-256 hash matched the local file. The related envision/layout/index.html, focused tests, docs/envision.md, and CHANGELOG.md may change when required to complete and document the fixes.
+- The portable file contract remains format nnc-layout-1 with exactly 11 layers and a 615 by 768 background. This preserves compatibility with all three project files inspected during the audit.
+- Existing project files must continue to reopen without migration. New validation will reject only files that cannot render safely or conform to the existing geometry and image contract.
+- Background images must remain exactly 615 by 768 pixels. Layer art and replacement logos will be limited to 4,096 pixels per side and 16,777,216 decoded pixels. These thresholds provide ample resolution for the 615 by 768 output while bounding browser memory use.
+- Layer boxes must use finite coordinates with x and y greater than or equal to zero, positive width and height, and right and bottom edges within the 615 by 768 canvas.
+- The browser cannot prove that a fallback anchor download reached disk. The fallback will report that a download was requested and will keep the project dirty. Browsers that support the File System Access API will clear dirty state only after the file write completes successfully.
+- Text will wrap on whitespace, fall back to character-level breaks for long uninterrupted strings, and shrink to a defined minimum font size. Text that still cannot fit will be rejected with an actionable status instead of being exported unreadably.
+- No new production dependency is required. Tests will use the repository's existing Node and browser-test tooling and small generated fixtures stored with the tests.
+- Implementation will stay on the current System by Dave feature branch or a fresh branch created from current origin/main according to repository policy. Production remains GitHub Pages from main.
+
+2. PHASED IMPLEMENTATION PLAN
+
+Phase Name: Phase 1: Baseline Contract and Regression Harness
+
+Goal: Capture the current portable-project behavior and create automated fixtures that reproduce every audited failure before changing editor logic.
+
+Key Milestones:
+- Add a focused Envision layout test module that loads editor.js with controlled DOM, canvas, image-decoder, file-reader, and download doubles.
+- Add valid fixtures representing AfterJinx, Signal Assembly, Signal Assembly Fire, an older file without eventName, and a file containing a replacement logo.
+- Add invalid fixtures for a null layer, negative and off-canvas boxes, oversized dimensions, excessive decoded pixels, malformed image data, and an overlong Unicode event name.
+- Add browser-test cases for long text, stale canvas labeling, repeated export clicks, failed downloads, context loss, and unsaved-state preservation.
+- Record the expected nnc-layout-1 invariants and new safety limits in docs/envision.md before implementation begins.
+
+Dependencies: Current editor.js, index.html, the three inspected flyer project shapes, repository test tooling, and a clean or safely isolated checkout must be available.
+
+Required Resources: System by Dave repository, Node.js, the existing package lock, the repository's browser automation dependency, a local static HTTP server, and a developer familiar with browser canvas APIs.
+
+Estimated Timeline: 1 to 2 days.
+
+Owner / Responsible Party: System by Dave frontend developer.
+
+Risks / Failure Points:
+- Real flyer files contain large embedded data URLs, which can make fixtures slow or unsuitable for version control. Replace image payloads with minimal deterministic test images while preserving the real schema.
+- Browser canvas behavior differs from test doubles. Keep at least one rendered browser case for every error class that depends on native decoding or canvas behavior.
+- Tests that assert exact raster bytes can become browser-version dependent. Assert dimensions, visible bounds, status state, and sampled regions instead of full binary equality unless an exact fixture is stable.
+
+Phase Name: Phase 2: Safe Import and Resource Validation
+
+Goal: Validate the entire candidate project and all decoded image resources before committing any state to the active editor.
+
+Key Milestones:
+- Introduce explicit validators for the project object, non-null layer objects, required string fields, supported kinds, 11-layer count, and finite in-canvas geometry.
+- Refactor image loading to validate MIME type, encoded length, decoded width, decoded height, and decoded pixel count with named limits and specific error messages.
+- Decode layer art and logos sequentially or through a bounded queue with a concurrency limit of two, avoiding the current 22-image Promise.all memory spike.
+- Build a candidate project and candidate image collection without changing project, background, images, form fields, menu options, canvas visibility, or dirty state.
+- Render the candidate on a scratch canvas and commit it to the active editor only after validation, decoding, and the complete draw pass succeed.
+- Add tests proving that every rejected import leaves the prior project, preview, selected layer, event name, and dirty state unchanged.
+
+Dependencies: Phase 1 fixtures and harness must be complete. Safety-limit constants and nnc-layout-1 invariants must be recorded.
+
+Required Resources: Browser Image or createImageBitmap support, Canvas 2D APIs, Node test runner, browser test runner, and the existing real project files for compatibility checks outside committed fixtures.
+
+Estimated Timeline: 1 to 2 days.
+
+Owner / Responsible Party: System by Dave frontend developer.
+
+Risks / Failure Points:
+- Sequential decoding can make the 1.48 MB AfterJinx file feel slower. Add a visible loading status and measure the real fixture so the safer path remains usable.
+- Browser decoders can reject valid but uncommon WebP or JPEG encodings differently. Preserve the current PNG, JPEG, and WebP allowlist and report the exact failed asset and reason.
+- Scratch-canvas rendering can temporarily double canvas memory. Reuse one 615 by 768 scratch canvas and release candidate image references immediately after failure.
+- Overly strict geometry checks could reject a legacy file that intentionally bleeds beyond the canvas. The three known projects are already in bounds, and any newly discovered exception must be documented before relaxing the rule.
+
+Phase Name: Phase 3: Transactional Editing and Rendering Recovery
+
+Goal: Make logo replacement, reset, text editing, canvas availability, and renderer failures atomic and recoverable.
+
+Key Milestones:
+- Check getContext('2d') during initialization and show a blocking editor status when no usable context is available.
+- Handle canvas context loss by disabling edit and export controls, preserving project data, and restoring the preview from project state after context restoration.
+- Refactor logo replacement to decode and render a candidate logo before changing layer.logo or images[index].logo.
+- Roll back the candidate logo and keep the previous image and serialized layer unchanged when decoding or rendering fails.
+- Clear the retained decoded logo reference when wording replaces a logo or Restore original layer removes it.
+- Wrap canvas save and restore operations in try/finally and route rendering exceptions through one error type that identifies the failed layer.
+
+Dependencies: Phase 2 candidate-state and safe-image-loading helpers must be complete.
+
+Required Resources: Canvas context-loss event support, test doubles that can force getContext failure and draw exceptions, and the Phase 1 browser harness.
+
+Estimated Timeline: 1 to 2 days.
+
+Owner / Responsible Party: System by Dave frontend developer.
+
+Risks / Failure Points:
+- Some browsers expose different context-loss behavior for 2D canvas. Test the explicit null-context path everywhere and treat context restoration as progressive recovery.
+- Error rollback can accidentally preserve a new decoded image reference. Assert old and new layer data plus tracked image references after every forced failure.
+- Disabling the complete fieldset during recovery can hide the failure from keyboard users. Keep the status region available and move focus to the recovery message only for blocking failures.
+
+Phase Name: Phase 4: Readable Text, Accessible Identity, and Reliable Export
+
+Goal: Produce readable flyer copy, identify the active event correctly to assistive technology, and prevent exports from claiming success or racing with later edits.
+
+Key Milestones:
+- Add a deterministic text-layout helper that measures candidate lines, wraps at word boundaries, breaks long uninterrupted strings, and shrinks within defined artist and information minimum font sizes.
+- Reject text that cannot fit its layer box at the minimum font size and keep the previous render and wording available for correction.
+- Update the canvas aria-label to "Edited flyer for EVENT NAME" on import and event-name input, with "Edited Envision flyer" as the empty fallback.
+- Add an export operation token and busy state so only the latest PNG callback can update status or initiate a download and repeated clicks cannot start parallel exports.
+- Wrap Blob creation, canvas.toBlob, object-URL creation, file writing, and download initiation in explicit error handling that restores controls and reports a recovery action.
+- Use showSaveFilePicker when available and clear dirty state only after a completed editable-file write. Keep dirty state on anchor-download fallback and label the status "Download requested" rather than "prepared."
+- Truncate sanitized filenames by Unicode code point, preserve valid emoji, and retain the existing Windows reserved-name protection.
+
+Dependencies: Phase 3 rendering and rollback paths must be complete. The editor must expose a single status and busy-state controller.
+
+Required Resources: Canvas measureText, Blob and object-URL APIs, optional File System Access API, accessibility-tree inspection, keyboard testing, and desktop plus phone browser viewports.
+
+Estimated Timeline: 2 to 3 days.
+
+Owner / Responsible Party: System by Dave frontend developer with accessibility review by the product owner or a designated reviewer.
+
+Risks / Failure Points:
+- Text fitting can alter the appearance of existing edited text. Preserve original art rendering when text equals original and add screenshot comparisons for the three known flyers.
+- File System Access API is unavailable in Safari and Firefox. The fallback must remain fully functional and explicit about its inability to confirm disk persistence.
+- Status updates from import, editing, and export can still race if they bypass the shared operation token. Route every asynchronous status change through the same operation-state helper.
+- Dynamic accessible names can become verbose with long event names. Reuse the normalized 100-code-point event name and avoid repeating layer details in the canvas name.
+
+Phase Name: Phase 5: Full Verification, Documentation, and Release
+
+Goal: Prove compatibility, failure recovery, responsiveness, accessibility, and production behavior before merging and deploying the hardened editor.
+
+Key Milestones:
+- Run the focused Envision unit and browser tests, node --check envision/layout/editor.js, git diff --check, npm run verify:indexing, npm run verify:public-navigation, and npm run verify:public-consistency with passing results.
+- Open, edit, save, reopen, and export the AfterJinx, Signal Assembly, and Signal Assembly Fire projects and verify each download uses its event name and remains 615 by 768 pixels.
+- Verify the editor at desktop, the 680-pixel breakpoint, and a 375 by 812 phone viewport, including no page scroll, keyboard order, visible focus, touch targets, light and dark themes, and zero unexpected console errors.
+- Verify the accessibility tree announces the correct event name, reports blocking and recoverable errors through the status region, and keeps every core action keyboard operable.
+- Update docs/envision.md and CHANGELOG.md with validation limits, download-confirmation behavior, compatibility guarantees, recovery behavior, and the exact verification commands.
+- Review the complete diff, commit only task-owned files, push the authorized branch, verify the remote ref, merge after required checks are green, verify the Pages deployment, and repeat the three-project smoke test on https://systembydave.com/envision/layout/.
+
+Dependencies: Phases 1 through 4 must be complete with no unresolved high- or medium-severity failures. Repository CI, GitHub access, and the Pages deployment workflow must be available.
+
+Required Resources: Node.js, repository verification scripts, desktop and phone browser automation, the three real project files, GitHub repository access, GitHub Pages deployment access, and a reviewer for final visual acceptance.
+
+Estimated Timeline: 1 to 2 days plus CI and Pages deployment time.
+
+Owner / Responsible Party: System by Dave frontend developer for implementation and automated verification, repository maintainer for merge, and Dave or Nick for final visual acceptance with real flyer files.
+
+Risks / Failure Points:
+- Existing repository-wide checks may expose unrelated failures. Record their owning commit and evidence separately, while fixing every failure caused by this work.
+- GitHub Pages caching can make live files temporarily differ from the merged commit. Verify the deployed editor.js hash before live acceptance.
+- Automated raster checks cannot prove artistic acceptability at phone size. Final acceptance requires a human side-by-side review of all three real flyers.
+- A browser-specific download permission prompt can block unattended smoke tests. Verify API-level behavior automatically and perform one visible manual save in each supported browser family used for acceptance.
+
+3. EXECUTION NOTES
+
+Critical Sequencing Constraints:
+- Build the failure fixtures before refactoring. Each audited defect needs a failing test that proves the old behavior and a passing test that proves the fix.
+- Complete full project validation and scratch rendering before committing imported state. Any earlier DOM or global-state mutation recreates the partial-import bug.
+- Implement shared operation and error-state handling before changing asynchronous export behavior. Import, logo decoding, and PNG encoding must use the same stale-operation rules.
+- Complete text fitting before final screenshot baselines. Capturing baselines earlier would encode the known unreadable one-line behavior.
+- Run real-file compatibility checks before merging, then repeat them only after the deployed editor.js hash matches the merged commit.
+
+Parallelizable Work:
+- Unit fixtures for schema, geometry, filenames, and null layers can be developed alongside browser fixtures for canvas, context loss, accessibility, and export races after the baseline contract is written.
+- Documentation updates for validation limits and recovery messages can proceed while implementation tests run, provided final wording is reconciled with actual behavior before commit.
+- Desktop, 680-pixel, and phone responsive checks can run concurrently after the implementation is stable.
+- Accessibility-tree verification and visual screenshot comparison can run concurrently because they inspect different outputs from the same build.
+
+Quick Wins:
+- Add a null-object guard to layer validation and return the existing "Invalid layout layer" message.
+- Update the canvas aria-label whenever the normalized event name changes.
+- Add explicit in-canvas box validation for x, y, width, and height.
+- Clear images[index].logo when text or reset removes the serialized logo.
+- Replace status wording from "prepared" to "requested" on unconfirmed anchor-download fallback.
+
+Long-Lead Tasks:
+- Browser-family validation of download behavior requires access to each supported browser and may include user-visible permission prompts.
+- Human visual acceptance of AfterJinx, Signal Assembly, and Signal Assembly Fire requires Dave or Nick to review phone-size exports.
+- GitHub review, CI, merge, Pages deployment, cache propagation, and live hash confirmation can extend beyond implementation time.
+
+4. NEXT ACTIONS
+
+1. Create scripts/envision_layout_editor.test.mjs with the valid nnc-layout-1 fixture and failing cases for null layers, out-of-bounds boxes, unsafe decoded dimensions, download failure, stale export callbacks, and Unicode filename truncation.
+2. Add named canvas, geometry, decoded-dimension, decoded-pixel, and decode-concurrency constants to envision/layout/editor.js and document their exact values in docs/envision.md.
+3. Refactor openLayout() to validate, decode, and render a candidate project on a scratch canvas before assigning project, background, images, form values, layer options, canvas visibility, or dirty state.
+4. Refactor logo replacement and PNG or editable-file export to use rollback-safe operations, operation tokens, explicit error states, and confirmed-write semantics where the browser supports them.
+5. Run the focused Envision tests and the three real-file browser smoke test, then execute the repository public-page verification commands and review the complete diff before committing.

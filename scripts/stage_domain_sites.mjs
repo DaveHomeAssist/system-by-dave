@@ -24,6 +24,7 @@ import vm from 'node:vm';
 import crypto from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { FIELD_KIT_PAGE, stagedFieldKitPage } from './field_kit_launch.mjs';
 import { applyManagedSiteMirrors } from './managed_site_mirrors.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -408,6 +409,40 @@ function homePage(site, origin) {
 // is root-absolute because GitHub Pages serves it at whatever path was requested.
 const AV_NOT_FOUND_STYLE = '@font-face{font-family:"DM Sans";font-weight:100 1000;font-display:swap;src:url(/fonts/dm-sans.woff2) format("woff2")}:root{color-scheme:dark}*{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;padding:24px;background:#0a0d14;color:#f3f4f7;font:16px/1.6 "DM Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}main{width:min(100%,34rem);padding:32px;border:1px solid rgba(255,255,255,.09);border-radius:14px;background:#0f131d}main:focus{outline:none}.code{margin:0 0 10px;color:#58c38b;font:400 12px/1.4 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.1em;text-transform:uppercase}h1{margin:0 0 10px;font-size:clamp(28px,6vw,36px);font-weight:600;letter-spacing:-.02em;line-height:1.15}p{margin:0 0 24px;color:rgba(243,244,247,.74)}.actions{display:flex;flex-wrap:wrap;gap:10px}.btn{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:12px 22px;border:1px solid rgba(255,255,255,.18);border-radius:10px;color:#f3f4f7;font-weight:500;text-decoration:none}.btn.primary{background:#f3f4f7;border-color:#f3f4f7;color:#0a0d14}.btn:hover{border-color:#58c38b}a:focus-visible{outline:2px solid #58c38b;outline-offset:3px}.skip{position:absolute;left:-999px;top:12px;padding:12px 16px;border-radius:10px;background:#f3f4f7;color:#0a0d14}.skip:focus{left:12px}';
 
+// Publish the verified daily snapshot at the blog route on each Pages release.
+function stageEngineeringBlog(dir, origin) {
+  const archive = 'demos/engineering-daily';
+  const receipt = JSON.parse(read(archive + '/release.json'));
+  const html = read(archive + '/index.html');
+  if (sha256(html) !== receipt.publicSha256 || receipt.files.length !== receipt.editions * 2) {
+    throw new Error('Engineering archive does not match its release receipt');
+  }
+  const oldOrigin = 'https://systembydave.com';
+  const oldRoute = oldOrigin + '/' + archive + '/';
+  const blog = origin + '/blog/';
+  const output = html
+    .replaceAll(oldRoute, blog)
+    .replace('<title>Video Engineering Daily | System by Dave</title>', '<title>AV by Dave Blog</title>')
+    .replaceAll('content="Video Engineering Daily"', 'content="AV by Dave Blog"')
+    .replace('aria-label="System by Dave home"', 'aria-label="AV by Dave home"')
+    .replace('<a href="/demos/" aria-label="AV demos, parent of Video Engineering Daily">Video Engineering</a>', '<a href="/blog/">AV by Dave Blog</a>')
+    .replaceAll('href="/demos/"', 'href="' + oldOrigin + '/demos/"')
+    .replaceAll(oldOrigin + '/demos/og/hub.png', origin + '/img/av-by-dave-og.png');
+  if (!receipt.editions || !output.includes('<link rel="canonical" href="' + blog + '">') ||
+      !output.includes('<title>AV by Dave Blog</title>') || !output.includes('id="archive-data"')) {
+    throw new Error('AV by Dave Blog could not be generated from the daily archive');
+  }
+  writeFile(dir, 'blog/index.html', output);
+  for (const { name, sha256: expected } of receipt.files) {
+    if (!/^Edition [0-9]+\.(svg|png)$/.test(name)) throw new Error('Unexpected story card name: ' + name);
+    const destination = path.join(dir, 'blog', 'Story Cards', name);
+    fs.mkdirSync(path.dirname(destination), { recursive: true });
+    const bytes = fs.readFileSync(abs(archive + '/Story Cards/' + name));
+    if (sha256(bytes) !== expected) throw new Error('Story card does not match release receipt: ' + name);
+    fs.writeFileSync(destination, bytes);
+  }
+}
+
 function notFoundPage(site) {
   const title = escapeHtml(site.name);
   if (site.registry) {
@@ -719,7 +754,12 @@ function stageSite(site, closed, policy, options) {
   for (const file of [...closed.files].sort()) {
     const target = path.join(dir, file);
     fs.mkdirSync(path.dirname(target), { recursive: true });
-    fs.copyFileSync(abs(file), target);
+    if (file === FIELD_KIT_PAGE) {
+      // Indexed only once checkout is live (scripts/field_kit_launch.mjs).
+      fs.writeFileSync(target, stagedFieldKitPage(read('js/sbd-launch-config.js'), read(file)));
+    } else {
+      fs.copyFileSync(abs(file), target);
+    }
   }
   const origin = options.siteOrigins[site.id] || `https://${site.domain}`;
   const sourceOrigin = options.sourceOrigin || options.config.origin;
@@ -747,6 +787,9 @@ function stageSite(site, closed, policy, options) {
     }
     writeFile(dir, 'js/domain-move-sites.js', moveSitesScript(options.config, options.policies, options));
   }
+  if (site.id === 'avbydave') {
+    stageEngineeringBlog(dir, origin);
+  }
   writeFile(dir, '404.html', notFoundPage(site));
   writeFile(dir, 'transfer.html', transferPage(site, origin));
   writeFile(dir, 'js/domain-transfer-config.js', `window.SBD_DOMAIN_TRANSFER=${JSON.stringify({
@@ -760,6 +803,11 @@ function stageSite(site, closed, policy, options) {
   if (options.cutover) {
     execFileSync('python3', [path.join(ROOT, 'scripts/gen_sitemap.py'), '--site', site.id, '--lastmod', '--out', path.join(dir, 'sitemap.xml')], { cwd: ROOT, stdio: ['ignore', 'ignore', 'inherit'] });
     hasSitemap = fs.existsSync(path.join(dir, 'sitemap.xml'));
+    if (hasSitemap && site.id === 'avbydave') {
+      const sitemap = path.join(dir, 'sitemap.xml');
+      const xml = fs.readFileSync(sitemap, 'utf8');
+      fs.writeFileSync(sitemap, xml.replace('</urlset>', '  <url><loc>' + origin + '/blog/</loc></url>\n</urlset>'));
+    }
   }
   const baseRules = robotsRules(robots(site, origin, options.cutover, hasSitemap));
   const blockedImages = options.cutover
@@ -876,6 +924,24 @@ function moveSitesScript(config, policies, options) {
   return `window.SBD_DOMAIN_MOVES=${JSON.stringify(sites)};\n`;
 }
 
+// Published on systembydave.com, which deploys on every push. A destination whose content did not change
+// is not republished (scripts/domain_publish_plan.mjs), so its source.json can name an older commit. This
+// records what the deploy staged for each destination, so a monitor can tell a current site from a stale one
+// (scripts/launch/smoke_live_domain.mjs).
+function deployMarker(staged, options) {
+  const sites = {};
+  for (const { site, result } of staged) {
+    const provenance = JSON.parse(fs.readFileSync(path.join(result.dir, 'source.json'), 'utf8'));
+    sites[site.id] = { domain: site.domain, artifactSha256: provenance.artifactSha256, files: provenance.files };
+  }
+  return `${JSON.stringify({
+    schema: 'system-by-dave.deploy.v1',
+    sourceRepository: options.config.sourceRepository,
+    sourceCommit: options.commit,
+    sites
+  }, null, 2)}\n`;
+}
+
 // Every configured site needs a publish step that passes its own deploy key.
 function checkWorkflow(config) {
   const workflow = read('.github/workflows/deploy-pages.yml');
@@ -931,7 +997,8 @@ function main() {
   }
 
   for (const { site, entries, cutover } of plans) {
-    const closed = closeSite(site, entries, generated, movedIndex, args.simulate);
+    const generatedForSite = site.id === 'avbydave' ? new Set([...generated, 'blog/index.html']) : generated;
+    const closed = closeSite(site, entries, generatedForSite, movedIndex, args.simulate);
     closed.problems.push(...checkOffline(site, registry, closed.files));
     closed.warnings.forEach((warning) => console.warn(`warn ${site.id}: ${warning}`));
     if (closed.problems.length) {
@@ -964,7 +1031,8 @@ function main() {
       applyCutover(siteRoot, site, entries, options).forEach((file) => removed.add(file));
       console.log(`${site.id}: systembydave.com now redirects ${[...entries.pages].filter((file) => /\.html?$/i.test(file)).length} pages to ${site.domain}`);
     }
-    applyManagedSiteMirrors(siteRoot);
+    applyManagedSiteMirrors(siteRoot, { includeStartupRedirect: true });
+    writeFile(siteRoot, 'deploy.json', deployMarker(staged, options));
     if (staged.some((item) => item.cutover)) {
       writeFile(siteRoot, 'js/domain-move-sites.js', moveSitesScript(config, policies, options));
       const problems = checkRemovedAssets(siteRoot, removed);
@@ -982,7 +1050,7 @@ function main() {
 }
 
 export {
-  CONFIG_FILE, read, loadRegistry, siteEntries, routeFor,
+  CONFIG_FILE, read, loadRegistry, siteEntries, routeFor, deployMarker,
   robots, robotsRules, robotsAllows, declaresNoindex, previewImagePaths, crawlPolicyProblems, stageManagedSnapshotRoutes
 };
 

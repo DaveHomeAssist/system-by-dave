@@ -9,7 +9,7 @@ export const LIBRARY: PanelDef[] = [
   { type: 'clients', name: 'Clients', group: 'Common', description: 'Client identity, contact and notes.', minW: 3, minH: 3 },
   { type: 'venues', name: 'Venues', group: 'Common', description: 'Venue identity, location and notes.', minW: 3, minH: 3 },
   { type: 'updates', name: 'Job updates', group: 'Common', description: 'Set a stage, next action and dated update.', minW: 3, minH: 3 },
-  { type: 'document', name: 'Document', group: 'Utilities', description: 'Save, export, restore and Show Advance imports with explicit identity binding.', minW: 3, minH: 3 },
+  { type: 'document', name: 'Project', group: 'Utilities', description: 'Save, export, restore and Show Advance imports with explicit identity binding.', minW: 3, minH: 3 },
 ];
 export const DEFAULT_VIEWS: View[] = [
   { id: 'desk', name: 'Desk', panels: [

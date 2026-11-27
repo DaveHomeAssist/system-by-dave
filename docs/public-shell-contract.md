@@ -28,6 +28,8 @@ Every public System by Dave route must give a visitor five reliable orientation 
 
 ## Responsive and focus behavior
 
+The Tools directory keeps search, category selection, and the result count in view while the project list scrolls. A visitor can combine a name or topic with a category, clear either filter, follow a category link, and return to the same results with Back. All project links remain available when JavaScript is disabled. Check the controls and card artwork at phone, desktop, and ultrawide sizes in both themes. A shared search uses the q query parameter and the existing category fragment. The browser keeps unrelated query parameters and saves the theme under sbd-theme.
+
 - At and below 680 px, primary destinations remain directly available; they must not disappear behind a hamburger-only control.
 - Navigation controls and skip links meet a 44 by 44 CSS-pixel target where they are persistently visible.
 - Focus indicators remain visible against every supported theme.

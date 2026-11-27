@@ -100,7 +100,8 @@ to make stale documentation true.
  Docs, scripts, reports, plans, tests, and private pages stay in the
  repository and are not copied to the site.
 - **Domain sites:** `scripts/domain-sites.json` owns which pages are also
-  published on housevideo.app and avbydave.com, and each site's cutover state.
+  published on housevideo.app, walk.housevideo.app and avbydave.com, and each
+  site's cutover state.
   Those pages link systembydave.com-only destinations absolutely
   (`https://systembydave.com/...`); see `docs/domain-sites.md`. Release gates
   take expected canonical origins and sitemap membership from

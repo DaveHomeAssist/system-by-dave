@@ -806,7 +806,8 @@ if (!throwlineTools[0]?.storageKeys?.some((item) => item.key === 'throwline:stag
 if (!throwlineTools[0]?.storageKeys?.some((item) => item.key === 'throwline:stage-units:v1')) {
   fail('Registry must include the versioned Throwline Stage measurement-units key.');
 }
-['ProjectorThrow/', 'ProjectorThrow/Stage3D.html'].forEach((route) => {
+// ProjectorThrow/ only redirects to Stage3D.html, so the sitemap lists the final page.
+['ProjectorThrow/Stage3D.html'].forEach((route) => {
   const url = `${originFor(route)}/${route}`;
   if (!sitemapFor(route).includes(`<loc>${url}</loc>`)) fail(`Sitemap is missing ${url}.`);
 });

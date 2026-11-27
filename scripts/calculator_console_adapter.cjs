@@ -1,4 +1,4 @@
-const names = { audioCard: 'Audio Delay', projectionCard: 'Projection', storageCard: 'Record Storage', powerCard: 'Power Load', voltageDropCard: 'Voltage Drop', splCard: 'SPL Distance', summaryCard: 'Operator Summary', showContextCard: 'Show context' };
+const names = { audioCard: 'Audio Delay', projectionCard: 'Throw distance (quick)', storageCard: 'Record Storage', powerCard: 'Power Load', voltageDropCard: 'Voltage Drop', splCard: 'SPL Distance', summaryCard: 'Operator Summary', showContextCard: 'Show context' };
 async function activate(page, id) {
   await page.locator('.console-shell').waitFor();
   await page.locator('.console-quick').getByRole('button', { name: names[id], exact: true }).click();

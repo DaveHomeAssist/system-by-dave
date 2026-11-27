@@ -9,7 +9,7 @@ export const LIBRARY: PanelDef[] = [
   { type: 'network', name: 'Network', group: 'Common', description: 'Edit device, address and VLAN records.', minW: 3, minH: 3 },
   { type: 'cable', name: 'Cable', group: 'Common', description: 'Edit runs, endpoints and testing status.', minW: 3, minH: 3 },
   { type: 'issues', name: 'Issues', group: 'Common', description: 'Review issues and open their source records.', minW: 3, minH: 3 },
-  { type: 'document', name: 'Document', group: 'Utilities', description: 'Plan name, Save, export, restore and Power, Network or Cable Plan imports.', minW: 3, minH: 3 },
+  { type: 'document', name: 'Project', group: 'Utilities', description: 'Plan name, Save, export, restore and Power, Network or Cable Plan imports.', minW: 3, minH: 3 },
 ];
 export const DEFAULT_VIEWS: View[] = [
   { id: 'systems', name: 'Systems', panels: [

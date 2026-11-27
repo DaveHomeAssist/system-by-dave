@@ -10,9 +10,14 @@ const env = { ...process.env, AV_RETAINED_HOST: '1' };
 const limit = Number(process.env.AV_RETAINED_PROBE_LIMIT_MS) || 240000;
 for (const key of ['AV_VIDEO_BASE', 'AV_AUDIO_BASE', 'AUDIO_BASE', 'SHOW_CONTROL_BASE', 'SHOW_OPS_BASE', 'SHOW_OPS_BASE_URL', 'OFFICE_BASE', 'SHOP_BASE', 'INFRA_BASE', 'LIGHTING_BASE']) env[key] = server.base;
 try {
+  // AV_RETAINED_FROM and AV_RETAINED_UNTIL (exclusive) pick one slice of the list,
+  // so CI can run the probes as parallel jobs that together cover every file.
   const start = process.env.AV_RETAINED_FROM ? files.indexOf(process.env.AV_RETAINED_FROM) : 0;
   if (start < 0) throw Error('Unknown retained probe start');
-  for (const file of files.slice(start)) await new Promise((done, reject) => {
+  const end = process.env.AV_RETAINED_UNTIL ? files.indexOf(process.env.AV_RETAINED_UNTIL) : files.length;
+  if (end < 0) throw Error('Unknown retained probe end');
+  if (end <= start) throw Error('Retained probe slice is empty');
+  for (const file of files.slice(start, end)) await new Promise((done, reject) => {
     const started = Date.now();
     const child = spawn(process.execPath, [`scripts/${file}.mjs`, '--no-sandbox'], { env, stdio: 'inherit' });
     // A stalled probe names itself and stops here instead of using up the CI job.

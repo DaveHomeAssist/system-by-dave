@@ -15,8 +15,8 @@ handoffs.
 - Hosting: GitHub Pages from `main`, with `CNAME` preserving the custom domain.
  The Pages workflow publishes site content (`scripts/stage_public_site.mjs`),
  not the docs, scripts, plans, or private pages that stay in this repository.
-  The FMP suite and AV by Dave are also published from here to housevideo.app
-  and avbydave.com (`docs/domain-sites.md`).
+  The FMP suite, venue walk and AV by Dave are also published from here to
+  housevideo.app, walk.housevideo.app and avbydave.com (`docs/domain-sites.md`).
 
 ## Architecture
 
@@ -76,6 +76,9 @@ handoffs.
 - `ProjectorThrow/`: Throwline planner and Stage 3D companion
 - `depotops/`, `pixelforge/`, `noteforge/`: product-specific public surfaces;
   NoteForge is a managed release artifact synchronized from its own repository
+- `rehearsal-capture/`: Rehearsal Capture on avbydave.com, generated with its `run-review/`
+  forward by `scripts/build_rehearsal_capture.mjs` from the viewer pinned in
+  `apps/rehearsal-capture/`; never hand-edit either (docs/rehearsal-capture.md)
 - `data/`: authored product data such as the Gear Reference library
 - `docs/`: public contracts, product boundaries, audits, and focused plans
 - `scripts/`: generators, release syncs, source verifiers, and browser probes

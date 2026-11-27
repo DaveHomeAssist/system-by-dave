@@ -106,11 +106,15 @@
         "av-workbook/",
         "field-kit/",
         "field-kit/thanks/",
+        "frame-sync/",
         "boxlens/",
+        "rehearsal-capture/",
+        "run-review/",
         "console-guide/"
       ],
       "assets": [
         "img/av-by-dave-og.png",
+        "img/ontrack-share.jpg",
         "js/av-landing-theme.js",
         "js/sbd-events.js",
         "js/sbd-checkout.js",
@@ -127,6 +131,7 @@
         "revision": 4,
         "keys": [
           "av-suite-dashboard.v1",
+          "sbd.avSuite.recent.v1",
           "av-suite-ui.v1",
           "av-suite-dock-compact.v1",
           "av-theme-mode.v1",

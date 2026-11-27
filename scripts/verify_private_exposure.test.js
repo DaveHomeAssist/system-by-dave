@@ -12,6 +12,7 @@ test('rejects private files and local paths without disclosing values', (t) => {
   const sources = {
     'house/private.html': '<p>private fixture</p>',
     'cross-project-dashboard.json': '{}',
+    'date_project_implementation_plan.txt': 'Private implementation plan',
     'index.html': '<p>' + '/' + 'Users/example/private-project' + '</p>',
     'public.html': '<p>Public documentation</p>'
   };
@@ -23,4 +24,8 @@ test('rejects private files and local paths without disclosing values', (t) => {
   assert.equal(failures.length, 3);
   assert.ok(!failures.join('\n').includes('example'));
   assert.deepEqual(inspectFiles(root, ['public.html']), []);
+  assert.deepEqual(
+    inspectFiles(root, ['date_project_implementation_plan.txt'], { publish: true }),
+    ['date_project_implementation_plan.txt: internal file']
+  );
 });

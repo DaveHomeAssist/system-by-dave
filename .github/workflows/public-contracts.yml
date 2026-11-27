@@ -9,17 +9,17 @@ permissions:
 jobs:
   contracts:
     runs-on: ubuntu-latest
-    # The job runs 8 to 10 minutes (the Projctl step alone takes about 8). Run 671 was cancelled at
-    # the old 10 minute limit, so leave headroom.
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
         with:
           node-version: 24
+      - run: npm run test:cheesesteaks-sync
       - run: npm run verify:private-exposure
       - run: npm run verify:indexing
       - run: python3 scripts/gen_sitemap.py --check
+      - run: npm run verify:davai
       - run: npm run verify:public-navigation
       - run: npm run verify:public-consistency
       - run: npm ci --no-audit --no-fund
@@ -28,16 +28,16 @@ jobs:
       # ubuntu-latest already supplies Chromium's runtime libraries. Match the
       # domain gate: headless tests need the shell, not a stalled apt mirror.
       - run: npx playwright install --only-shell chromium
-      - name: Verify Projctl relay and operator controls
+      - run: node scripts/probe_brand_reference.mjs
+      - name: Verify AOM board policy and operator views
         run: |
-          python3 -m unittest discover -s apps/projctl/tools/acceptance -p 'test_*.py'
-          npm ci --prefix apps/projctl --ignore-scripts --no-audit --no-fund
-          npm test --prefix apps/projctl
-          npm run test:browser --prefix apps/projctl
-          npm run test:venue-browser --prefix apps/projctl
+          node scripts/probe_aom_show_board.mjs
+          node scripts/probe_aom_storage.mjs
+          node scripts/probe_aom_clipboard.mjs
       - run: npm run test:public-viewport
       - run: npm run probe:cue-sheet-editing
       - run: npm run probe:thephilly
+      - run: npm run test:davai-browser
       - name: Verify engineering daily journeys
         run: |
           python3 -m http.server 8000 --bind 127.0.0.1 >/tmp/daily-server.log 2>&1 &
@@ -49,3 +49,50 @@ jobs:
           done
           node scripts/probe_engineering_daily.cjs
           node scripts/probe_engineering_entry.cjs
+
+
+  projctl-contracts:
+    name: Projctl relay and venue
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            apps/projctl/package-lock.json
+      - run: python3 -m unittest discover -s apps/projctl/tools/acceptance -p 'test_*.py'
+      - run: npm ci --no-audit --no-fund
+      - run: npm ci --prefix apps/projctl --ignore-scripts --no-audit --no-fund
+      - run: npm test --prefix apps/projctl
+      - run: npx playwright install --only-shell chromium
+      - run: npm run test:venue-browser --prefix apps/projctl
+
+  projctl-browser:
+    name: Projctl browser shard ${{ matrix.shard }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3, 4]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            apps/projctl/package-lock.json
+      - run: npm ci --no-audit --no-fund
+      - run: npm ci --prefix apps/projctl --ignore-scripts --no-audit --no-fund
+      - run: npx playwright install --only-shell chromium
+      - name: Run Projctl browser shard
+        env:
+          SHARD_INDEX: ${{ matrix.shard }}
+          SHARD_TOTAL: ${{ strategy.job-total }}
+        run: npm run test:browser --prefix apps/projctl -- --shard "$SHARD_INDEX/$SHARD_TOTAL"

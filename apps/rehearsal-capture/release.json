@@ -1,0 +1,8 @@
+{
+  "schema": "system-by-dave.rehearsal-capture-release.v1",
+  "sourceRepository": "DaveHomeAssist/frozen-rehearsal-capture",
+  "sourceCommit": "9607a806a0099af9b191cd9e849a30ce8172fae0",
+  "sourcePath": "viewer/dist/rehearsal-review.html",
+  "sourceSha256": "92e37ac7aae701d47152eef4a6fa167df011ef444525251a7ca04496ecc35976",
+  "viewerBuilt": "2026-11-20T08:18:09Z"
+}

@@ -75,9 +75,14 @@ const robots = read('robots.txt');
 // outside the sitemap) and av/ is indexable in the AV sitemap (one fewer), so the count holds.
 // Equipment Lab adds its source template, original checklist and package return route.
 // Eight original family entries now redirect into the shared console.
-// The noindex Sync & Signal Field Kit draft (field-kit/, docs/launch/README.md) adds one,
+// The noindex Sync & Signal Field Kit page (field-kit/, docs/launch/README.md) adds one,
 // and its buyers-only download page (field-kit/thanks/, noindex, reached from Stripe's
-// after-payment redirect) adds one more.
+// after-payment redirect) adds one more. The noindex frame-sync/ short link (avbydave.com/frame-sync/,
+// canonical to systembydave.com/demos/frame-sync.html, used in the frame sync reel) adds one more.
+// Once checkout is open the Field Kit page joins the avbydave.com sitemap
+// (scripts/field_kit_launch.mjs) and leaves this count. Main's 221 includes field-kit/
+// unlisted and has no frame-sync/, so the open count stays 221 (field-kit listed,
+// frame-sync unlisted) and the closed count is 222.
 // Projctl adds two nonpublic relay pages: the control UI and passcode sign-in.
 // The Frozen Monitor adds six noindex relay pages under apps/projctl/public/monitor/ (2026-11-14).
 // The Frozen standalone house handoff and its local relay copy add two noindex crew reference pages.
@@ -86,7 +91,19 @@ const robots = read('robots.txt');
 // The Projctl show backup page adds one noindex relay role page, apps/projctl/public/show.html (2026-11-18).
 // The Projctl power operator page adds one noindex relay page (apps/projctl/public/power.html).
 // The Philly prototype (thephilly/, noindex, private working prototype) adds one.
-if (unlisted.length !== 220) fail(`Expected 220 tracked routes outside the sitemap; found ${unlisted.length}.`);
+// ProjectorThrow/ only forwards to ProjectorThrow/Stage3D.html, so the AV sitemap
+// lists the final address instead (scripts/gen_sitemap.py REDIRECT_ONLY) and adds one.
+const fieldKitListed = sitemapRoutes.has('/field-kit/');
+// Envision and its portable layout editor are both direct-access routes.
+// The private Envision coordinator adds one tracked noindex source template.
+// Rehearsal Capture adds three noindex pages: the avbydave.com route rehearsal-capture/,
+// the run-review/ forward from its first address, and its pinned upstream viewer under
+// apps/rehearsal-capture/upstream/ (docs/rehearsal-capture.md, 2026-11-26).
+// The public Recipe Journal mirror is intentionally outside the sitemap.
+// The six temporary Retreat Series preview pages are direct access only.
+// Cross-Pollinate adds one direct-link playtest route at /puzzle/.
+const expectedUnlisted = fieldKitListed ? 235 : 236;
+if (unlisted.length !== expectedUnlisted) fail(`Expected ${expectedUnlisted} tracked routes outside the sitemap; found ${unlisted.length}.`);
 SBD_REGISTRY.tools.filter((tool) => tool.tag === 'Application').forEach((tool) => {
   const route = `/${tool.href}`;
   const source = read(tool.href.endsWith('/') ? `${tool.href}index.html` : tool.href);

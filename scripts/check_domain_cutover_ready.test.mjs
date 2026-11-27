@@ -47,8 +47,11 @@ test('destination must serve the exact release and pages before redirects publis
     return new Response(body, { status: body === undefined ? 404 : 200 });
   };
   await checkDestination(site, directory, request);
-  files['/source.json'] = JSON.stringify({ ...metadata, sourceCommit: 'stale' });
-  await assert.rejects(checkDestination(site, directory, request), /sourceCommit differs/);
+  // An older publish commit is fine when the content digest matches: nothing about the site changed.
+  files['/source.json'] = JSON.stringify({ ...metadata, sourceCommit: 'published-earlier' });
+  await checkDestination(site, directory, request);
+  files['/source.json'] = JSON.stringify({ ...metadata, artifactSha256: 'stale digest' });
+  await assert.rejects(checkDestination(site, directory, request), /artifactSha256 differs/);
   files['/source.json'] = JSON.stringify(metadata);
   files['/walk/'] = '<h1>Old release</h1>';
   await assert.rejects(checkDestination(site, directory, request), /bytes differ/);
@@ -84,7 +87,7 @@ test('a fresh cached mismatch is waited out once instead of polled', async t => 
     const route = new URL(url).pathname;
     const stale = reads === 1;
     const body = route === '/source.json'
-      ? JSON.stringify({ ...metadata, sourceCommit: stale ? 'stale' : 'expected' })
+      ? JSON.stringify({ ...metadata, artifactSha256: stale ? 'stale digest' : 'digest' })
       : fs.readFileSync(path.join(directory, route.slice(1) + (route.endsWith('/') ? 'index.html' : '')), 'utf8');
     return new Response(body, { status: 200, headers: { 'cache-control': 'max-age=600', age: stale ? '0' : '601' } });
   };

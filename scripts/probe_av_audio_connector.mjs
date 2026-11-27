@@ -81,7 +81,7 @@ async function speakerStatus(scope) {
   return {choice:panel.getByRole('combobox',{name:'Speaker status choices',exact:true}),custom:panel.getByRole('textbox',{name:'Speaker status',exact:true})};
 }
 async function imported(scope, raw, saved = false, source = 'Input List') {
-  await quick(scope,'Document');
+  await quick(scope,'Project');
   await scope.locator('.console-panel[data-panel="document"]').getByRole('combobox',{name:/^legacy tool/i}).selectOption({label:source});
   if (saved) await button(scope,'Preview saved browser sheet').click();
   else await scope.locator('input[type=file]').setInputFiles(file(raw));
@@ -175,7 +175,7 @@ try {
   await imported(restore,JSON.stringify(old)); assert.equal(await (await connection(restore)).inputValue(),'');
   assert.deepEqual(await exported(restore,restore),old,'missing connection is not silently migrated from original');
   await save(restore); const before=await read(restore);
-  await quick(restore,'Document'); await restore.locator('input[type=file]').setInputFiles(file('{bad'));
+  await quick(restore,'Project'); await restore.locator('input[type=file]').setInputFiles(file('{bad'));
   assert.equal(await button(restore,'Confirm import').count(),0);
   assert.equal(await read(restore),before); assert.deepEqual(await exported(restore,restore),old);
   await (await connection(restore)).fill('Temporary connection');

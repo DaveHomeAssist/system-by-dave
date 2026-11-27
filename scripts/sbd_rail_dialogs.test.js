@@ -113,7 +113,8 @@ function descendants(element) {
 }
 
 function hasClass(element, className) {
-  return element.className.split(/\s+/).includes(className);
+  // SVG elements take their class through setAttribute, as in a real document.
+  return [element.className, element.getAttribute('class') || ''].join(' ').split(/\s+/).includes(className);
 }
 
 function elementsByClass(root, className) {
@@ -188,8 +189,24 @@ test('typed route resolution carries context only to eligible internal destinati
   const audioConsole = new URL(dialogs.resolveRoute('console:audio', options).href);
   assert.equal(audioConsole.pathname, '/av-audio/');
   assert.equal(audioConsole.searchParams.get('sbdShow'), 'Gala');
-  assert.equal(dialogs.resolveRoute('external:arenaops', options).code, 'not-navigable');
+  assert.equal(dialogs.resolveRoute('external:arenaops', options).code, 'unknown-reference');
   assert.equal(dialogs.resolveRoute('tool:cueforge', options).code, 'unknown-reference');
+});
+
+test('guide and panel links resolve from the site root on pages inside a folder', () => {
+  const { dialogs, registry } = loadRuntime();
+  const options = { registry, baseUrl: 'https://avbydave.com/', sourceUrl: 'https://avbydave.com/av/' };
+  assert.equal(dialogs.resolveSiteHref('console-guide/', options).href, 'https://avbydave.com/console-guide/');
+  assert.equal(dialogs.resolveSiteHref('field-kit/', options).href, 'https://avbydave.com/field-kit/');
+  assert.equal(dialogs.resolveSiteHref('https://systembydave.com/demos/', options).href, 'https://systembydave.com/demos/');
+  assert.equal(dialogs.resolveSiteHref('javascript:alert(1)', options).code, 'unsafe-protocol');
+  assert.equal(dialogs.resolveSiteHref('', options).ok, false);
+  for (const guide of registry.guides || []) {
+    if (!guide.href) continue;
+    const resolved = new URL(dialogs.resolveSiteHref(guide.href, options).href);
+    assert.equal(resolved.pathname.startsWith('/av/'), guide.href.startsWith('av/'), `${guide.id} must not land under /av/`);
+  }
+  assert.equal(new URL(dialogs.resolveRoute('toolbox', options).href).pathname, '/av/', 'panel cards fall back to the console, not /av/av/');
 });
 
 test('draft reads validate the direct console key without writing or trusting the index', () => {
@@ -307,10 +324,17 @@ test('All apps and Customize dialogs preserve truthful status, focus, and explic
   assert.equal(elementsByAttribute(controller.allAppsDialog, 'data-rail-ref', 'family:audio').length, 0, 'All apps lists no Toolbox families');
   const cueForge = elementsByAttribute(controller.allAppsDialog, 'data-rail-ref', 'external:cueforge')[0];
   assert.equal(cueForge.getAttribute('href'), 'https://systembydave.com/cueforge.html');
-  const arenaOps = elementsByAttribute(controller.allAppsDialog, 'data-rail-ref', 'external:arenaops')[0];
-  assert.equal(arenaOps.tagName, 'DIV');
-  assert.equal(arenaOps.hasAttribute('href'), false);
+  assert.equal(elementsByAttribute(controller.allAppsDialog, 'data-rail-ref', 'external:arenaops').length, 0);
   assert.equal(action(controller.customizeDialog, 'external:arenaops', 'pin'), undefined);
+  assert.equal(elementsByAttribute(controller.allAppsDialog, 'data-rail-ref', 'external:rehearsal-capture').length, 1, 'Rehearsal Capture is listed once, under Show tools');
+  assert.equal(elementsByAttribute(controller.allAppsDialog, 'data-rail-ref', 'tool:ontrack').length, 0, 'OnTrack stays out of All apps');
+  assert.equal(elementsByAttribute(controller.allAppsDialog, 'data-rail-ref', 'external:housevideo').length, 0, 'House Video stays out of All apps');
+  assert.equal(elementsByClass(avVideo, 'sbd-rail-dialog__card-icon').length, 1, 'console cards carry their icon');
+  const allAppsHeader = elementsByClass(controller.allAppsDialog, 'sbd-rail-dialog__header')[0];
+  assert.equal(elementsByClass(allAppsHeader, 'sbd-rail-dialog__search--bar').length, 1, 'All apps search sits in the top bar');
+  const allAppsClose = elementsByClass(allAppsHeader, 'sbd-rail-dialog__close')[0];
+  assert.equal(allAppsClose.getAttribute('aria-label'), 'Close All apps');
+  assert.equal(elementsByClass(allAppsClose, 'sbd-rail-dialog__close-icon').length, 1, 'close is an icon button');
   assert.equal(preferenceStorage.setCalls.length, 0);
 
   click(action(controller.allAppsDialog, 'rail', 'customize'));

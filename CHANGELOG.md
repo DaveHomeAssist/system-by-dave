@@ -1,5 +1,196 @@
 # Changelog
 
+## November 27, 2026. OnTrack keyboard navigation
+
+- Added a first-focus skip link and keyboard navigation between Library, Sets, Debrief and Data, with a visible focus indicator and an announced selected tab.
+
+## November 27, 2026. OnTrack and House Video out of All apps
+
+- The console's All apps dialog no longer lists OnTrack or House Video / FMP. Both stay in the registry, can still be pinned from Customize, and keep their own links.
+- Registry version is now `v20261127-all-apps-trim`, so the offline cache refreshes.
+
+## November 27, 2026. Console polish
+- All apps lists Rehearsal Capture once (under Show tools), shows each app's icon on its card, puts search in the top bar beside the title, and closes with an icon button like Add panel.
+- A new panel from Add panel opens at half the workspace when there is room (then a quarter, then 4x4), so it is big enough to use and to split side by side.
+- The console header says how many panels are open instead of "Empty workspace" once a panel is added.
+- Signal Flow's empty card sits above the canvas controls instead of covering them, and the Signal Flow rail shortcut is left aligned like the other rail entries.
+- The avbydave.com homepage keeps Blog, Console, Throwline and PixelForge in the header on tablets and phones (on their own row), and each Console department tile opens that department.
+- Registry version `v20261127-console-polish` rolls the offline cache.
+
+## November 27, 2026. Envision cross device workspace
+
+- The private Studio shows the route from the current computer through Dominic to Walter, with project-source and image-runner states in one keyboard-accessible panel.
+- Envision Studio 1.1.0 for Mac can keep chosen projects and their selected artwork in a private, read-only offline cache. Cached projects remain visible when Dominic is unavailable and refresh after reconnection.
+
+## November 27, 2026. Console white gaffer palette and light toggle
+- The AV by Dave console uses the white gaffer look in all four palettes: black, paint pen white and aluminum gray from the AV by Dave tokens (Gaffer dark, Call Sheet light). The AV badge, primary buttons, selected rail entries and panel outlines use the ink color instead of rust or orange. Status colors are unchanged.
+- A sun and moon button beside Menu switches light and dark in one tap. White and Black swap with each other, and Follow system stays in Menu > Appearance. The choice is the shared `av-theme-mode.v1`, so the homepage follows it.
+- The console's browser chrome colors match the new palette. Other AV tools keep Warm Paper and Stage Slate.
+
+## November 27, 2026. Add device top bar
+- Signal Flow's Add device and Rename device dialogs have one top bar with the title and a close button. The bottom Cancel button is gone, so the dialog has one close.
+
+## November 27, 2026. Console guide links
+- The console rail, its search and All apps open Console Spec Guide and the Sync & Signal Field Kit at `/console-guide/` and `/field-kit/`. They had resolved under `/av/` and returned a missing page.
+- Panel cards in All apps, such as Signal Flow on phone, fall back to the console at `/av/` instead of `/av/av/`.
+- The console registry generation is `v20261126-console-links`, so offline copies pick up the change.
+
+## November 27, 2026. Cross-Pollinate four-week rotation
+
+- Adds 15 original 9×9 crosswords. The daily calendar now runs for 28 days before a filled grid repeats, with 26 small puzzles and two 11×11 editions.
+
+## November 27, 2026. Cross-Pollinate second grid
+
+- A fresh grid is the default for November 27 UTC. Open the date picker to return to the first grid and its saved solve or replay. Each grid saves progress separately.
+
+## November 27, 2026. Cross-Pollinate layout rotation
+
+- Rotates distinct 9×9 crossword patterns and adds an occasional 11×11 garden. The date arrows and date chooser preview grid size. Earlier puzzle dates and saves remain compatible.
+
+## November 27, 2026. Cross-Pollinate replays
+
+- Replay a completed garden with the current clues. Replay progress saves separately so players can return to their original solve.
+
+## November 26, 2026. Cross-Pollinate clues and vine bonuses
+
+- Revised the starter clues for more challenge without revealing their answers. When a solved long answer grows a vine that reveals a letter, the game identifies the clue that earned it and the clue it helped.
+
+## November 26, 2026. Cross-Pollinate playtest
+
+- Play the daily garden crossword at `/puzzle/`. Solve crossing words to grow the garden and earn wildcard seeds. The preview is available by direct link.
+
+## November 26, 2026. New Bethlehem retreat preview
+
+- Connected the welcome, visit details, registration and public contact to the retreat editor’s published release. Drafts stay in the private editor.
+- Added a temporary, unlisted retreat website at `/retreat/` for sharing by direct link. The preview now names New Bethlehem and explains whom the one-day Catholic retreat is for. The home page features the supplied devotional artwork at its original proportions. The About page introduces Sharon Delaney, links to her EWTN News author profile, and lists five of her National Catholic Register articles, including her 2023 report on the Carlo Acutis shrine in Brick, New Jersey.
+
+## November 26, 2026. Envision web artwork and Notion Agents
+
+- Export a selected Library image as a square thumbnail, wide card or link preview. Choose its framing and file name, then download the image shown in the preview.
+- The Notion Agents catalog opens with four workflow choices. Each portrait links directly to its setup details and contact action. The Tools card shows the catalog, and shared links use a desk illustration rendered on Walter.
+
+## November 26, 2026. Envision image directions
+
+- Choose a folded paper, fiber light or botanical print study in the public builder and private studio. Walter rendered each sample from the prompt it supplies. The folded paper study also appears in Envision link previews.
+- Recall a saved project or artwork direction, keep unsaved wording through reload in the same tab, and resolve a competing save before replacing it. Back and Forward revisit studio workspaces.
+- A render request keeps its project identity across navigation and can retry an unacknowledged submission after reload using the same job key.
+
+## November 26, 2026. Project directory artwork and Envision names
+
+- Search the Tools directory by name or subject, combine a search with a category, and return to those results with Back. The results scroll beneath the controls in both themes.
+- OnTrack, AV Video, Garden OS and Hat-in-Ring Radar use individual images generated on Walter. Theme Organizer keeps its selected screenshot crop. OnTrack uses its turntable study when a link is shared.
+- Rename a candidate in the private Envision Library and reopen its editable package with the saved artwork name. A concurrent rename prompts the operator to review the current name.
+
+## November 26, 2026. Envision artwork review
+
+- Browse search results and favorites in the private studio with Previous, Next or the arrow keys. Full view shows each image’s dimensions, seed and recorded render time when available.
+- Phone full view keeps the whole image and its controls within the dialog when the generation prompt becomes a long artwork title.
+- Compare opens a revision beside its source. Switching the visible side keeps the candidate selected for editing. A completed background render leaves a review in place.
+- The Back Focus directory card and House Video link preview use two camera studies generated on Walter.
+
+## November 26, 2026. Envision Mac render comparisons
+
+- Compare a generated revision with its original directly from the canvas, choose a different candidate, or replace one side. The Mac saves the selected pixels and their render details for offline use.
+- Compare includes two Walter renders of the same optical cube under daylight and tungsten lighting. Local image files and phone width remain available.
+
+## November 26, 2026. Prompt Library image exports
+
+- Open an image prompt to copy it or export a named brief for Envision. The Urban Architecture entry includes a render made from its exact prompt.
+- The library has light and dark themes, a single results pane, collapsible filters and a manual copy dialog when clipboard access fails.
+- The tools directory uses individual artwork for Prompt Library and Trailkeeper. The library’s share preview uses its architecture study.
+
+## November 26, 2026. Envision image briefs
+
+- Envision opens on image prompts with optical, paper and custom subjects. Image revisions can keep the source framing. The prompt can be exported directly to the owner's personal studio.
+- Image briefs import as image projects. Existing saved flyers keep their art direction, format and separate show copy.
+- Imported briefs open directly in Generate on the Mac or Create in the private browser studio. Editable layouts still open in their editor.
+- Mac Generate can recall a selected artwork prompt, the project's saved brief or the built-in sample prompt. Images with a worker receipt show their engine time beside their dimensions.
+
+## November 26, 2026. Envision project artwork
+
+- The public Envision layout editor opens an editable optical study generated on Walter. Its title, caption and credit can be changed, exported as PNG and reopened from an editable copy.
+- Private studio project cards use the latest generated or finished artwork when a layout background has yet to be chosen. Thumbnail requests use project ownership, same-origin browser embedding and an indexed lookup.
+- The System by Dave Prompt Lab page has a dedicated share image made from Walter’s index-card study.
+
+## November 26, 2026. Run Review is now Rehearsal Capture
+
+- The avbydave.com page is now Rehearsal Capture at `/rehearsal-capture/`, with that name on the homepage tools table, the console Show tools menu, the breadcrumb and the page title.
+- `/run-review/` forwards to the new address and keeps any query or hash, so saved links still open it.
+- The Frozen copy at wst.housevideo.app/run-review/ is unchanged. The console registry generation is `v20261126-rehearsal-capture`.
+
+## November 26, 2026. AV Suite rail icons
+
+- AV Suite rail: every tool has its own icon in the collapsed rail, badges collapse to a dot, groups separated.
+
+## November 26, 2026. Envision Studio for Mac
+
+- The Apple Silicon app opens on image generation. Select a project, give Walter a prompt or reference, compare candidates and save the chosen PNG. The app icon and sample artwork came from studio renders.
+- Open the private studio for layered compositions, masks, finishes and the render queue. Compare two saved images locally at fit or phone width, including while disconnected.
+
+## November 26, 2026. Run Review on avbydave.com
+
+- Run Review now opens at `/run-review/` on avbydave.com, from the homepage tools table (Early build) and the console's Show tools menu. It is the Frozen Rehearsal Review viewer, unchanged, pinned to its `frozen-rehearsal-capture` build and given the AV by Dave name, breadcrumb, palette and shared theme choice.
+- With no show published on the site it runs in local mode: open a capture archive (and an optional Notion cue snapshot) from this computer. Review marks and notes stay in this browser and export as CSV, Markdown or JSON. The page is noindex for now.
+- The Frozen copy at wst.housevideo.app/run-review/ is unchanged. The console registry generation is `v20261126-run-review`.
+
+## November 26, 2026. Envision editable exports
+
+- The private studio now asks you to save pending layer and event field edits before downloading an editable project ZIP or legacy flyer.
+
+## November 26, 2026. Recipe Journal mirror
+
+- Browse the live public Recipe Journal at `/recipes/`. The full Journal opens separately for family sign-in and Kitchen.
+
+## November 25, 2026. AV console menus: Featured, Show tools and Learn
+
+- The Rail on `/av/` is Search, Workspace, Featured, Departments, Show tools, Reference, Learn, then All apps and Customize. Featured is Throwline, LED Wall Calculator, Signal Flow, the Console Spec Guide and AV Calculator. Saved `sbd.rail.v1` pins are unchanged.
+- All apps uses those sections and a one-line description. The phone Apps sheet adds search, featured chips, the last three items used on this device (`sbd.avSuite.recent.v1`) and collapsed sections.
+- Add panel leads with the same featured panels plus Multiview, Audio Delay and On Deck, and shows a panel count on each tile. Show tools replaces the Tools group. Gear 3D models are inside Equipment Lab. Ion 3D and the second SmartFade stay registered and stay off the chooser.
+- Infrastructure's console label is Power, Network & Cable. The last panel in each pack is named Project. On a short Show Control screen the backup launcher reads Project controls. The header link reads Learn. The Shop is unchanged. Routes, the sitemap and existing storage keys are unchanged. Arena Ops and DeckForge are no longer menu cards. Retired sheet ids are out of the navigation groups.
+- The calculator page's no-JavaScript list names Throw distance (quick) and points that estimate at Throwline.
+
+## November 25, 2026. Envision Personal Studio
+
+- Added private image generation on local hardware with a durable queue, reference and masked revisions, artwork comparison and reusable event layouts.
+- Added feed, story, lobby and campaign packages with event-based filenames, editable project import and export, and verified catalog backups. Saved events in the public prompt kit now offer a downloadable brief and a browser-local shortcut to the owner's private studio.
+- Fixed fragmented image output from the personal studio by using the SDXL Turbo noise schedule for new renders. Stored jobs retain their original workflow on retry.
+
+## November 24, 2026. Envision download names
+
+- The layout editor names editable projects and PNGs after the event and remembers the event name in saved projects.
+
+## November 24, 2026. Envision flyer studio
+
+- Added a direct-access flyer prompt studio and portable layout editor at `/envision/`. The editor accepts existing AfterJinx project files and exports PNGs locally.
+
+## November 23, 2026. Field Kit checkout open
+
+- Open the $12 Sync & Signal Field Kit. `checkoutOpen: true` in `js/sbd-launch-config.js` is the switch: the Buy button goes to the Stripe Payment Link, and avbydave.com publishes the page as indexable. Set that one line to `false` to keep "Checkout opens soon" and leave the page noindex.
+- Register the kit folder's download hash so the thanks page shows the download button for that link. The share link stays out of this repository.
+- Replace the three card previews with the final page-1 renders. The tear-test preview is unchanged.
+
+## November 23, 2026. Screenshots on the tool cards
+
+- Tools directory cards that only had the sprite now show a live screenshot in the same art box (`img.tc-art.tc-art--shot`, lazy, with the capture's alt text). Theme Organizer keeps `img/theme-organizer-card.webp`; the new full-page capture is lighter and harder to read at that size. Garden OS, Back Focus, OnTrack and AV Video are unchanged. Prompts, Trailkeeper and Hat-in-Ring had no file in the capture set.
+- The home page shows the console on the AV by Dave card, the Notion page on the Notion card, Cue Sheet on the Cue Sheet spotlight, and `img/sort-inbox.webp` on the Sort Inbox spotlight. The agents pages keep `img/agent-sort-inbox.webp`.
+- The avbydave.com tools list shows the console, Throwline, PixelForge and PlotForge. Throwline uses the dark stage shot. The light Throwline capture stays in `img/` unused, because the page does not swap images with the theme. Field Kit and Run Review stay without an image. The mislabeled calculator capture is `img/av-by-dave-calculator.webp` and is not shown: there is no AV Calculator card.
+- Phone captures and the Lighting Console Spec Guide capture are in `img/` and unused. No card uses a `<picture>` set, and the console guide has no card.
+- Davai's headline now sizes from its column, so "architecture" stays beside the route panel from 1280 px through 1680 px.
+- Cue Sheet's column header sticks to the top of the table. The old 68 px offset was inside the table scroller, so the header covered cue 001.
+- On a short screen the home-page shots shrink to the same 50px cap as the other reader images, so they stay inside the page. Tool-card shots use the existing 7:5 art box instead of the file's height attribute.
+
+## November 23, 2026. Domain publish staging path
+
+- Resolve the staged site directory before entering the destination checkout, so the publish planner can read its provenance file.
+
+## November 23, 2026. The Philly 215 preview
+
+- Added a proposed citywide awards preview to The Philly and linked the pothole guide to official Philly311 reporting and tracking.
+
+## November 23, 2026. Throwline sitemap check follows the Stage 3D page
+
+- `ProjectorThrow/` only redirects to `ProjectorThrow/Stage3D.html`, so the sitemap lists the final page. Throwline release verification checks that address and still requires the registry entry at `ProjectorThrow/`.
+
 ## November 23, 2026. Publish the public site, not the repository
 
 - GitHub Pages was copying the repository root. `scripts/stage_public_site.mjs` now publishes site content. Docs, scripts, reports, plans, tests, application source, and `career-market.html` stay in the repository and are not served. The Equipment Lab reference markdown and the Davai storyboard script stay, because pages link to them. `apps/projctl/public/` stays, because those noindex pages are part of the site. `scripts/stage_public_site.test.mjs` diffs the new publish against the previous one.
@@ -9,6 +200,14 @@
 - The privacy policy names David Robertson, an individual, New Jersey law, and avbydave@gmail.com.
 - The project registry labels its June 11, 2026 snapshot and shows Phillies Wire as paused until Feb 2027.
 - The demos tab bar scrolls at narrow widths instead of overlapping. The page heading stays outside the tab panels, where the hub probe does not treat it as clipped panel text.
+
+## November 23, 2026. Frozen handoff brought current through November 21
+
+- The house handoff, on the Frozen workspace and the public WST pages, now says the house team has run video since November 19, names show file 3.1, and records lamps, deck pixels and opening night as they stood on November 21.
+
+## November 23, 2026. Frozen workspace and hosting plan
+
+- Record the proposed Frozen operator views inside the AV console and the separate assessment for moving the public workspace off GPT Sites. The plan does not change the running show pages and does not authorize a migration.
 
 ## November 23, 2026. Theme Organizer on the tools directory
 
@@ -67,6 +266,14 @@
 - The home page's files joined the registry's offline list and the cache generation is `v20261121-site-home`, so a saved copy of `/` opens styled offline. `verify:av` now requires `av-home/` as the staged home, the console's own canonical and return link, and the shared theme key; its pinned counts are 164 base and 183 offline assets.
 - Checked locally: all four sections at ten sizes from 320 by 568 to 3840 by 1080 in both themes with no page scroll, clipping or sub 44 px control; keyboard skip link, section history, theme persistence into the console and back, print and no JavaScript on the staged avbydave.com site; `verify:av`, `verify:indexing`, `verify:public-navigation`, `verify:public-consistency`, `verify:domain-sites`, `verify:private-exposure`, `verify:throwline`, the console shell, nav funnel and first visit probes, the 57 domain move scenarios and the 33 step Frozen reference.
 
+## November 21, 2026. Destination sites deploy only when their content changes
+
+- A push to `main` used to redeploy housevideo.app, walk.housevideo.app and avbydave.com even when it touched none of their pages (for example a new page under systembydave.com). Each destination's `source.json` carries the source commit, so it differs on every push and the "nothing changed" check in `scripts/publish_domain_site.sh` never held. Content digests were unchanged across the previous push; only that marker moved.
+- `scripts/domain_publish_plan.mjs` now decides per destination. It publishes when any file other than `source.json` differs, skips when only `source.json` differs and the live site already serves the staged content digest, and republishes (an empty commit if needed) when the live site does not serve the staged content or cannot be read, so a destination Pages deploy that failed earlier is retried instead of being reported as done. Covered by `scripts/domain_publish_plan.test.mjs` in `npm run verify:domain-sites`.
+- The walk cutover gate (`scripts/check_domain_cutover_ready.mjs --live`) compares the live walk site with the staged one by `artifactSha256` instead of `sourceCommit`, so a push that does not change the walk site no longer makes the systembydave.com deploy wait for a walk deploy that has nothing to deploy.
+- systembydave.com publishes `deploy.json` on every deploy: the source commit and the content digest staged for each destination (`scripts/stage_domain_sites.mjs`, `scripts/domain_deploy_marker.test.mjs`). The live-behind-main check (`scripts/launch/smoke_live_domain.mjs --behind-main`) compares `deploy.json` with main, then checks that each destination serves the digest staged for it, because a destination's own `source.json` commit is no longer expected to equal main HEAD. `--expect-release <sha>` replaces `--expect-commit` for post-deploy waits. Until the first deploy publishes `deploy.json` the check falls back to the old comparison.
+- `docs/domain-sites.md`, `docs/launch/uptime-monitoring.md`, the self-hosted smoke workflow example and the README describe the new behaviour. The publish step itself runs only on `main`, so it is covered by unit tests and a staged dry run rather than a pull request run.
+
 ## November 21, 2026. The Philly prototype at /thephilly/
 
 - Added `/thephilly/`, the clickable prototype of The Philly, a free quarterly print magazine about Philadelphia (private source: `DaveHomeAssist/the-philly`). The page is `noindex`, outside the sitemap and carries real artist and listing content from the prototype, so it is for sharing by link only.
@@ -75,6 +282,16 @@
 - The Food Finders story (`#story-food-finders`) has a Cheesesteak Radar: a button opens the Philly Cheesesteak Heatmap from `/cheesesteaks/` in a frame, with links to the full map and rankings. The frame is created on click and removed on close, so no map tiles load until a reader opens it. The note beside it repeats the heatmap's own description (real shops from OpenStreetMap and Google Maps, weekly snapshot, not a complete list).
 - The Public site contracts job timeout goes from 10 to 20 minutes. The job now runs 8 to 10 minutes, mostly in the Projctl relay step, and was cancelled at the old limit on the previous pull request (run 671) and again on this one, once in the middle of the first probe.
 - `npm run probe:thephilly` (`scripts/probe_thephilly.mjs`, run on every pull request) checks that the page never scrolls at 1440, 680 and 375 px on eight routes, that nothing leaves the origin before the radar opens, the skip link and breadcrumb, the Sounds QR codes, the radar open and close, and the theme toggle.
+
+## November 21, 2026. Saved optical evidence
+
+- Added a pure saved-frame shutter evaluator for isolated target/control regions
+  and open/close response candidates. No relay or equipment output integration.
+
+## November 21, 2026. Offline diagnostic planning
+
+- Added a source-only projector check planner with synthetic fixtures, explicit
+  timing constraints and no relay integration or diagnostic lamp retry.
 
 ## November 20, 2026. Frozen workspace navigation
 
@@ -177,6 +394,10 @@ Workspace search opens show pages and R5 references. Notes retains the last shar
 - The `video` job was not hanging. It ran 12 to 15 minutes against its 15-minute limit; three of eight recent green runs finished above 14m40s. The retained standalone-build suite (`npm run test:av-retained-browser`, about six minutes) ran inside the last long step, "Infrastructure and Shop panels and saved-plan compatibility", so on a slower runner the job was cancelled while that suite was still passing checks (run 44161812645 and the first attempt of run 44167101248).
 - The suite now runs in a parallel `retained` job, which builds the eight family fixtures it serves. Every step in both jobs has its own `timeout-minutes`, so a real stall fails at the step that stalled.
 - The retained runner stops any probe that runs past four minutes (`AV_RETAINED_PROBE_LIMIT_MS`) and names it in the error.
+
+## Frozen Monitor: compact app bar, 2026-11-17
+
+- The six Monitor pages move the Light, Dark and System buttons into one theme menu, following the refined header design. The bar stays on one row down to about 1000 px, so it no longer takes three rows when the Monitor shares a screen with Rehearsal Review, MIDI Live and PTZ. In Dark, the current section and an active Show Lock get the glow from the design. The saved theme and all relay behaviour are unchanged.
 
 ## Projctl Barco standby power state, 2026-11-17
 
@@ -760,6 +981,12 @@ Workspace search opens show pages and R5 references. Notes retains the last shar
 - Add Edition 026, Active HDMI cable direction, with an Extron sourced lesson,
   matching diagram and SVG/PNG story card. Preserve previous editions and behavior.
 
+## November 1, 2026: Field Kit checkout
+
+- Wire the AV by Dave Stripe Payment Link ($12) into `js/sbd-launch-config.js`, finalise the Field Kit delivery, statement descriptor (AVBYDAVE FIELD KIT), refund and licence text, and remove the DRAFT markers, so the Buy button opens. `fieldKit.download.sha256` stays empty until Dave registers the kit share link, so the thanks page keeps the email-me card.
+- Index `/field-kit/` on avbydave.com only while checkout is live: the source stays noindex and the publish step swaps it, with a matching avbydave.com sitemap entry (`scripts/field_kit_launch.mjs`, `scripts/gen_sitemap.py`, tested in `verify:domain-sites`).
+- Add the avbydave.com/frame-sync/ Reel short link, a noindex redirect to systembydave.com/demos/frame-sync.html that keeps the query string.
+
 ## November 1, 2026: Video Engineering Daily
 
 - Add Edition 025, LED refresh and shutter exposure, with a Brompton sourced
@@ -770,6 +997,45 @@ Workspace search opens show pages and R5 references. Notes retains the last shar
 ## October 30, 2026: Vite development server patch
 
 - Upgrade Vite from 6.4.4 to 6.4.5 for GHSA-8g5g-mxqh-grgj and raise the minimum compatible version. Add a loopback regression proving raw/import queries cannot retrieve a denied synthetic file, enforced by the existing pull request contract job.
+
+## October 30, 2026: Brand reference policy and reading controls
+
+- Add a restrictive content policy to the noindex brand reference, allowing its existing Google font sources and local navigation script while blocking connections, inline scripts, objects and forms.
+- Preserve all seven reference sections and artwork with light/default and dark reading themes, keyboard section tabs, bounded reading, URL history, print expansion and no-JavaScript access.
+
+## October 30, 2026: Platform setup documentation
+
+- Declare Node.js 24 for local package tooling, matching CI, with `.nvmrc`.
+- Include the venue walk publishing domain in repository orientation and the domain source map. Replace stale pre-cutover wording while preserving the separate authenticated acceptance gate.
+
+## 2026-10-30
+
+- AOM Copy text now reports confirmed clipboard results and offers selected
+  manual-copy text when permission or the fallback fails. Preserve an editor
+  opened during a pending permission request.
+
+- AOM now preserves existing saved bytes after failed reads or invalid saved
+  JSON. Block autosave of fallback sample data, retain visible failure feedback,
+  and offer an exact original-text download plus explicit reload retry.
+  Disposable local and artifact storage fixtures cover the failure boundary.
+
+- AOM show board now has an explicit resource policy and bounded Timeline, Live,
+  Turns and Tools views. Preserve the route, saved board key and data, import
+  confirmation and photo transcription request. Add keyboard room/session
+  controls and dialog focus handling. Mocked scan regression makes no inference
+  calls. Source validation and deployment remain separate.
+
+
+## October 30, 2026: Preserve heatmap exports during sync
+
+- Validate source revisions and stage and compare heatmap exports before replacement. Restore the previous export when promotion fails, and retain its backup if restoration fails.
+- Add read-only build parity verification and regression coverage for invalid inputs, copy failures, promotion failures and recovery. Public heatmap files are unchanged.
+
+## October 30, 2026: Davai reference navigation
+
+- Put the skip link first on all fourteen generated reference pages and make its target focusable.
+- Add a light default with a saved theme toggle, bounded reading panel, persistent page navigation and a memory layer disclosure. Preserve content, routes, fragments and printable reference.
+- Verify generated parity and keyboard, theme, viewport and no-JavaScript journeys in the public contracts workflow.
 
 ## October 30, 2026: Video Engineering Daily
 

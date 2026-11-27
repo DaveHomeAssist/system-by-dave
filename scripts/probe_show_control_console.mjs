@@ -79,13 +79,13 @@ async function reachable(locator) {
   assert.ok(result.width >= 44 && result.height >= 44 && result.inside && result.hit, `Unreachable ${locator}: ${JSON.stringify(result)}`);
 }
 async function openImport(page, kind) {
-  await quick(page, kind === 'restore' ? 'Document' : 'Setup');
-  const launcher = button(page, kind === 'restore' ? 'Document controls' : 'Setup and imports');
+  await quick(page, kind === 'restore' ? 'Project' : 'Setup');
+  const launcher = button(page, kind === 'restore' ? 'Project controls' : 'Setup and imports');
   if (await launcher.isVisible()) await launcher.click();
   await button(page, kind === 'restore' ? 'Restore backup' : kind === 'forge' ? 'Review CueForge file' : 'Review Cue Sheet').click();
 }
 async function exportRun(page) {
-  await quick(page, 'Document');
+  await quick(page, 'Project');
   const download = page.waitForEvent('download'); await button(page, 'Export backup').click();
   return JSON.parse(await readFile(await (await download).path(), 'utf8'));
 }
@@ -189,13 +189,13 @@ try {
 
   const safety = (await fresh({ width: 375, height: 812 })).page;
   await safety.evaluate(key => localStorage.setItem(key, '{damaged'), STORE); await safety.reload();
-  assert.equal(await button(safety, 'Save run').isDisabled(), true); await quick(safety, 'Document');
+  assert.equal(await button(safety, 'Save run').isDisabled(), true); await quick(safety, 'Project');
   assert.equal(await button(safety, 'Replace damaged saved run').isDisabled(), true);
   const damagedDownload = safety.waitForEvent('download'); await button(safety, 'Download unreadable saved data').click();
   assert.equal(await readFile(await (await damagedDownload).path(), 'utf8'), '{damaged');
   await safety.evaluate(key => localStorage.setItem(key, '{newer damaged'), STORE);
   await button(safety, 'Replace damaged saved run').click(); assert.match(await safety.locator('#notice').textContent(), /Another tab changed/);
-  assert.equal(await read(safety), '{newer damaged'); await safety.reload(); await quick(safety, 'Document');
+  assert.equal(await read(safety), '{newer damaged'); await safety.reload(); await quick(safety, 'Project');
   const secondDownload = safety.waitForEvent('download'); await button(safety, 'Download unreadable saved data').click(); await secondDownload;
   await button(safety, 'Replace damaged saved run').click(); assert.equal(await read(safety), null);
   await safety.evaluate(({ key, draftKey, doc }) => {
@@ -219,7 +219,7 @@ try {
     if (await page.locator('html').getAttribute('data-av-theme') !== theme) await page.locator('#theme').click();
     for (const size of sizes) {
       await page.setViewportSize(size);
-      for (const [name, type] of [['On Deck', 'deck'], ['Cues', 'cues'], ['Notes', 'notes'], ['Call Log', 'log'], ['Setup', 'setup'], ['Document', 'document']]) {
+      for (const [name, type] of [['On Deck', 'deck'], ['Cues', 'cues'], ['Notes', 'notes'], ['Call Log', 'log'], ['Setup', 'setup'], ['Project', 'document']]) {
         await quick(page, name); await noOverflow(page, `${theme}/${size.width}/${name}`);
         assert.equal(await panel(page, type).count(), 1);
         if (type === 'deck') {
@@ -232,7 +232,7 @@ try {
         if (type === 'cues') await reachable(panel(page, 'cues').locator('.call-cue').last());
         if (type === 'notes') await reachable(page.getByLabel('Operator notes'));
         if (type === 'setup' || type === 'document') {
-          const target = button(page, size.height < 500 ? type === 'setup' ? 'Setup and imports' : 'Document controls' : type === 'setup' ? 'Add a cue' : 'Export backup');
+          const target = button(page, size.height < 500 ? type === 'setup' ? 'Setup and imports' : 'Project controls' : type === 'setup' ? 'Add a cue' : 'Export backup');
           await reachable(target);
           if (size.height < 500) { await target.click(); await reachable(button(page, type === 'setup' ? 'Add a cue' : 'Export backup')); await button(page, 'Close dialog').click(); }
         }

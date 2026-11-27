@@ -16,10 +16,14 @@
 .console-tools button[aria-pressed=true]{border-color:var(--av-warning-line);color:var(--av-warning)}
 .console-icon{min-width:44px;padding:0 10px;display:inline-grid;place-items:center;background:transparent}
 .console-notice{margin:0;padding:8px 14px;font-size:12px;background:var(--av-warning-soft);border-bottom:1px solid var(--av-warning-line);color:var(--av-text)}
-.console-grid{position:relative;flex:1;min-height:0;display:grid;gap:8px;padding:10px 12px;touch-action:none}
+.console-grid{position:relative;flex:1;min-height:0;display:grid;--console-gap:8px;gap:var(--console-gap);padding:10px 12px;touch-action:none}
 /* Snap-grid dots: visible on every palette (about 1.2-1.4:1 against the canvas) yet light
-   enough that body and muted text still clear WCAG AA 4.5:1 even where a glyph sits on a dot. */
-.console-grid{--av-dot:rgba(77,57,39,.12);background-image:radial-gradient(circle,var(--av-dot) 1.25px,transparent 1.6px);background-size:24px 24px;background-position:12px 10px}
+   enough that body and muted text still clear WCAG AA 4.5:1 even where a glyph sits on a dot.
+   Four dots per half-cell snap step (about 13px at 1470 wide, was a fixed 24px unrelated
+   to the cells), one centred in every gutter, so the dots show exactly where a panel edge
+   can land. Colours are unchanged; the dot is 0.25px wider (1.25 to 1.5px) because a dot
+   drawn across four fractional tiles renders softer than the old whole-pixel tile. */
+.console-grid{--av-dot:rgba(77,57,39,.12);background-image:radial-gradient(circle at 0 0,var(--av-dot) 1.5px,transparent 1.9px);background-origin:content-box;background-size:calc((100% + var(--console-gap,8px)) / 96) calc((100% + var(--console-gap,8px)) / 64);background-position:calc(var(--console-gap,8px) / -2) calc(var(--console-gap,8px) / -2)}
 html[data-av-theme="white"] .console-grid{--av-dot:rgba(0,0,0,.13)}
 html[data-av-theme="dark"] .console-grid{--av-dot:rgba(255,255,255,.12)}
 html[data-av-theme="black"] .console-grid{--av-dot:rgba(255,255,255,.13)}
@@ -80,6 +84,11 @@ html[data-av-theme="black"] .console-grid{--av-dot:rgba(255,255,255,.13)}
 .console-menu>button.danger{margin-top:4px;box-shadow:0 -5px 0 -4px var(--av-line)}
 .console-icon[aria-expanded=true]{border-color:var(--av-focus-line,var(--av-line-strong));background:var(--av-focus-soft,var(--av-surface-2))}
 @media(forced-colors:active){.console-menu [role=menuitem]:focus-visible{outline:3px solid Highlight}}
+.console-sec{margin:2px 2px 6px;font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--av-muted)}
+.console-featured-row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin-bottom:8px}
+.console-featured-row button{display:flex;flex-direction:column;align-items:flex-start;gap:2px;min-height:52px;text-align:left;background:var(--av-surface-2);border-color:color-mix(in srgb,var(--av-accent,#e48a4c) 45%,var(--av-line))}
+.console-featured-row button span{font-size:11px;font-weight:400;color:var(--av-muted)}
+.console-groups.is-tiles button small{display:block;font-weight:400;letter-spacing:0;text-transform:none;color:var(--av-muted);font-size:10.5px}
 .console-groups{display:flex;gap:4px}
 .console-groups button{flex:1;background:transparent}
 .console-groups button[aria-current=true]{border-color:var(--av-accent);background:var(--av-accent-soft)}
@@ -110,7 +119,7 @@ html[data-av-theme="black"] .console-grid{--av-dot:rgba(255,255,255,.13)}
 .console-rename{display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:600}
 @media(max-width:1099px){.console-strip{padding:4px 8px}.console-quick{margin-left:0;padding-left:0;border-left:0;order:3;flex-basis:100%}}
 @media(max-width:719px){
-  .console-grid{padding:6px;gap:6px}
+  .console-grid{padding:6px;--console-gap:6px;gap:6px}
   .console-quick{flex:none;margin:0;justify-content:stretch;padding:4px 6px max(4px,env(safe-area-inset-bottom));border-left:0;border-top:1px solid var(--av-line);background:var(--av-surface)}
   .console-quick button{flex:1;min-width:0;padding:8px 6px;font-size:12px;justify-content:center}
   .console-tools button:first-child{padding:0 10px}

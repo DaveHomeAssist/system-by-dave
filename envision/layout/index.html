@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Layout Editor | Envision | System by Dave</title>
+  <meta name="description" content="Open a sample or a saved layout, edit its text and logos, then export a PNG or an editable copy.">
+  <link rel="canonical" href="https://systembydave.com/envision/layout/">
+  <meta name="theme-color" content="#251d1a">
+  <meta property="og:type" content="website"><meta property="og:title" content="Layout Editor | Envision | System by Dave">
+  <meta property="og:url" content="https://systembydave.com/envision/layout/"><meta property="og:description" content="Open a sample or a saved layout, edit its text and logos, then export a PNG or an editable copy.">
+  <meta name="twitter:card" content="summary"><meta name="twitter:title" content="Layout Editor | Envision | System by Dave"><meta name="twitter:description" content="Open a sample or a saved layout, edit its text and logos, then export a PNG or an editable copy.">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<link rel="stylesheet" href="../studio.css">
+<style>
+body{display:grid;grid-template-rows:auto minmax(0,1fr) auto;gap:.65rem;padding:clamp(.65rem,2vw,1.5rem)}
+header, main, footer{width:100%;max-width:1550px;margin-inline:auto}
+header{display:flex;align-items:center;gap:.75rem}header h1{margin-right:auto;font-size:clamp(1.15rem,3vw,2rem)}
+main{display:grid;grid-template-columns:minmax(220px,1fr) minmax(280px,1fr);gap:.75rem}
+.preview{min-height:0;min-width:0;display:grid;grid-template:minmax(0,1fr)/minmax(0,1fr);place-items:center;background:#10101a;border-radius:.75rem;overflow:hidden;color:white;padding:.5rem}
+.preview-empty{display:grid;justify-items:center;gap:.75rem;padding:.65rem;text-align:center}
+canvas{display:block;width:100%;height:100%;min-width:0;min-height:0;object-fit:contain}
+.file-options summary{display:flex;align-items:center;min-height:44px;cursor:pointer;font-weight:650}
+.file-options summary::before{content:"▸";margin-right:.45rem}.file-options[open] summary::before{content:"▾"}
+.file-options[open]>:not(summary){margin-block:.5rem}
+.controls{display:grid;gap:.8rem;align-content:start;padding:1rem;overflow:auto}fieldset{min-width:0;border:0;padding:0;margin:0;display:grid;gap:.7rem}label{display:grid;gap:.25rem;font-weight:650}
+footer{display:flex;align-items:center;gap:.6rem;flex-wrap:wrap}#status{font-size:.82rem;color:var(--muted)}
+@media(max-width:680px){main{grid-template-columns:1fr;grid-template-rows:minmax(130px,1fr) minmax(125px, .95fr)}header{gap:.4rem}header .button,header button{padding:.3rem .45rem}.controls{padding:.65rem;gap:.4rem}fieldset{gap:.4rem}}
+@media(max-width:450px){header{display:grid;grid-template-columns:auto minmax(0,1fr) auto;row-gap:0}header h1{grid-column:1/3;grid-row:2;line-height:1.1}header button{grid-column:3;grid-row:1/3}header .button{justify-self:start;white-space:nowrap}}
+</style>
+<script defer src="./editor.js"></script>
+</head>
+<body>
+<a class="skip" href="#workspace">Skip to workspace</a>
+<noscript>Enable JavaScript to use Envision.</noscript>
+<header><a class="button" href="/">System by Dave</a><a class="button" href="../">Envision</a><h1>Layout editor</h1><button id="theme" type="button">Dark theme</button></header>
+<main id="workspace" tabindex="-1">
+<section class="preview" aria-label="Layout preview">
+<div class="preview-empty" id="empty"><p>Open a sample or choose your own layout file.</p><button id="open-sample" class="primary" type="button">Open sample layout</button></div>
+<canvas id="flyer" width="615" height="768" aria-label="Edited layout preview" hidden></canvas>
+</section>
+<section class="station controls" aria-label="Layout editor">
+<details id="file-options" class="file-options" open><summary id="file-options-title">Open a layout</summary>
+<label>Open layout file<input type="file" id="project" accept=".json,application/json"></label>
+<p class="muted" id="help">Open a .flyer.json file from Envision or the AfterJinx Flyer Kit. Save an editable copy to keep your changes.</p>
+<button type="button" id="reopen-sample" hidden>Open sample layout</button>
+</details>
+<fieldset id="fields" disabled><label>Name for downloads<input id="event-name" maxlength="100" required pattern=".*\S.*" autocomplete="off"></label><label>Layer<select id="slot"></select></label>
+<label>Wording<input id="wording" maxlength="200" autocomplete="off"></label>
+<label id="logo-label">Replace artist logo<input type="file" id="logo" accept="image/png,image/jpeg,image/webp"></label>
+<button type="button" id="reset">Restore original layer</button>
+</fieldset>
+</section></main>
+<footer><button id="save" class="primary" disabled>Save editable copy</button><button id="export" disabled>Export PNG</button><span id="status" role="status"></span></footer>
+</body></html>
