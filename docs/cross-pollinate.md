@@ -6,7 +6,7 @@ playtest preview. The page includes up-front site navigation, a skip link,
 social metadata, and a CSP pinning the inline game script.
 
 The build owner is the Cross-Pollinate repository. The export was built
-from revision `803948d5a5e0776cb9e671830fc08ec10754e6b4` with
+from revision `6f03b68b112c2605c7423155a598a990540572d1` with
 `npm run build -- --system-by-dave`. Copy its
 `dist/system-by-dave/index.html` into `puzzle/index.html` for updates. Changes
 to the game or its hosted markup belong in the source repository.
@@ -22,3 +22,8 @@ keyboard controls inside the same three viewports when every font is scaled
 1.3x and 1.5x, which mimics an enlarged Android system text size. The source
 probe fails on the previous build and passes on this one. Normal-size text
 keeps the one-row header, and saved attempt keys are unchanged.
+
+The November 28 challenge grid is a second, harder puzzle for that date. The
+scheduled puzzle stays the default with its existing save key. The date picker
+offers **Open challenge grid**, and a link ending in `#challenge` opens it
+directly on November 28 UTC and afterwards. It saves under its own key.

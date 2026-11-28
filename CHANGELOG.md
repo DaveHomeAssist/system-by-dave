@@ -1,5 +1,10 @@
 # Changelog
 
+## November 28, 2026. Cross-Pollinate challenge grid
+
+- Adds a harder second Cross-Pollinate puzzle for November 28. Tap the date and choose **Open challenge grid**, or open `https://systembydave.com/puzzle/#challenge`. It has 41 open squares instead of 27, 18 clues, no three-letter answers and less direct clues.
+- The scheduled November 28 puzzle stays the default. The challenge grid saves separately, so solves already started are untouched.
+
 ## November 28, 2026. Cross-Pollinate header at large phone text sizes
 
 - Keeps the Cross-Pollinate title, date card and top bar fully on screen when a phone's system text size is enlarged. The title no longer cuts off at "Words in bloc", and the date card moves to its own row instead of running past the right edge.
