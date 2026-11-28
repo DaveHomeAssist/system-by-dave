@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en" data-theme="light">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-rGqj/noBiFAKsw2P/z0/zzvMHO1gKXmTfbDRtuBJNmw='; style-src 'unsafe-inline'; img-src 'self' data:; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-tU15aoDDMHxE8wM4vR1Gs1qgjKBWR3Id4K/nTsEfESQ='; style-src 'unsafe-inline'; img-src 'self' data:; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'">
 <meta name="description" content="Solve the daily garden crossword, grow plants and use wildcard seeds for a nearby clue.">
 <meta name="robots" content="noindex, follow">
 <link rel="canonical" href="https://systembydave.com/puzzle/">
@@ -13,6 +13,9 @@
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Cross-Pollinate | Daily Garden Crossword">
 <meta name="twitter:description" content="Solve the daily garden crossword, grow plants and use wildcard seeds for a nearby clue.">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#f4f1e7">
@@ -274,6 +277,7 @@ dialog::backdrop{background:#111a13a0}
     <div class="date-actions">
       <button class="primary" id="open-puzzle">Open puzzle</button>
       <button class="quiet" type="button" id="open-first-grid" hidden>Open first grid</button>
+      <button class="quiet" type="button" id="open-challenge-grid" hidden>Open challenge grid</button>
     </div>
   </form>
 </dialog>
@@ -285,7 +289,7 @@ dialog::backdrop{background:#111a13a0}
       <li>Correct answers bloom automatically. Answers of eight or more letters grow vines that can reveal one letter in a nearby clue. Solve two crossing answers with a shared theme to earn a golden wildcard seed.</li>
       <li>Select a seed in the soil and plant it to reveal one letter in a nearby unsolved clue. The arrows slide it across soil until an edge or obstacle stops it. A move must leave a clue within reach.</li>
     </ol>
-    <p>Use the date arrows to visit other gardens, or tap the date to preview and choose a puzzle. Finish a garden to unlock Replay, which saves separately from your original solve. Progress stays in this browser.</p>
+    <p>Use the date arrows to visit other gardens, or tap the date to preview and choose a puzzle. Finish a garden to unlock Replay, which saves separately from your original solve. Some dates also offer a harder challenge grid in the date picker, with longer answers and trickier clues. It saves separately too. Progress stays in this browser.</p>
     <button class="primary">Back to the garden</button>
   </form>
 </dialog>
@@ -683,9 +687,32 @@ YEW|Evergreen with red cups surrounding its seeds
     "#LAB#######/#ILL#######/#LOO#######/#YES#######/###SALEM###/###OPERA###/###METAL###/#######LOG#/#######AHA#/#######RIM#/#######DOE#",
     "##BIO######/##ERR######/##TIC######/##ASH######/####ACE####/####ROT####/####DOE####/######RYE##/######NAY##/######ALE##/######LED##"
   ];
+  var challengeGridDate = "2026-11-28";
+  var challengeLayout = "#####AREA/#####TEAR/####ALARM/####SADLY/##DAISY##/SPEND####/HINGE####/ELSE#####/DEER#####";
+  var challengeClues = `
+ALARM|It goes off to get you going|readiness
+ANGER|It can make you see red|emotion
+AREA|Specialty, or what acres measure|maps
+ARMY|Force to be reckoned with?|readiness
+ASIDE|Stage whisper meant for the audience|performance
+ATLAS|It holds the world between two covers|maps
+DAISY|Flower plucked to settle \u201Cloves me, loves me not\u201D|nature/plants
+DEER|White-tailed garden raider|nature/wildlife nature/outdoors
+DENSE|Hard to see through, like fog or a thicket|nature/plants nature/outdoors weather
+EARL|Peer who outranks a viscount|titles
+ELSE|Word after \u201Cor\u201D in an ultimatum|speech
+HINGE|Turning point for a gate|tools
+PILE|Raked-up heap, or a fortune, informally|money nature/outdoors
+READY|Word before \u201Cset\u201D and \u201Cgo\u201D|readiness
+SADLY|How bad news is often broken|emotion
+SHED|Drop, as antlers, or where the rake hangs|nature/wildlife tools
+SPEND|Part with, as money or an afternoon|money
+TEAR|It might run down a cheek or through a sheet|emotion
+`.trim();
   var november27Edition = starterEditions.length;
   var monthlyStart = november27Edition + 1;
-  var editions = [...starterEditions, november27Layout, ...monthlyLayouts].map((edition) => edition.split("/"));
+  var editions = [...starterEditions, november27Layout, ...monthlyLayouts, challengeLayout].map((edition) => edition.split("/"));
+  var challengeEdition = editions.length - 1;
   var editionClues = `
 ACE|Card that can sit high or low|games
 ADO|Much ___ About Nothing|literature
@@ -1128,6 +1155,15 @@ WRY|Like a remark delivered with an arched eyebrow|speech emotion
     if (index === november27Edition) return november27Entries;
     return index >= monthlyStart ? monthlyEntries : authoredEntries;
   }
+  var challengeEntries = readClues(challengeClues);
+  var hasChallengeGrid = (day2) => day2 === challengeGridDate;
+  var latestChallengeDate = (today2) => challengeGridDate <= today2 ? challengeGridDate : void 0;
+  function challengeForDay(day2) {
+    if (!hasChallengeGrid(day2)) throw new Error(`No challenge grid for ${day2}`);
+    const puzzle2 = authoredPuzzle(challengeEdition, true, day2, challengeEntries);
+    if (planSeeds(puzzle2).length < 4) throw new Error(`No reachable seeds for the ${day2} challenge grid`);
+    return puzzle2;
+  }
   function puzzleForDay(day2, firstGrid2 = false) {
     const choice = firstGrid2 && day2 === secondGridDate ? void 0 : scheduledGarden(day2);
     const puzzle2 = choice?.[0] === "edition" ? authoredPuzzle(choice[1], choice[2], day2, clueBookForEdition(choice[1])) : legacyPuzzle(day2, choice?.[1], choice?.[2]);
@@ -1328,6 +1364,7 @@ WRY|Like a remark delivered with an arched eyebrow|speech emotion
   var slideDirections = { ArrowUp: "up", ArrowDown: "down", ArrowLeft: "left", ArrowRight: "right" };
   var day = today;
   var firstGrid = false;
+  var challenge = false;
   var attempt = "original";
   var puzzle;
   var garden;
@@ -1356,6 +1393,7 @@ WRY|Like a remark delivered with an arched eyebrow|speech emotion
   }
   var originalKey = () => {
     const dateKey = `cross-pollinate:v1:${day}`;
+    if (challenge) return `${dateKey}:challenge`;
     return day === secondGridDate && !firstGrid ? `${dateKey}:new-grid` : dateKey;
   };
   var viewKey = () => `${originalKey()}:view`;
@@ -1387,11 +1425,13 @@ WRY|Like a remark delivered with an arched eyebrow|speech emotion
   var formatSize = (size) => `${size}\xD7${size}`;
   function previewDate() {
     const valid = dateInput.validity.valid;
-    text("date-preview", valid ? `${formatSize(gridSizeForDay(dateInput.value))} crossword` : "Choose today or an earlier date.");
+    const extra = valid && hasChallengeGrid(dateInput.value);
+    text("date-preview", valid ? `${formatSize(gridSizeForDay(dateInput.value))} crossword${extra ? ", plus a harder challenge grid" : ""}` : "Choose today or an earlier date.");
     const twoGrids = valid && dateInput.value === secondGridDate;
     byId("open-puzzle").disabled = !valid;
     text("open-puzzle", twoGrids ? "Open new grid" : "Open puzzle");
     byId("open-first-grid").hidden = !twoGrids;
+    byId("open-challenge-grid").hidden = !extra;
   }
   function updateDateArrows() {
     for (const [id, offset, label] of [["prev", -1, "Previous garden"], ["next", 1, "Next garden"]]) {
@@ -1403,11 +1443,12 @@ WRY|Like a remark delivered with an arched eyebrow|speech emotion
       button.setAttribute("aria-label", button.disabled ? label : `${label}, ${size} by ${size}`);
     }
   }
-  function openDay(value, useFirstGrid = false) {
+  function openDay(value, useFirstGrid = false, useChallenge = false) {
     day = value;
     firstGrid = useFirstGrid && day === secondGridDate;
+    challenge = useChallenge && hasChallengeGrid(day);
     attempt = read(viewKey()) === "replay" ? "replay" : "original";
-    puzzle = puzzleForDay(day, firstGrid);
+    puzzle = challenge ? challengeForDay(day) : puzzleForDay(day, firstGrid);
     tiles.style.setProperty("--grid-size", String(puzzle.size));
     document.querySelector("main").dataset.gridSize = String(puzzle.size);
     garden = restore();
@@ -1419,10 +1460,10 @@ WRY|Like a remark delivered with an arched eyebrow|speech emotion
     focus = slot.cells.find((cell) => !locked(puzzle, garden, cell)) ?? slot.cells[0];
     clueDirection = slot.direction;
     selectedSeed = "";
-    text("day-caption", `${firstGrid ? "FIRST GRID" : value === today ? "TODAY" : "ARCHIVE"} \xB7 ${formatSize(puzzle.size)}`);
+    text("day-caption", `${challenge ? "CHALLENGE" : firstGrid ? "FIRST GRID" : value === today ? "TODAY" : "ARCHIVE"} \xB7 ${formatSize(puzzle.size)}`);
     text("day-label", dateFormat.format(/* @__PURE__ */ new Date(`${day}T12:00:00Z`)));
     updateDateArrows();
-    status(attempt === "replay" && garden.solved.length === 1 ? "Your original solve is saved. This is a separate replay." : garden.solved.length > 1 ? "" : "The center word is planted for you.");
+    status(attempt === "replay" && garden.solved.length === 1 ? "Your original solve is saved. This is a separate replay." : garden.solved.length > 1 ? "" : challenge ? "Challenge grid: longer answers, trickier clues. The center word is planted." : hasChallengeGrid(day) ? "The center word is planted. Want it harder? Tap the date for the challenge grid." : "The center word is planted for you.");
     buildTiles();
     fillClues();
     update();
@@ -1576,9 +1617,10 @@ WRY|Like a remark delivered with an arched eyebrow|speech emotion
     }
     draw();
   }
+  var wonMessage = () => hasChallengeGrid(day) && !challenge ? "Garden complete! Ready for more? Tap the date for the challenge grid." : "Garden complete! Every clue is in bloom.";
   function reportGrowth(count, oldSeeds) {
     const newSeeds = garden.seeds.filter((seed) => activeSeed(puzzle, garden, seed)).length - oldSeeds;
-    if (garden.solved.length === puzzle.slots.length) status("Garden complete! Every clue is in bloom.");
+    if (garden.solved.length === puzzle.slots.length) status(wonMessage());
     else if (newSeeds > 0) status(`Cross-pollination! ${newSeeds === 1 ? "A wildcard seed is" : `${newSeeds} wildcard seeds are`} ready.`);
     else if (count > 0) status(count === 1 ? "A new word bloomed." : `${count} words bloomed.`);
     else if (slot.cells.every((cell) => garden.ink[cell])) status("That answer isn\u2019t blooming yet. Check the letters.");
@@ -1659,7 +1701,7 @@ WRY|Like a remark delivered with an arched eyebrow|speech emotion
     }
     save();
     choose(hint.target, hint.cell, true);
-    if (garden.solved.length === puzzle.slots.length) status("Garden complete! Every clue is in bloom.");
+    if (garden.solved.length === puzzle.slots.length) status(wonMessage());
     else status(`Seed revealed a letter in ${hint.target.number} ${hint.target.direction}.`);
   }
   function setMobileView(clues) {
@@ -1709,7 +1751,7 @@ WRY|Like a remark delivered with an arched eyebrow|speech emotion
   });
   byId("replay").addEventListener("click", () => {
     store(viewKey(), attempt === "original" ? "replay" : "original");
-    openDay(day, firstGrid);
+    openDay(day, firstGrid, challenge);
   });
   dateInput.max = today;
   byId("choose-date").addEventListener("click", () => {
@@ -1730,6 +1772,12 @@ WRY|Like a remark delivered with an arched eyebrow|speech emotion
     if (dateInput.value !== secondGridDate) return;
     picker.close();
     openDay(secondGridDate, true);
+  });
+  byId("open-challenge-grid").addEventListener("click", () => {
+    if (!hasChallengeGrid(dateInput.value)) return;
+    const date = dateInput.value;
+    picker.close();
+    openDay(date, false, true);
   });
   byId("prev").addEventListener("click", () => stepDate(-1));
   byId("next").addEventListener("click", () => stepDate(1));
@@ -1752,12 +1800,14 @@ WRY|Like a remark delivered with an arched eyebrow|speech emotion
   directionButtons.forEach((button) => button.addEventListener("click", () => changeDirection(button.dataset.direction)));
   slideButtons.forEach((button) => button.addEventListener("click", () => throwSeed(button.dataset.slide)));
   setTheme(read("cross-pollinate:theme") === "dark");
-  openDay(day);
+  var linkedChallenge = location.hash === "#challenge" ? latestChallengeDate(today) : void 0;
+  openDay(linkedChallenge ?? day, false, Boolean(linkedChallenge));
   new ResizeObserver(draw).observe(byId("board"));
   var hooks = window;
   hooks.render_game_to_text = () => JSON.stringify({
     mode: garden.solved.length === puzzle.slots.length ? "won" : "playing",
     day,
+    challenge,
     attempt,
     size: puzzle.size,
     coordinates: "Zero-based cells, row-major from top left",
@@ -1782,6 +1832,8 @@ WRY|Like a remark delivered with an arched eyebrow|speech emotion
     draw();
   };
 })();
+
+;if("serviceWorker"in navigator)addEventListener("load",()=>{navigator.serviceWorker.register("sw.js").catch(()=>{})});
 </script>
 </body>
 </html>

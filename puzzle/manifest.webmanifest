@@ -1,0 +1,17 @@
+{
+  "name": "Cross-Pollinate",
+  "short_name": "Cross-Pollinate",
+  "description": "A daily garden crossword. Correct answers grow flowers, and themed crossings earn wildcard seeds.",
+  "lang": "en-US",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f2f0e6",
+  "theme_color": "#f2f0e6",
+  "categories": ["games", "puzzle"],
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
