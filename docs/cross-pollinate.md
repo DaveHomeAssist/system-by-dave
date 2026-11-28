@@ -6,10 +6,11 @@ playtest preview. The page includes up-front site navigation, a skip link,
 social metadata, and a CSP pinning the inline game script.
 
 The build owner is the Cross-Pollinate repository. The export was built
-from revision `6f03b68b112c2605c7423155a598a990540572d1` with
-`npm run build -- --system-by-dave`. Copy its
-`dist/system-by-dave/index.html` into `puzzle/index.html` for updates. Changes
-to the game or its hosted markup belong in the source repository.
+from revision `89890ab4973f3a7c8e1959d9bad85bed0af28a97` with
+`npm run build -- --system-by-dave`. Copy the whole `dist/system-by-dave/`
+folder into `puzzle/` for updates: `index.html`, `manifest.webmanifest`,
+`sw.js` and `icons/`. Changes to the game or its hosted markup belong in the
+source repository.
 
 The November 27 phone repair keeps all 27 in-game keyboard controls inside
 320, 375 and 412 CSS-pixel portrait viewports. The 412-pixel case represents
@@ -27,3 +28,11 @@ The November 28 challenge grid is a second, harder puzzle for that date. The
 scheduled puzzle stays the default with its existing save key. The date picker
 offers **Open challenge grid**, and a link ending in `#challenge` opens it
 directly on November 28 UTC and afterwards. It saves under its own key.
+
+The November 28 install support makes the route an installable web app. The page
+links `puzzle/manifest.webmanifest` and registers `puzzle/sw.js`, whose scope is
+`/puzzle/` only. Page loads are network first with the cached copy as the
+offline fallback, and the worker removes only caches named `cross-pollinate-`
+because other tools share this origin. Its cache name changes with every
+release. The page policy adds `manifest-src 'self'` and `worker-src 'self'`.
+Saved attempt keys are unchanged.

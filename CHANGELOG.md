@@ -1,5 +1,10 @@
 # Changelog
 
+## November 28, 2026. Cross-Pollinate installs as an app
+
+- Cross-Pollinate can now be installed from the browser. In Chrome on Android, open the menu and choose **Install app** or **Add to Home screen** to get a home screen icon that opens the game full screen.
+- The installed game reopens without a connection after its first visit. Page loads still check the network first, so new puzzles and fixes arrive as before. Saved solves and replays are unchanged.
+
 ## November 28, 2026. Cross-Pollinate challenge grid
 
 - Adds a harder second Cross-Pollinate puzzle for November 28. Tap the date and choose **Open challenge grid**, or open `https://systembydave.com/puzzle/#challenge`. It has 41 open squares instead of 27, 18 clues, no three-letter answers and less direct clues.

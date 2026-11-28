@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en" data-theme="light">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-H7O5J+z6Pd6ha2uHLcxoViJZvigKJX7kq5SoKxU1SWE='; style-src 'unsafe-inline'; img-src 'self' data:; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-tU15aoDDMHxE8wM4vR1Gs1qgjKBWR3Id4K/nTsEfESQ='; style-src 'unsafe-inline'; img-src 'self' data:; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'">
 <meta name="description" content="Solve the daily garden crossword, grow plants and use wildcard seeds for a nearby clue.">
 <meta name="robots" content="noindex, follow">
 <link rel="canonical" href="https://systembydave.com/puzzle/">
@@ -13,6 +13,9 @@
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Cross-Pollinate | Daily Garden Crossword">
 <meta name="twitter:description" content="Solve the daily garden crossword, grow plants and use wildcard seeds for a nearby clue.">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#f4f1e7">
@@ -1829,6 +1832,8 @@ WRY|Like a remark delivered with an arched eyebrow|speech emotion
     draw();
   };
 })();
+
+;if("serviceWorker"in navigator)addEventListener("load",()=>{navigator.serviceWorker.register("sw.js").catch(()=>{})});
 </script>
 </body>
 </html>
