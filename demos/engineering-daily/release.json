@@ -1,9 +1,23 @@
 {
   "schema": 1,
-  "sourceSha256": "710b4e68e9c1d17a1a7fcb8d2c8d118fc0e1c4f7e03baa4150b0be582fc458af",
-  "publicSha256": "178aefb56d19adecd3e14c6b9b789bfcdb4fc662e5b4666fc3e2d31d78e01058",
-  "editions": 41,
+  "sourceSha256": "c18d34f70be66666ff46ec18ff382c03ce606d1cceb608299397ef7ee2a510e9",
+  "publicSha256": "51d8f1c9b56d6a4a01a4cf80b9c7ed9b29a6df3a10d537f398023a000c82bde4",
+  "editions": 42,
   "files": [
+    {
+      "name": "Edition 042.svg",
+      "id": 42,
+      "date": "2026-11-28",
+      "title": "Four SDI inputs must agree",
+      "sha256": "6ec80a59131a8e83a24537c690d5b2566d63355ef4360e19798222c0ba730e33"
+    },
+    {
+      "name": "Edition 042.png",
+      "id": 42,
+      "date": "2026-11-28",
+      "title": "Four SDI inputs must agree",
+      "sha256": "ba402f3de8e8bb1d5d090ba4f0be32e712fc8a0e8efbab37da676cf4fcedea27"
+    },
     {
       "name": "Edition 040.svg",
       "id": 40,
