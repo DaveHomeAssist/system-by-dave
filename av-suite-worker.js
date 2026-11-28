@@ -12,6 +12,7 @@ importScripts('./js/sbd-registry.js');
 // November 3: refresh the Throwline inspection viewer with this cache generation.
 // November 12: add the Equipment Lab projector package to this cache generation.
 // November 14: report optional assets that failed to cache, and request persistent storage.
+// November 27: cache the shared keyboard shortcuts used by offline workspaces.
 var CACHE_PREFIX='sbd-av-suite-';
 var CACHE_NAME=CACHE_PREFIX+self.SBD_REGISTRY.version;
 var OFFLINE_ASSETS=self.SBD_REGISTRY.offlineAssets();

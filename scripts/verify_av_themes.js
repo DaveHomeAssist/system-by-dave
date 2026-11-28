@@ -82,10 +82,13 @@ routes.forEach((route) => {
       fail(`${route.file} does not initialize Throwline from the system preference.`);
     }
   } else {
-    if (route.id !== 'av-workbook' && !/name="theme-color" content="#EEE8DF" media="\(prefers-color-scheme: light\)"/.test(html)) {
+    // The AV by Dave console wears the Gaffer and Call Sheet chrome (css/av-theme.css).
+    const lightChrome = route.id === 'av-suite' ? '#F3F2EC' : '#EEE8DF';
+    const darkChrome = route.id === 'av-suite' ? '#0F0F0E' : '#0C1016';
+    if (route.id !== 'av-workbook' && !html.includes(`name="theme-color" content="${lightChrome}" media="(prefers-color-scheme: light)"`)) {
       fail(`${route.file} is missing the Warm Paper browser-chrome color.`);
     }
-    if (route.id !== 'av-workbook' && !/name="theme-color" content="#0C1016" media="\(prefers-color-scheme: dark\)"/.test(html)) {
+    if (route.id !== 'av-workbook' && !html.includes(`name="theme-color" content="${darkChrome}" media="(prefers-color-scheme: dark)"`)) {
       fail(`${route.file} is missing the Stage Slate browser-chrome color.`);
     }
   }

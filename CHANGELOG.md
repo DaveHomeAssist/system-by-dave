@@ -1,5 +1,183 @@
 # Changelog
 
+## November 27, 2026. Cross-Pollinate phone keyboard containment
+
+- Keeps every in-game QWERTY key, including `P`, inside narrow portrait screens so a Galaxy Note 20 player can finish with the familiar controls and current saved solve.
+- Contains the date card and Garden bed progress label. Browser checks cover 320, 375 and 412 CSS pixels with all 27 keys visible and clickable.
+
+## November 27, 2026. AV console keyboard help
+
+- Press `?` in the AV console to open keyboard shortcut help and `Escape` to close it. The offline cache refreshes to include the updated console shell.
+
+## November 27, 2026. OnTrack keyboard navigation
+
+- Added a first-focus skip link and keyboard navigation between Library, Sets, Debrief and Data, with a visible focus indicator and an announced selected tab.
+
+## November 27, 2026. OnTrack and House Video out of All apps
+
+- The console's All apps dialog no longer lists OnTrack or House Video / FMP. Both stay in the registry, can still be pinned from Customize, and keep their own links.
+- Registry version is now `v20261127-all-apps-trim`, so the offline cache refreshes.
+
+## November 27, 2026. Console polish
+- All apps lists Rehearsal Capture once (under Show tools), shows each app's icon on its card, puts search in the top bar beside the title, and closes with an icon button like Add panel.
+- A new panel from Add panel opens at half the workspace when there is room (then a quarter, then 4x4), so it is big enough to use and to split side by side.
+- The console header says how many panels are open instead of "Empty workspace" once a panel is added.
+- Signal Flow's empty card sits above the canvas controls instead of covering them, and the Signal Flow rail shortcut is left aligned like the other rail entries.
+- The avbydave.com homepage keeps Blog, Console, Throwline and PixelForge in the header on tablets and phones (on their own row), and each Console department tile opens that department.
+- Registry version `v20261127-console-polish` rolls the offline cache.
+
+## November 27, 2026. Envision cross device workspace
+
+- The private Studio shows the route from the current computer through Dominic to Walter, with project-source and image-runner states in one keyboard-accessible panel.
+- Envision Studio 1.1.0 for Mac can keep chosen projects and their selected artwork in a private, read-only offline cache. Cached projects remain visible when Dominic is unavailable and refresh after reconnection.
+
+## November 27, 2026. Console white gaffer palette and light toggle
+- The AV by Dave console uses the white gaffer look in all four palettes: black, paint pen white and aluminum gray from the AV by Dave tokens (Gaffer dark, Call Sheet light). The AV badge, primary buttons, selected rail entries and panel outlines use the ink color instead of rust or orange. Status colors are unchanged.
+- A sun and moon button beside Menu switches light and dark in one tap. White and Black swap with each other, and Follow system stays in Menu > Appearance. The choice is the shared `av-theme-mode.v1`, so the homepage follows it.
+- The console's browser chrome colors match the new palette. Other AV tools keep Warm Paper and Stage Slate.
+
+## November 27, 2026. Add device top bar
+- Signal Flow's Add device and Rename device dialogs have one top bar with the title and a close button. The bottom Cancel button is gone, so the dialog has one close.
+
+## November 27, 2026. Console guide links
+- The console rail, its search and All apps open Console Spec Guide and the Sync & Signal Field Kit at `/console-guide/` and `/field-kit/`. They had resolved under `/av/` and returned a missing page.
+- Panel cards in All apps, such as Signal Flow on phone, fall back to the console at `/av/` instead of `/av/av/`.
+- The console registry generation is `v20261126-console-links`, so offline copies pick up the change.
+
+## November 27, 2026. Cross-Pollinate four-week rotation
+
+- Adds 15 original 9×9 crosswords. The daily calendar now runs for 28 days before a filled grid repeats, with 26 small puzzles and two 11×11 editions.
+
+## November 27, 2026. Cross-Pollinate second grid
+
+- A fresh grid is the default for November 27 UTC. Open the date picker to return to the first grid and its saved solve or replay. Each grid saves progress separately.
+
+## November 27, 2026. Cross-Pollinate layout rotation
+
+- Rotates distinct 9×9 crossword patterns and adds an occasional 11×11 garden. The date arrows and date chooser preview grid size. Earlier puzzle dates and saves remain compatible.
+
+## November 27, 2026. Cross-Pollinate replays
+
+- Replay a completed garden with the current clues. Replay progress saves separately so players can return to their original solve.
+
+## November 26, 2026. Cross-Pollinate clues and vine bonuses
+
+- Revised the starter clues for more challenge without revealing their answers. When a solved long answer grows a vine that reveals a letter, the game identifies the clue that earned it and the clue it helped.
+
+## November 26, 2026. Cross-Pollinate playtest
+
+- Play the daily garden crossword at `/puzzle/`. Solve crossing words to grow the garden and earn wildcard seeds. The preview is available by direct link.
+
+## November 26, 2026. New Bethlehem retreat preview
+
+- Connected the welcome, visit details, registration and public contact to the retreat editor’s published release. Drafts stay in the private editor.
+- Added a temporary, unlisted retreat website at `/retreat/` for sharing by direct link. The preview now names New Bethlehem and explains whom the one-day Catholic retreat is for. The home page features the supplied devotional artwork at its original proportions. The About page introduces Sharon Delaney, links to her EWTN News author profile, and lists five of her National Catholic Register articles, including her 2023 report on the Carlo Acutis shrine in Brick, New Jersey.
+
+## November 26, 2026. Envision web artwork and Notion Agents
+
+- Export a selected Library image as a square thumbnail, wide card or link preview. Choose its framing and file name, then download the image shown in the preview.
+- The Notion Agents catalog opens with four workflow choices. Each portrait links directly to its setup details and contact action. The Tools card shows the catalog, and shared links use a desk illustration rendered on Walter.
+
+## November 26, 2026. Envision image directions
+
+- Choose a folded paper, fiber light or botanical print study in the public builder and private studio. Walter rendered each sample from the prompt it supplies. The folded paper study also appears in Envision link previews.
+- Recall a saved project or artwork direction, keep unsaved wording through reload in the same tab, and resolve a competing save before replacing it. Back and Forward revisit studio workspaces.
+- A render request keeps its project identity across navigation and can retry an unacknowledged submission after reload using the same job key.
+
+## November 26, 2026. Project directory artwork and Envision names
+
+- Search the Tools directory by name or subject, combine a search with a category, and return to those results with Back. The results scroll beneath the controls in both themes.
+- OnTrack, AV Video, Garden OS and Hat-in-Ring Radar use individual images generated on Walter. Theme Organizer keeps its selected screenshot crop. OnTrack uses its turntable study when a link is shared.
+- Rename a candidate in the private Envision Library and reopen its editable package with the saved artwork name. A concurrent rename prompts the operator to review the current name.
+
+## November 26, 2026. Envision artwork review
+
+- Browse search results and favorites in the private studio with Previous, Next or the arrow keys. Full view shows each image’s dimensions, seed and recorded render time when available.
+- Phone full view keeps the whole image and its controls within the dialog when the generation prompt becomes a long artwork title.
+- Compare opens a revision beside its source. Switching the visible side keeps the candidate selected for editing. A completed background render leaves a review in place.
+- The Back Focus directory card and House Video link preview use two camera studies generated on Walter.
+
+## November 26, 2026. Envision Mac render comparisons
+
+- Compare a generated revision with its original directly from the canvas, choose a different candidate, or replace one side. The Mac saves the selected pixels and their render details for offline use.
+- Compare includes two Walter renders of the same optical cube under daylight and tungsten lighting. Local image files and phone width remain available.
+
+## November 26, 2026. Prompt Library image exports
+
+- Open an image prompt to copy it or export a named brief for Envision. The Urban Architecture entry includes a render made from its exact prompt.
+- The library has light and dark themes, a single results pane, collapsible filters and a manual copy dialog when clipboard access fails.
+- The tools directory uses individual artwork for Prompt Library and Trailkeeper. The library’s share preview uses its architecture study.
+
+## November 26, 2026. Envision image briefs
+
+- Envision opens on image prompts with optical, paper and custom subjects. Image revisions can keep the source framing. The prompt can be exported directly to the owner's personal studio.
+- Image briefs import as image projects. Existing saved flyers keep their art direction, format and separate show copy.
+- Imported briefs open directly in Generate on the Mac or Create in the private browser studio. Editable layouts still open in their editor.
+- Mac Generate can recall a selected artwork prompt, the project's saved brief or the built-in sample prompt. Images with a worker receipt show their engine time beside their dimensions.
+
+## November 26, 2026. Envision project artwork
+
+- The public Envision layout editor opens an editable optical study generated on Walter. Its title, caption and credit can be changed, exported as PNG and reopened from an editable copy.
+- Private studio project cards use the latest generated or finished artwork when a layout background has yet to be chosen. Thumbnail requests use project ownership, same-origin browser embedding and an indexed lookup.
+- The System by Dave Prompt Lab page has a dedicated share image made from Walter’s index-card study.
+
+## November 26, 2026. Run Review is now Rehearsal Capture
+
+- The avbydave.com page is now Rehearsal Capture at `/rehearsal-capture/`, with that name on the homepage tools table, the console Show tools menu, the breadcrumb and the page title.
+- `/run-review/` forwards to the new address and keeps any query or hash, so saved links still open it.
+- The Frozen copy at wst.housevideo.app/run-review/ is unchanged. The console registry generation is `v20261126-rehearsal-capture`.
+
+## November 26, 2026. AV Suite rail icons
+
+- AV Suite rail: every tool has its own icon in the collapsed rail, badges collapse to a dot, groups separated.
+
+## November 26, 2026. Envision Studio for Mac
+
+- The Apple Silicon app opens on image generation. Select a project, give Walter a prompt or reference, compare candidates and save the chosen PNG. The app icon and sample artwork came from studio renders.
+- Open the private studio for layered compositions, masks, finishes and the render queue. Compare two saved images locally at fit or phone width, including while disconnected.
+
+## November 26, 2026. Run Review on avbydave.com
+
+- Run Review now opens at `/run-review/` on avbydave.com, from the homepage tools table (Early build) and the console's Show tools menu. It is the Frozen Rehearsal Review viewer, unchanged, pinned to its `frozen-rehearsal-capture` build and given the AV by Dave name, breadcrumb, palette and shared theme choice.
+- With no show published on the site it runs in local mode: open a capture archive (and an optional Notion cue snapshot) from this computer. Review marks and notes stay in this browser and export as CSV, Markdown or JSON. The page is noindex for now.
+- The Frozen copy at wst.housevideo.app/run-review/ is unchanged. The console registry generation is `v20261126-run-review`.
+
+## November 26, 2026. Envision editable exports
+
+- The private studio now asks you to save pending layer and event field edits before downloading an editable project ZIP or legacy flyer.
+
+## November 26, 2026. Recipe Journal mirror
+
+- Browse the live public Recipe Journal at `/recipes/`. The full Journal opens separately for family sign-in and Kitchen.
+
+## November 25, 2026. AV console menus: Featured, Show tools and Learn
+
+- The Rail on `/av/` is Search, Workspace, Featured, Departments, Show tools, Reference, Learn, then All apps and Customize. Featured is Throwline, LED Wall Calculator, Signal Flow, the Console Spec Guide and AV Calculator. Saved `sbd.rail.v1` pins are unchanged.
+- All apps uses those sections and a one-line description. The phone Apps sheet adds search, featured chips, the last three items used on this device (`sbd.avSuite.recent.v1`) and collapsed sections.
+- Add panel leads with the same featured panels plus Multiview, Audio Delay and On Deck, and shows a panel count on each tile. Show tools replaces the Tools group. Gear 3D models are inside Equipment Lab. Ion 3D and the second SmartFade stay registered and stay off the chooser.
+- Infrastructure's console label is Power, Network & Cable. The last panel in each pack is named Project. On a short Show Control screen the backup launcher reads Project controls. The header link reads Learn. The Shop is unchanged. Routes, the sitemap and existing storage keys are unchanged. Arena Ops and DeckForge are no longer menu cards. Retired sheet ids are out of the navigation groups.
+- The calculator page's no-JavaScript list names Throw distance (quick) and points that estimate at Throwline.
+
+## November 25, 2026. Envision Personal Studio
+
+- Added private image generation on local hardware with a durable queue, reference and masked revisions, artwork comparison and reusable event layouts.
+- Added feed, story, lobby and campaign packages with event-based filenames, editable project import and export, and verified catalog backups. Saved events in the public prompt kit now offer a downloadable brief and a browser-local shortcut to the owner's private studio.
+- Fixed fragmented image output from the personal studio by using the SDXL Turbo noise schedule for new renders. Stored jobs retain their original workflow on retry.
+
+## November 24, 2026. Envision download names
+
+- The layout editor names editable projects and PNGs after the event and remembers the event name in saved projects.
+
+## November 24, 2026. Envision flyer studio
+
+- Added a direct-access flyer prompt studio and portable layout editor at `/envision/`. The editor accepts existing AfterJinx project files and exports PNGs locally.
+
+## November 23, 2026. Field Kit checkout open
+
+- Open the $12 Sync & Signal Field Kit. `checkoutOpen: true` in `js/sbd-launch-config.js` is the switch: the Buy button goes to the Stripe Payment Link, and avbydave.com publishes the page as indexable. Set that one line to `false` to keep "Checkout opens soon" and leave the page noindex.
+- Register the kit folder's download hash so the thanks page shows the download button for that link. The share link stays out of this repository.
+- Replace the three card previews with the final page-1 renders. The tear-test preview is unchanged.
+
 ## November 23, 2026. Screenshots on the tool cards
 
 - Tools directory cards that only had the sprite now show a live screenshot in the same art box (`img.tc-art.tc-art--shot`, lazy, with the capture's alt text). Theme Organizer keeps `img/theme-organizer-card.webp`; the new full-page capture is lighter and harder to read at that size. Garden OS, Back Focus, OnTrack and AV Video are unchanged. Prompts, Trailkeeper and Hat-in-Ring had no file in the capture set.
@@ -832,6 +1010,12 @@ Workspace search opens show pages and R5 references. Notes retains the last shar
 
 - Add Edition 026, Active HDMI cable direction, with an Extron sourced lesson,
   matching diagram and SVG/PNG story card. Preserve previous editions and behavior.
+
+## November 1, 2026: Field Kit checkout
+
+- Wire the AV by Dave Stripe Payment Link ($12) into `js/sbd-launch-config.js`, finalise the Field Kit delivery, statement descriptor (AVBYDAVE FIELD KIT), refund and licence text, and remove the DRAFT markers, so the Buy button opens. `fieldKit.download.sha256` stays empty until Dave registers the kit share link, so the thanks page keeps the email-me card.
+- Index `/field-kit/` on avbydave.com only while checkout is live: the source stays noindex and the publish step swaps it, with a matching avbydave.com sitemap entry (`scripts/field_kit_launch.mjs`, `scripts/gen_sitemap.py`, tested in `verify:domain-sites`).
+- Add the avbydave.com/frame-sync/ Reel short link, a noindex redirect to systembydave.com/demos/frame-sync.html that keeps the query string.
 
 ## November 1, 2026: Video Engineering Daily
 

@@ -24,7 +24,7 @@ function publishForbidden(name) {
   if (/\.(?:test|spec)\.[cm]?[jt]sx?$/.test(norm)) return 'test';
   if (/(^|\/)[^/]*probe\.[cm]?js$/.test(norm)) return 'probe';
   if (norm.endsWith('.d.ts') || norm.endsWith('.d.mts')) return 'type declarations';
-  if (norm === 'implementation_plan.txt' || norm === 'systembydave-site.zip' || norm === 'youtube-pipeline-regression-2026-06-11.js' || norm === 'build_site.py') return 'internal file';
+  if (norm === 'implementation_plan.txt' || norm === 'date_project_implementation_plan.txt' || norm === 'systembydave-site.zip' || norm === 'youtube-pipeline-regression-2026-06-11.js' || norm === 'build_site.py') return 'internal file';
   if (/(^|\/)package(?:-lock)?\.json$/.test(norm)) return 'package metadata';
   if (norm.startsWith('av-workbook/assets/')) return 'withdrawn workbook assets';
   const parts = norm.split('/');

@@ -7,7 +7,7 @@ export const LAYOUT_KEY = 'sbd.shop.layout.v1';
 export const LIBRARY: PanelDef[] = [
   { type: 'worklist', name: 'Worklist', group: 'Common', description: 'Filter and select prep, pack, load in and strike work.', minW: 3, minH: 3, lit: true },
   { type: 'inspector', name: 'Item inspector', group: 'Common', description: 'Edit the selected item, quantities, ownership and blockers.', minW: 3, minH: 3 },
-  { type: 'document', name: 'Document', group: 'Utilities', description: 'Plan name, Save, export, restore and copies from Gear Prep, Truck Pack, Load In or Strike plans.', minW: 3, minH: 3 },
+  { type: 'document', name: 'Project', group: 'Utilities', description: 'Plan name, Save, export, restore and copies from Gear Prep, Truck Pack, Load In or Strike plans.', minW: 3, minH: 3 },
 ];
 export const DEFAULT_VIEWS: View[] = [
   { id: 'work', name: 'Work', panels: [

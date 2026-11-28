@@ -55,7 +55,7 @@ try {
       return { label: funnel?.getAttribute('aria-label'), crumb: !!row?.querySelector('nav[aria-label="Breadcrumb"] [aria-current="page"]'), links, sw: document.documentElement.scrollWidth, vw: innerWidth, rowSW: row?.scrollWidth, rowCW: row?.clientWidth };
     });
     // Demos live on systembydave.com (Dave, c4b517e): absolute, UTM-tagged; the Field Kit is same-site.
-    const want = [['Demos', /^https:\/\/systembydave\.com\/demos\/\?utm_source=avbydave&utm_medium=nav&utm_campaign=console&utm_content=demos$/], ['Field Kit', /^\/field-kit\/$/], ['Subscribe', /^https:\/\/systembydave\.com\/demos\/\?utm_source=avbydave&utm_medium=nav&utm_campaign=console&utm_content=subscribe#subscribe$/]];
+    const want = [['Learn', /^https:\/\/systembydave\.com\/demos\/\?utm_source=avbydave&utm_medium=nav&utm_campaign=console&utm_content=demos$/], ['Field Kit', /^\/field-kit\/$/], ['Subscribe', /^https:\/\/systembydave\.com\/demos\/\?utm_source=avbydave&utm_medium=nav&utm_campaign=console&utm_content=subscribe#subscribe$/]];
     if (state.links.length !== want.length || want.some(([t, re], i) => state.links[i].text !== t || !re.test(state.links[i].href))) fail(`${tag} console funnel links: ${JSON.stringify(state.links)}`);
     if (!state.label) fail(`${tag} funnel nav has no aria-label`);
     if (!state.crumb) fail(`${tag} breadcrumb lost its aria-current item`);

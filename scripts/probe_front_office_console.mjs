@@ -31,7 +31,7 @@ const channel = process.env.CHROME_CHANNEL ? { channel: process.env.CHROME_CHANN
 const draftKey = 'sbd.frontOffice.draft.v1', layoutKey = 'sbd.frontOffice.layout.v1';
 const fixture = {version:1,clients:[{id:'c1',name:'Synthetic client',contact:'Contact',notes:'Client notes'},{id:'c2',name:'Second client',contact:'',notes:''}],venues:[{id:'v1',name:'Synthetic venue',location:'Location',notes:'Venue notes'},{id:'v2',name:'Second venue',location:'',notes:''}],jobs:Array.from({length:20},(_,i)=>({id:'j'+i,name:'Synthetic show '+(i+1),clientId:'c1',venueId:'v1',stage:'Inquiry',nextAction:'Confirm date',updates:[{id:'u'+i,body:'Initial note',date:'2026-10-12T12:00:00Z'}]}))};
 const source = {schema:ADVANCE_SCHEMA,meta:{showName:'Advance fixture',client:'Source client',venue:'Source venue',showDate:'2026-10-12'},items:[{id:'a1',section:'power',ask:'Confirm shore power',owner:'Venue',due:'Tomorrow',priority:'high',status:'custom-status',details:'Synthetic',notes:'Retained'}]};
-const panels = [['Jobs','jobs'],['Clients','clients'],['Venues','venues'],['Job updates','updates'],['Document','document']];
+const panels = [['Jobs','jobs'],['Clients','clients'],['Venues','venues'],['Job updates','updates'],['Project','document']];
 
 const read = (page, key = KEY) => page.evaluate(key => localStorage.getItem(key), key);
 const button = (scope, name) => scope.getByRole('button', { name, exact: true });
@@ -56,7 +56,7 @@ async function save(page) {
   await page.waitForFunction(() => !document.querySelector('.office-header p').textContent.includes('Unsaved records') && /Saved to this browser|Recovered document saved/.test(document.getElementById('footerMessage').textContent));
   if (await button(page, 'Back to panels').isVisible()) await button(page, 'Back to panels').click();
 }
-async function exportPlan(page) { await quick(page, 'Document'); const downloaded = page.waitForEvent('download'); await button(panel(page, 'document'), 'Export JSON').click(); return JSON.parse(await readFile(await (await downloaded).path(), 'utf8')); }
+async function exportPlan(page) { await quick(page, 'Project'); const downloaded = page.waitForEvent('download'); await button(panel(page, 'document'), 'Export JSON').click(); return JSON.parse(await readFile(await (await downloaded).path(), 'utf8')); }
 async function reachable(control, label = String(control)) {
   await control.scrollIntoViewIfNeeded();
   const r = await control.evaluate(element => {
@@ -81,7 +81,7 @@ async function noOverflow(scope, label) {
 function pass(name) { passed.push(name); console.log(`PASS ${name}`); }
 
 async function importSource(page, value, saved = false) {
-  await quick(page,'Document'); await button(page,'Import Show Advance').click();
+  await quick(page,'Project'); await button(page,'Import Show Advance').click();
   if(saved){await page.evaluate(({key,raw})=>localStorage.setItem(key,raw),{key:ADVANCE_KEY,raw:typeof value==='string'?value:JSON.stringify(value)});await button(page,'Read saved Show Advance').click();}
   else await page.locator('#importFile').setInputFiles(jsonFile(value));
   await page.locator('#confirmImport:enabled').waitFor();
@@ -97,7 +97,7 @@ try {
   await page.keyboard.press('Tab');await page.keyboard.press('Enter');assert.equal(await page.evaluate(()=>document.activeElement.id),'main');
   const clients=panel(page,'clients'),venues=panel(page,'venues'),jobs=panel(page,'jobs');
   await clients.getByLabel('Client name',{exact:true}).fill('New client');await clients.getByLabel('Contact',{exact:true}).fill('Synthetic contact');await clients.getByLabel('Client notes').fill('Retained client note');
-  await quick(page,'Document');await page.locator('#saveBtn').click();assert.match(await page.locator('#footerMessage').textContent(),/unfinished forms/);assert.equal(await read(page),null);
+  await quick(page,'Project');await page.locator('#saveBtn').click();assert.match(await page.locator('#footerMessage').textContent(),/unfinished forms/);assert.equal(await read(page),null);
   await quick(page,'Clients');assert.equal(await clients.getByLabel('Client name',{exact:true}).inputValue(),'New client');await button(clients,'Add client').click();
   await venues.getByLabel('Venue name',{exact:true}).fill('New venue');await venues.getByLabel('Location',{exact:true}).fill('Synthetic location');await venues.getByLabel('Venue notes').fill('Retained venue note');await button(venues,'Add venue').click();
   await jobs.getByLabel('Job name',{exact:true}).fill('New show');await jobs.getByRole('combobox',{name:/^Client/}).selectOption({label:'New client'});await jobs.getByRole('combobox',{name:/^Venue/}).selectOption({label:'New venue'});await jobs.getByLabel('Next action',{exact:true}).fill('Book room');await button(jobs,'Add job').click();
@@ -125,20 +125,20 @@ try {
   await importSource(imports,raw,true);await bindNew(imports);await imports.locator('#confirmImport').click();assert.equal(await read(imports),null);await save(imports);
   const first=JSON.parse(await read(imports));assert.equal(first.jobs[0].sourceAdvance.raw,raw);assert.equal(first.jobs[0].stage,'Advance');assert.equal(first.jobs[0].nextAction,'');assert.equal(await read(imports,ADVANCE_KEY),raw);
   await quick(imports,'Job updates');let downloaded=imports.waitForEvent('download');await button(imports,'Export original Show Advance').click();assert.equal(await readFile(await(await downloaded).path(),'utf8'),raw);
-  await quick(imports,'Document');await button(imports,'Import Show Advance').click();await button(imports,'Read saved Show Advance').click();assert.match(await imports.locator('#importPreview').textContent(),/already copied/);assert.equal(await imports.locator('#confirmImport').isDisabled(),true);await button(imports,'Close import').click();
+  await quick(imports,'Project');await button(imports,'Import Show Advance').click();await button(imports,'Read saved Show Advance').click();assert.match(await imports.locator('#importPreview').textContent(),/already copied/);assert.equal(await imports.locator('#confirmImport').isDisabled(),true);await button(imports,'Close import').click();
   const changed=structuredClone(source);changed.items[0].status='confirmed';await importSource(imports,changed);assert.match(await imports.locator('#importPreview').textContent(),/separate job/);await imports.getByLabel('Bind client').selectOption(first.clients[0].id);await imports.getByLabel('Bind venue').selectOption(first.venues[0].id);await imports.locator('#confirmImport').click();await save(imports);
   const copied=JSON.parse(await read(imports));assert.equal(copied.jobs.length,2);assert.equal(copied.clients.length,1);assert.equal(copied.venues.length,1);assert.equal(copied.jobs[0].sourceAdvance.raw,raw);
   const blank=structuredClone(source);blank.meta={showName:'',client:'',venue:'',showDate:''};await importSource(imports,blank);await bindNew(imports);await imports.locator('#confirmImport').click();assert.match(await imports.locator('#importPreview').textContent(),/Client name is required/);await imports.getByLabel('New client name').fill('Explicit client');await imports.getByLabel('New venue name').fill('Explicit venue');await imports.getByLabel('Imported job name').fill('Explicit show');await imports.locator('#confirmImport').click();assert.equal((await exportPlan(imports)).jobs.length,3);
   pass('saved/file Advance review, explicit existing/new identity binding, blank metadata, exact-original export, repeat rejection and changed-source separation');
 
-  await quick(imports,'Document');await button(imports,'Import Show Advance').click();
+  await quick(imports,'Project');await button(imports,'Import Show Advance').click();
   for(const bad of ['{bad',{schema:'future'},{...source,items:[source.items[0],source.items[0]]},'x'.repeat(1_000_001)]){await imports.locator('#importFile').setInputFiles(jsonFile(bad));await imports.getByText(/Import rejected:/).waitFor();assert.equal(await imports.locator('#confirmImport').isDisabled(),true);}
-  await button(imports,'Close import').click();await quick(imports,'Document');await button(imports,'Restore backup').click();
+  await button(imports,'Close import').click();await quick(imports,'Project');await button(imports,'Restore backup').click();
   for(const bad of [{...copied,workspace:{version:42,views:[]}},'x'.repeat(2_000_001),{...copied,jobs:[{...copied.jobs[0],clientId:'missing'}]}]){await imports.locator('#importFile').setInputFiles(jsonFile(bad));await imports.getByText(/Import rejected:/).waitFor();assert.equal(await imports.locator('#confirmImport').isDisabled(),true);}
   await imports.locator('#importFile').setInputFiles(jsonFile(copied));await imports.locator('#confirmImport:enabled').waitFor();await button(imports,'Close import').click();assert.equal((await exportPlan(imports)).jobs.length,3);
   await button(imports,'Restore backup').click();await imports.locator('#importFile').setInputFiles(jsonFile(copied));await imports.locator('#confirmImport:enabled').waitFor();await imports.evaluate(key=>localStorage.setItem(key,'{"other":"tab"}'),KEY);await imports.locator('#confirmImport').click();assert.match(await imports.locator('#importPreview').textContent(),/changed after preview/);await button(imports,'Close import').click();assert.equal(await read(imports),'{"other":"tab"}');assert.equal((await exportPlan(imports)).jobs.length,3);
   const stale=(await fresh()).page;await importSource(stale,raw,true);await bindNew(stale);await stale.evaluate(key=>localStorage.setItem(key,'changed source'),ADVANCE_KEY);await stale.locator('#confirmImport').click();assert.match(await stale.locator('#importPreview').textContent(),/changed after preview/);assert.equal(await read(stale),null);
-  const restore=(await fresh()).page;await quick(restore,'Document');await button(restore,'Restore backup').click();await restore.locator('#importFile').setInputFiles(jsonFile(copied));await restore.locator('#confirmImport').click();assert.equal(await read(restore),null);await save(restore);assert.deepEqual(await exportPlan(restore),copied);
+  const restore=(await fresh()).page;await quick(restore,'Project');await button(restore,'Restore backup').click();await restore.locator('#importFile').setInputFiles(jsonFile(copied));await restore.locator('#confirmImport').click();assert.equal(await read(restore),null);await save(restore);assert.deepEqual(await exportPlan(restore),copied);
   pass('malformed/excessive/unknown-version imports refused, cancel preserves work, stale backup/source guarded, exact backup roundtrip');
 
   await editJob(page,'Unsaved recovery action');await page.waitForFunction(key=>JSON.parse(localStorage.getItem(key)||'null')?.doc.jobs[0].nextAction==='Unsaved recovery action',draftKey);assert.deepEqual(JSON.parse(await read(page)),saved);
@@ -148,11 +148,11 @@ try {
   const malformed=(await fresh()).page;await seed(malformed);await malformed.evaluate(key=>localStorage.setItem(key,'{bad draft'),draftKey);await malformed.reload();await editJob(malformed,'Exportable action');await malformed.waitForFunction(()=>document.getElementById('footerMessage').textContent.includes('Draft recovery unavailable'));assert.equal(await read(malformed,draftKey),'{bad draft');assert.equal((await exportPlan(malformed)).jobs[0].nextAction,'Exportable action');
   pass('draft offered/restored/cleared, stale-tab write refusal, malformed draft retained and conflicts exportable');
 
-  const damaged=(await fresh()).page;await damaged.evaluate(key=>localStorage.setItem(key,'{unreadable original'),KEY);await damaged.reload();await quick(damaged,'Document');downloaded=damaged.waitForEvent('download');await button(damaged,'Download unreadable original').click();assert.equal(await readFile(await(await downloaded).path(),'utf8'),'{unreadable original');
+  const damaged=(await fresh()).page;await damaged.evaluate(key=>localStorage.setItem(key,'{unreadable original'),KEY);await damaged.reload();await quick(damaged,'Project');downloaded=damaged.waitForEvent('download');await button(damaged,'Download unreadable original').click();assert.equal(await readFile(await(await downloaded).path(),'utf8'),'{unreadable original');
   await button(damaged,'Restore backup').click();await damaged.locator('#importFile').setInputFiles(jsonFile(fixture));await damaged.locator('#confirmImport').click();assert.equal(await read(damaged),'{unreadable original');await save(damaged);assert.equal(await damaged.evaluate(()=>Object.keys(localStorage).filter(key=>key.startsWith('sbd.frontOffice.recovery.')).some(key=>localStorage.getItem(key)==='{unreadable original')),true);assert.deepEqual(JSON.parse(await read(damaged)),fixture);
   const refused=(await fresh()).page;await seed(refused);await editJob(refused,'Storage refused');const before=await read(refused);await refused.evaluate(key=>{const set=Storage.prototype.setItem;Storage.prototype.setItem=function(k,v){if(k===key)throw Error('Synthetic quota');return set.call(this,k,v);};},KEY);await refused.locator('#saveBtn').click();await refused.waitForFunction(()=>document.getElementById('footerMessage').textContent.includes('Synthetic quota'));assert.equal(await read(refused),before);assert.equal((await exportPlan(refused)).jobs[0].nextAction,'Storage refused');
   const unavailable=(await fresh(undefined,()=>{Storage.prototype.getItem=()=>{throw new DOMException('Synthetic denied storage','SecurityError');};})).page;assert.match(await unavailable.locator('#footerMessage').textContent(),/unavailable/);assert.equal(await panel(unavailable,'clients').getByLabel('Client name',{exact:true}).isDisabled(),true);
-  await quick(unavailable,'Document');const deniedDownload=unavailable.waitForEvent('download',{timeout:1000}).then(()=>true,()=>false);await button(unavailable,'Export JSON').click();assert.equal(await deniedDownload,false);assert.match(await unavailable.locator('#footerMessage').textContent(),/No original backup was created/);
+  await quick(unavailable,'Project');const deniedDownload=unavailable.waitForEvent('download',{timeout:1000}).then(()=>true,()=>false);await button(unavailable,'Export JSON').click();assert.equal(await deniedDownload,false);assert.match(await unavailable.locator('#footerMessage').textContent(),/No original backup was created/);
   const noLocks=(await fresh(undefined,()=>Object.defineProperty(navigator,'locks',{value:undefined,configurable:true}))).page;await seed(noLocks);await editJob(noLocks,'Without locks');await noLocks.locator('#saveBtn').click();await noLocks.getByText(/cannot coordinate saves/).waitFor();assert.equal(JSON.parse(await read(noLocks)).jobs[0].nextAction,'Confirm date');assert.equal((await exportPlan(noLocks)).jobs[0].nextAction,'Without locks');
   pass('unreadable originals preserved before recovery, denied/refused storage and missing Web Locks fail safely');
 
@@ -162,7 +162,7 @@ try {
   assert.match(await limit.locator('#footerMessage').textContent(),/excessive records/);assert.deepEqual(JSON.parse(await read(limit)),full);
   await limit.screenshot({path:join(output,'office-short-validation.png')});
   assert.ok(await limit.locator('#footerMessage').isVisible() || await panel(limit,'clients').getByRole('alert').isVisible(),'Record-limit feedback must be visible beside the active short-height form');
-  await quick(limit,'Document');await button(panel(limit,'document'),'Save document').click();await limit.locator('#footerMessage').waitFor({state:'visible'});assert.match(await limit.locator('#footerMessage').textContent(),/unfinished forms/);await button(limit,'Back to panels').click();
+  await quick(limit,'Project');await button(panel(limit,'document'),'Save document').click();await limit.locator('#footerMessage').waitFor({state:'visible'});assert.match(await limit.locator('#footerMessage').textContent(),/unfinished forms/);await button(limit,'Back to panels').click();
 
   await page.reload();await quick(page,'Jobs');
   const sizes=[{width:1440,height:900},{width:1100,height:900},{width:1024,height:768},{width:720,height:900},{width:680,height:812},{width:375,height:812},{width:844,height:390},{width:320,height:256},{width:3840,height:1080}];

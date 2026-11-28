@@ -25,6 +25,20 @@
     catch(error){return null;}
   }
 
+  // Guide and panel links in the registry are written relative to the site
+  // root. Resolve them against that root, not the current page, so a page
+  // under a folder such as /av/ never turns them into /av/<link>.
+  function resolveSiteHref(href,options){
+    if(!href) return {ok:false,code:'not-navigable'};
+    var base=routeBase(options);
+    if(!base) return {ok:false,code:'invalid-base'};
+    var url;
+    try{url=new URL(href,base);}
+    catch(error){return {ok:false,code:'invalid-destination'};}
+    if(url.protocol!=='http:'&&url.protocol!=='https:') return {ok:false,code:'unsafe-protocol'};
+    return {ok:true,code:'resolved',href:url.href};
+  }
+
   function sourceContext(sourceUrl,base){
     var context={};
     if(!sourceUrl) return context;
@@ -166,15 +180,70 @@
     return element;
   }
 
+  function iconElement(documentRef,paths,className){
+    var svg=typeof documentRef.createElementNS==='function'?documentRef.createElementNS('http://www.w3.org/2000/svg','svg'):documentRef.createElement('svg');
+    svg.setAttribute('viewBox','0 0 24 24');
+    svg.setAttribute('aria-hidden','true');
+    svg.setAttribute('focusable','false');
+    svg.setAttribute('class',className);
+    array(paths).forEach(function(data){
+      var path=typeof documentRef.createElementNS==='function'?documentRef.createElementNS('http://www.w3.org/2000/svg','path'):documentRef.createElement('path');
+      path.setAttribute('d',data);
+      svg.appendChild(path);
+    });
+    return svg;
+  }
+
+  function guideEntry(guide){
+    return {
+      ref:'guide:'+guide.id,
+      namespace:'guide',
+      id:guide.id,
+      label:guide.name,
+      href:guide.href,
+      navigable:true,
+      pinnable:false,
+      external:!!guide.external,
+      badge:guide.badge||'',
+      description:guide.blurb||'Opens page',
+      source:guide
+    };
+  }
+
   function catalog(registry){
+    registry=registryOrDefault(registry);
+    var menu=registry.menu||{};
+    var featured=(registry.featured||[]).map(function(item){
+      if(item.kind==='panel') return {ref:'panel:'+item.type,namespace:'panel',id:item.type,label:item.label,type:item.type,navigable:true,pinnable:false,description:item.blurb||'',source:item};
+      if(item.kind==='guide'){var guide=registry.guideById?registry.guideById(item.id):null;return guide?guideEntry(guide):null;}
+      return railRuntime().resolveRef((item.kind==='tool'?'tool:':'console:')+item.id,registry);
+    }).filter(Boolean);
+    featured.forEach(function(entry,index){var item=(registry.featured||[])[index];if(item&&item.blurb&&!entry.description) entry.description=item.blurb;});
+    var sections=[
+      {id:'featured',label:'Featured',entries:featured},
+      {id:'departments',label:'Departments',entries:(menu.departments||[]).map(function(id){return railRuntime().resolveRef('console:'+id,registry);}).filter(Boolean)},
+      {id:'tools',label:'Show tools',entries:(menu.showTools||[]).map(function(id){return railRuntime().resolveRef(id.indexOf(':')===-1?'tool:'+id:id,registry);}).filter(Boolean)},
+      {id:'reference',label:'Reference',entries:(menu.reference||[]).map(function(item){return railRuntime().resolveRef((item.kind==='tool'?'tool:':'console:')+item.id,registry);}).filter(Boolean)},
+      {id:'learn',label:'Learn',entries:(menu.learn||[]).map(function(id){var guide=registry.guideById?registry.guideById(id):null;return guide?guideEntry(guide):null;}).filter(Boolean)},
+      {id:'other',label:'Other apps',entries:(menu.otherTools||[]).map(function(id){return railRuntime().resolveRef('tool:'+id,registry);}).filter(Boolean).concat(array(registry.externals).map(function(item){return railRuntime().resolveRef('external:'+item.id,registry);}).filter(Boolean))}
+    ];
+    /* Other apps lists only what no earlier group already shows, so an app such
+       as Rehearsal Capture (Show tools) appears once. */
+    var listed={};
+    array(menu.hiddenFromAllApps).forEach(function(ref){listed[ref]=true;});
+    sections.slice(0,-1).forEach(function(section){section.entries.forEach(function(entry){listed[entry.ref]=true;});});
+    sections[sections.length-1].entries=sections[sections.length-1].entries.filter(function(entry){if(listed[entry.ref]) return false;listed[entry.ref]=true;return true;});
+    return sections;
+  }
+
+  function pinnableCatalog(registry){
     registry=registryOrDefault(registry);
     var consoleTools={};
     array(registry.consoles).forEach(function(item){if(item.toolId) consoleTools[item.toolId]=true;});
-    return [
-      {id:'consoles',label:'Consoles',entries:array(registry.consoles).map(function(item){return railRuntime().resolveRef('console:'+item.id,registry);}).filter(Boolean)},
-      {id:'tools',label:'Specialist tools',entries:array(registry.tools).filter(function(item){return !consoleTools[item.id]&&!item.retired;}).map(function(item){return railRuntime().resolveRef('tool:'+item.id,registry);}).filter(Boolean)},
-      {id:'externals',label:'External products',entries:array(registry.externals).map(function(item){return railRuntime().resolveRef('external:'+item.id,registry);}).filter(Boolean)}
-    ];
+    return array(registry.consoles).map(function(item){return railRuntime().resolveRef('console:'+item.id,registry);})
+      .concat(array(registry.tools).filter(function(item){return !consoleTools[item.id]&&!item.retired;}).map(function(item){return railRuntime().resolveRef('tool:'+item.id,registry);}))
+      .concat(array(registry.externals).map(function(item){return railRuntime().resolveRef('external:'+item.id,registry);}))
+      .filter(Boolean);
   }
 
   function entryType(entry){
@@ -213,7 +282,8 @@
     close.type='button';
     close.className='sbd-rail-dialog__close';
     close.setAttribute('aria-label','Close '+title);
-    close.textContent='Close';
+    close.setAttribute('title','Close');
+    close.appendChild(iconElement(documentRef,['M6 6l12 12','M18 6 6 18'],'sbd-rail-dialog__close-icon'));
     header.appendChild(heading);
     header.appendChild(close);
 
@@ -268,6 +338,8 @@
     });
     return {
       dialog:dialog,
+      header:header,
+      heading:heading,
       body:body,
       status:status,
       show:show,
@@ -324,23 +396,34 @@
     function routeOptions(){return {registry:registry,baseUrl:options.baseUrl,sourceUrl:options.sourceUrl};}
 
     function allAppsCard(entry){
-      var route=resolveRoute(entry.ref,routeOptions());
+      var route=entry.namespace==='guide'?resolveSiteHref(entry.href,routeOptions()):(entry.namespace==='panel'?resolveRoute('toolbox',routeOptions()):resolveRoute(entry.ref,routeOptions()));
       var card=documentRef.createElement(route.ok?'a':'div');
       card.className='sbd-rail-dialog__card'+(route.ok?'':' is-status');
       card.setAttribute('data-rail-ref',entry.ref);
       card.setAttribute('data-entry-type',entryType(entry));
       if(route.ok){
         card.setAttribute('href',route.href);
-        if(entry.namespace==='external') card.setAttribute('rel','noopener noreferrer');
+        if(entry.namespace==='external'||entry.external){card.setAttribute('rel','noopener noreferrer');card.setAttribute('target','_blank');}
         if(entry.ref===currentRef) card.setAttribute('aria-current','page');
-        if(typeof options.onNavigate==='function') card.addEventListener('click',function(event){options.onNavigate(entry,event);});
+        card.addEventListener('click',function(event){
+          if(entry.namespace==='panel'){
+            if(event&&event.preventDefault) event.preventDefault();
+            var signal=typeof root.CustomEvent==='function'?new root.CustomEvent('sbd:rail-open-panel',{detail:{type:entry.id},cancelable:true}):null;
+            var target=options.eventTarget||root;
+            if(signal&&target&&typeof target.dispatchEvent==='function') target.dispatchEvent(signal);
+            allApps.hide();
+            return;
+          }
+          if(typeof options.onNavigate==='function') options.onNavigate(entry,event);
+        });
       }else{
         card.setAttribute('tabindex','0');
         card.setAttribute('role','note');
         card.setAttribute('aria-label',entry.label+'. '+entryType(entry)+'.');
       }
+      if(array(entry.icon).length) card.appendChild(iconElement(documentRef,entry.icon,'sbd-rail-dialog__card-icon'));
       card.appendChild(textElement(documentRef,'strong','sbd-rail-dialog__card-title',entry.label));
-      card.appendChild(textElement(documentRef,'span','sbd-rail-dialog__type',entryType(entry)));
+      card.appendChild(textElement(documentRef,'span','sbd-rail-dialog__type',entry.description||(entry.source&&(entry.source.desc||entry.source.blurb))||entryType(entry)));
       if(entry.badge) card.appendChild(textElement(documentRef,'span','sbd-rail-dialog__badge',entry.badge));
       var draftSlot=createDraftSlot(documentRef,entry,draftTargets);
       if(draftSlot) card.appendChild(draftSlot);
@@ -349,11 +432,63 @@
 
     function renderAllApps(){
       var fragment=[];
+      var phone=false;
+      try{phone=!!(root.matchMedia&&root.matchMedia('(max-width: 719px)').matches);}catch(error){phone=false;}
+      var search=documentRef.createElement('form');
+      search.className='sbd-rail-dialog__search';
+      search.setAttribute('role','search');
+      var searchInput=documentRef.createElement('input');
+      searchInput.type='search';
+      searchInput.setAttribute('aria-label','Search tools, panels, guides');
+      searchInput.placeholder='Search tools, panels, guides';
+      var searchList=documentRef.createElement('div');
+      searchList.className='sbd-rail-dialog__search-results';
+      searchList.hidden=true;
+      search.appendChild(searchInput);
+      search.addEventListener('submit',function(event){if(event&&event.preventDefault) event.preventDefault();});
+      searchInput.addEventListener('input',function(){
+        var hits=railRuntime().searchHits?railRuntime().searchHits(registry,searchInput.value,root.SBD_PANEL_INDEX||[]):[];
+        searchList.replaceChildren();
+        searchList.hidden=!hits.length;
+        hits.forEach(function(hit){
+          var row=allAppsCard({ref:hit.ref,namespace:hit.kind==='panel'?'panel':hit.kind,id:hit.type||hit.ref,label:hit.label,href:hit.href,external:hit.external,description:hit.kind==='guide'?'Opens page':(hit.blurb||''),navigable:true,pinnable:false});
+          searchList.appendChild(row);
+        });
+      });
+      /* Search sits in the dialog's top bar beside the title and close, as in Add panel. */
+      search.className+=' sbd-rail-dialog__search--bar';
+      allApps.header.replaceChildren(allApps.heading,search,allApps.closeButton);
+      fragment.push(searchList);
+      if(phone){
+        var chips=documentRef.createElement('div');
+        chips.className='sbd-rail-dialog__chips';
+        sections.filter(function(sectionData){return sectionData.id==='featured';}).forEach(function(sectionData){
+          sectionData.entries.slice(0,4).forEach(function(entry){
+            var chip=allAppsCard(entry);
+            chip.className+=' sbd-rail-dialog__chip';
+            chips.appendChild(chip);
+          });
+        });
+        fragment.push(chips);
+        var recentItems=railRuntime().readRecent?railRuntime().readRecent(options.draftStorage,registry.recentKey):[];
+        if(recentItems.length){
+          var recent=documentRef.createElement('section');
+          recent.appendChild(textElement(documentRef,'h3','sbd-rail-dialog__section-title','Recent on this device'));
+          recentItems.forEach(function(item){
+            var known=railRuntime().resolveRef(item.ref,registry);
+            var recentEntry=known?{ref:known.ref,namespace:known.namespace,id:known.id,label:known.label,href:known.href,navigable:known.navigable,pinnable:false,external:known.external,source:known.source,description:item.detail||known.description||''}:{ref:item.ref,namespace:'note',label:item.label,description:item.detail||'',navigable:false,pinnable:false};
+            recent.appendChild(allAppsCard(recentEntry));
+          });
+          fragment.push(recent);
+        }
+      }
       sections.forEach(function(sectionData){
-        var section=documentRef.createElement('section');
-        var title=textElement(documentRef,'h3','sbd-rail-dialog__section-title',sectionData.label);
+        if(phone&&sectionData.id==='featured') return;
+        var section=documentRef.createElement(phone?'details':'section');
+        section.className='sbd-rail-dialog__section';
+        var title=textElement(documentRef,phone?'summary':'h3','sbd-rail-dialog__section-title',sectionData.label+(phone?' · '+sectionData.entries.length:''));
         title.setAttribute('id',prefix+sectionData.id+'Title');
-        section.setAttribute('aria-labelledby',title.getAttribute('id'));
+        if(section.tagName!=='DETAILS') section.setAttribute('aria-labelledby',title.getAttribute('id'));
         var grid=documentRef.createElement('div');
         grid.className='sbd-rail-dialog__grid';
         sectionData.entries.forEach(function(entry){grid.appendChild(allAppsCard(entry));});
@@ -387,9 +522,7 @@
     }
 
     function pinnableEntries(){
-      var result=[];
-      sections.forEach(function(sectionData){sectionData.entries.forEach(function(entry){if(entry.pinnable) result.push(entry);});});
-      return result;
+      return pinnableCatalog(registry).filter(function(entry){return entry.pinnable;});
     }
 
     function actionButton(label,action,reference,disabled,handler){
@@ -468,7 +601,7 @@
         var copy=documentRef.createElement('div');
         copy.className='sbd-rail-dialog__customize-copy';
         copy.appendChild(textElement(documentRef,'strong','',entry.label));
-        copy.appendChild(textElement(documentRef,'span','sbd-rail-dialog__type',entryType(entry)));
+        copy.appendChild(textElement(documentRef,'span','sbd-rail-dialog__type',entry.description||(entry.source&&entry.source.desc)||entryType(entry)));
         var controls=documentRef.createElement('div');
         controls.className='sbd-rail-dialog__customize-actions';
         var currentIndex=pinned.indexOf(entry.ref);
@@ -533,6 +666,7 @@
     version:'sbd.rail.dialogs.v1',
     draftEventName:DRAFT_CHANGE_EVENT,
     resolveRoute:resolveRoute,
+    resolveSiteHref:resolveSiteHref,
     readDraftState:readDraftState,
     createDraftObserver:createDraftObserver,
     create:createDialogs

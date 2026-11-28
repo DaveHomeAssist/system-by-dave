@@ -76,6 +76,9 @@ handoffs.
 - `ProjectorThrow/`: Throwline planner and Stage 3D companion
 - `depotops/`, `pixelforge/`, `noteforge/`: product-specific public surfaces;
   NoteForge is a managed release artifact synchronized from its own repository
+- `rehearsal-capture/`: Rehearsal Capture on avbydave.com, generated with its `run-review/`
+  forward by `scripts/build_rehearsal_capture.mjs` from the viewer pinned in
+  `apps/rehearsal-capture/`; never hand-edit either (docs/rehearsal-capture.md)
 - `data/`: authored product data such as the Gear Reference library
 - `docs/`: public contracts, product boundaries, audits, and focused plans
 - `scripts/`: generators, release syncs, source verifiers, and browser probes

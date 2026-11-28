@@ -118,15 +118,11 @@ Verify native mixed Calculator, Audio, Video and Lighting panels, replace/add,
 shared state, view save/reload, legacy layouts, export and palette/viewport
 containment before release. No new dependencies, hardware control or redesign.
 
-- `https://avbydave.com/av/` opens one console. The Rail on the left lists the
-  nine original application identities plus Equipment Lab and specialist tool links. Selecting a department
+- `https://avbydave.com/av/` opens one console. The Rail lists Search, Workspace, Featured, Departments, Show tools, Reference and Learn, then All apps and Customize. Saved `sbd.rail.v1` pins stay compatible. Selecting a department
   recalls its views in the same workspace and never renders a second console.
-- The panel chooser offers every application's panels in one library, grouped
-  by application, so a stored view can mix Video routes, Lighting fixtures and
-  Calculator controls side by side, plus a Tools group for the specialists
-  that have no native pack yet. Since October 29 it works in two steps: pick an
-  application, Tools or Gear 3D from the tiles, then pick a panel from that
-  group's list, which replaces the tiles (see the October 29 section below).
+- The panel chooser opens with a Featured row and department tiles that show panel counts. Show tools is the specialist group. Gear 3D models sit in Equipment Lab; Ion 3D and the second SmartFade stay registered for saved layouts and stay off the public list. Since October 29 it works in two steps: pick a
+  department or Show tools, then pick a panel from that
+  group's list, which replaces the tiles (see the October 29 section below). Search also reaches guide pages.
 - One view strip, one Add panel, one lock, one maximize, one status line.
   Views are owned by the shell (`sbd.avSuite.workspace.v1`), device-local
   arrangement in `sbd.avSuite.layout.v1`, both exportable as a layout file.
@@ -136,9 +132,9 @@ containment before release. No new dependencies, hardware control or redesign.
 - Specialist tools run as chrome-less panels of their own pages
   (`?sbdEmbed=panel`) until each has a native pack; "Open full" reaches the
   standalone route. Their documents and full-screen modes remain unchanged.
-- One **Document** panel per active application replaces the per-family
+- One **Project** panel per active application (the former Document panel) replaces the per-family
   Plan/Import and Backup panels: title and metadata, Save, Export, Restore,
-  and one-time import of legacy sheet data.
+  and one-time import of legacy sheet data. The panel type stays `document`.
 - Toolbox (`av-suite.html`) and `/av-video/` redirect into `/av/` preserving
   `sbd*` show context. Standalone family routes redirect to the shell with
   that application selected.

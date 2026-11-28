@@ -241,6 +241,174 @@ html[data-av-theme="black"] {
   --av-shadow-pop: 0 30px 88px -24px rgba(0, 0, 0, .98);
 }
 
+/* AV by Dave console (data-av-tool="av-suite"): the "white gaffer" look.
+   Black, paint pen white and aluminum gray, from css/avd/tokens.css (Gaffer
+   dark, Call Sheet light). The accent is the ink itself; color stays on the
+   status tokens (success, warning, danger, info), which this block leaves
+   alone. Other tools keep Warm Paper and Stage Slate. */
+html[data-av-tool="av-suite"]:is([data-av-theme="light"], [data-av-theme="system"]) {
+  --av-bg: #f3f2ec;
+  --av-surface: #ffffff;
+  --av-surface-2: #ebeae3;
+  --av-surface-3: #e6e5dd;
+  --av-raised: #e3e2da;
+  --av-control: #ffffff;
+  --av-line: #d8d6cc;
+  --av-line-strong: #85837a;
+  --av-text: #141412;
+  --av-text-2: #34342f;
+  --av-muted: #57554d;
+  --av-dim: #64625a;
+  --av-accent: #141412;
+  --av-accent-strong: #000000;
+  --av-primary-ink: #f2f0e9;
+  --av-focus: #141412;
+  --av-accent-soft: rgba(20, 20, 18, .06);
+  --av-accent-line: rgba(20, 20, 18, .34);
+  --av-focus-soft: rgba(20, 20, 18, .06);
+  --av-focus-line: rgba(20, 20, 18, .40);
+  --av-brand: #141412;
+  --av-brand-strong: #000000;
+  --av-brand-ink: #f2f0e9;
+  --av-brand-soft: rgba(20, 20, 18, .06);
+  --av-brand-line: rgba(20, 20, 18, .34);
+  --av-grid: rgba(20, 20, 18, .045);
+  --av-overlay: rgba(15, 15, 14, .48);
+  --av-shadow: 0 16px 40px -20px rgba(20, 20, 18, .28);
+  --av-shadow-pop: 0 28px 80px -26px rgba(20, 20, 18, .36);
+}
+
+html[data-av-tool="av-suite"][data-av-theme="white"] {
+  --av-bg: #ffffff;
+  --av-surface: #ffffff;
+  --av-surface-2: #f4f4f1;
+  --av-surface-3: #ebeae6;
+  --av-raised: #e3e2da;
+  --av-control: #ffffff;
+  --av-line: #d8d6cc;
+  --av-line-strong: #85837a;
+  --av-text: #141412;
+  --av-text-2: #34342f;
+  --av-muted: #57554d;
+  --av-dim: #64625a;
+  --av-accent: #141412;
+  --av-accent-strong: #000000;
+  --av-primary-ink: #f2f0e9;
+  --av-focus: #141412;
+  --av-accent-soft: rgba(20, 20, 18, .06);
+  --av-accent-line: rgba(20, 20, 18, .34);
+  --av-focus-soft: rgba(20, 20, 18, .06);
+  --av-focus-line: rgba(20, 20, 18, .40);
+  --av-brand: #141412;
+  --av-brand-strong: #000000;
+  --av-brand-ink: #f2f0e9;
+  --av-brand-soft: rgba(20, 20, 18, .06);
+  --av-brand-line: rgba(20, 20, 18, .34);
+  --av-grid: rgba(20, 20, 18, .045);
+  --av-overlay: rgba(15, 15, 14, .48);
+  --av-shadow: 0 16px 40px -20px rgba(20, 20, 18, .28);
+  --av-shadow-pop: 0 28px 80px -26px rgba(20, 20, 18, .36);
+}
+
+@media (prefers-color-scheme: dark) {
+  html[data-av-tool="av-suite"][data-av-theme="system"] {
+    --av-bg: #0f0f0e;
+    --av-surface: #181816;
+    --av-surface-2: #22221f;
+    --av-surface-3: #2a2a26;
+    --av-raised: #2f2f2b;
+    --av-control: #0a0a09;
+    --av-line: #2f2f2b;
+    --av-line-strong: #6e6c64;
+    --av-text: #f2f0e9;
+    --av-text-2: #cfcdc4;
+    --av-muted: #aba89e;
+    --av-dim: #8f8c82;
+    --av-accent: #f2f0e9;
+    --av-accent-strong: #ffffff;
+    --av-primary-ink: #11110f;
+    --av-focus: #f2f0e9;
+    --av-accent-soft: rgba(242, 240, 233, .08);
+    --av-accent-line: rgba(242, 240, 233, .36);
+    --av-focus-soft: rgba(242, 240, 233, .08);
+    --av-focus-line: rgba(242, 240, 233, .44);
+    --av-brand: #f2f0e9;
+    --av-brand-strong: #ffffff;
+    --av-brand-ink: #11110f;
+    --av-brand-soft: rgba(242, 240, 233, .08);
+    --av-brand-line: rgba(242, 240, 233, .36);
+    --av-grid: rgba(242, 240, 233, .04);
+    --av-overlay: rgba(0, 0, 0, .62);
+    --av-shadow: 0 16px 40px -16px rgba(0, 0, 0, .80);
+    --av-shadow-pop: 0 30px 88px -24px rgba(0, 0, 0, .90);
+  }
+}
+
+/* Keep this block in sync with the media block above. */
+html[data-av-tool="av-suite"][data-av-theme="dark"] {
+  --av-bg: #0f0f0e;
+  --av-surface: #181816;
+  --av-surface-2: #22221f;
+  --av-surface-3: #2a2a26;
+  --av-raised: #2f2f2b;
+  --av-control: #0a0a09;
+  --av-line: #2f2f2b;
+  --av-line-strong: #6e6c64;
+  --av-text: #f2f0e9;
+  --av-text-2: #cfcdc4;
+  --av-muted: #aba89e;
+  --av-dim: #8f8c82;
+  --av-accent: #f2f0e9;
+  --av-accent-strong: #ffffff;
+  --av-primary-ink: #11110f;
+  --av-focus: #f2f0e9;
+  --av-accent-soft: rgba(242, 240, 233, .08);
+  --av-accent-line: rgba(242, 240, 233, .36);
+  --av-focus-soft: rgba(242, 240, 233, .08);
+  --av-focus-line: rgba(242, 240, 233, .44);
+  --av-brand: #f2f0e9;
+  --av-brand-strong: #ffffff;
+  --av-brand-ink: #11110f;
+  --av-brand-soft: rgba(242, 240, 233, .08);
+  --av-brand-line: rgba(242, 240, 233, .36);
+  --av-grid: rgba(242, 240, 233, .04);
+  --av-overlay: rgba(0, 0, 0, .62);
+  --av-shadow: 0 16px 40px -16px rgba(0, 0, 0, .80);
+  --av-shadow-pop: 0 30px 88px -24px rgba(0, 0, 0, .90);
+}
+
+html[data-av-tool="av-suite"][data-av-theme="black"] {
+  --av-bg: #000000;
+  --av-surface: #0a0a09;
+  --av-surface-2: #141412;
+  --av-surface-3: #2a2a26;
+  --av-raised: #2f2f2b;
+  --av-control: #000000;
+  --av-line: #2f2f2b;
+  --av-line-strong: #6e6c64;
+  --av-text: #f2f0e9;
+  --av-text-2: #cfcdc4;
+  --av-muted: #aba89e;
+  --av-dim: #8f8c82;
+  --av-accent: #f2f0e9;
+  --av-accent-strong: #ffffff;
+  --av-primary-ink: #11110f;
+  --av-focus: #f2f0e9;
+  --av-accent-soft: rgba(242, 240, 233, .08);
+  --av-accent-line: rgba(242, 240, 233, .36);
+  --av-focus-soft: rgba(242, 240, 233, .08);
+  --av-focus-line: rgba(242, 240, 233, .44);
+  --av-brand: #f2f0e9;
+  --av-brand-strong: #ffffff;
+  --av-brand-ink: #11110f;
+  --av-brand-soft: rgba(242, 240, 233, .08);
+  --av-brand-line: rgba(242, 240, 233, .36);
+  --av-grid: rgba(242, 240, 233, .04);
+  --av-overlay: rgba(0, 0, 0, .62);
+  --av-shadow: 0 16px 40px -16px rgba(0, 0, 0, .80);
+  --av-shadow-pop: 0 30px 88px -24px rgba(0, 0, 0, .90);
+}
+
 /* Legacy aliases let the existing tools keep their layout and behavior while
    consuming the same palette. Throwline and PixelForge keep specialist token
    names and are bridged separately below. */

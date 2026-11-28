@@ -90,7 +90,7 @@ function assertRailRegistryContracts(registry) {
     ['show-ops', 'showops', 'Show Ops', 'available'],
     ['front-office', 'office', 'Front Office', 'available'],
     ['shop', 'shop', 'The Shop', 'available'],
-    ['infrastructure', 'infra', 'Infrastructure', 'available'],
+    ['infrastructure', 'infra', 'Power, Network & Cable', 'available'],
     ['lighting', 'lighting', 'Lighting', 'available'],
     ['equipment-lab', 'equipmentlab', 'Equipment Lab', 'available'],
     ['av-calculator', 'calc', 'AV Calculator', 'available']
@@ -164,8 +164,7 @@ function assertRailRegistryContracts(registry) {
     ['cueforge', 'CueForge', 'handoff', 'https://systembydave.com/cueforge.html', 'Desktop app'],
     ['plotforge', 'PlotForge', 'handoff', 'plotforge.html', 'Own app'],
     ['housevideo', 'House Video / FMP', 'handoff', 'https://housevideo.app/', 'Link out'],
-    ['arenaops', 'Arena Ops', 'status', undefined, 'API pending'],
-    ['deckforge', 'DeckForge + Stream Deck', 'status', undefined, 'Control surface']
+    ['rehearsal-capture', 'Rehearsal Capture', 'handoff', 'rehearsal-capture/', 'Own app']
   ];
   const actualExternals = (registry.externals || []).map((external) => [
     external.id,
@@ -208,7 +207,7 @@ function assertRailRegistryContracts(registry) {
     if (!registry.baseAssets.includes(asset)) fail(`Rail asset is missing from baseAssets: ${asset}.`);
     if (!registry.offlineAssets().includes(asset)) fail(`Rail asset is missing from offlineAssets: ${asset}.`);
   });
-  if (registry.version !== 'v20261122-chooser-bar') fail(`AV cache generation is not current: ${registry.version}.`);
+  if (registry.version !== 'v20261127-av-console-shortcuts') fail(`AV cache generation is not current: ${registry.version}.`);
   if (registry.offlineAssets().some((asset) => /^https?:/i.test(asset))) fail('Offline assets include an external host.');
 
   const storageKeyCount = registry.tools.flatMap((tool) => tool.storageKeys || []).length;
@@ -223,7 +222,7 @@ function assertRailRegistryContracts(registry) {
     const stub = read(tool.href);
     if (!/<meta name="robots" content="noindex,follow">/.test(stub) || !stub.includes(`location.replace('/av/?app=${tool.retired}')`) || !/rel="canonical" href="https:\/\/avbydave\.com\/"/.test(stub)) fail(`Retired route ${tool.href} is not a noindex redirect stub into /av/?app=${tool.retired}.`);
   });
-  if (registry.tools.length !== 53 || registry.baseAssets.length !== 164 || registry.offlineAssets().length !== 183 || storageKeyCount !== 83) {
+  if (registry.tools.length !== 53 || registry.baseAssets.length !== 165 || registry.offlineAssets().length !== 184 || storageKeyCount !== 83) {
     fail(`AV application integration changed an inventory count unexpectedly (tools=${registry.tools.length}, baseAssets=${registry.baseAssets.length}, offlineAssets=${registry.offlineAssets().length}, storageKeys=${storageKeyCount}).`);
   }
   (registry.externals || []).forEach((external) => {

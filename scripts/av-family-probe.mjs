@@ -8,13 +8,13 @@ import { pathToFileURL } from 'node:url';
 
 export const FAMILIES = {
   video: { route: 'av-video', label: 'AV Video', key: 'sbd.avVideo.v1', document: 'Project', field: 'Plan name' },
-  audio: { route: 'av-audio', label: 'Audio', key: 'sbd.avAudio.v1', document: 'Document', field: 'Plan title' },
-  'show-control': { route: 'show-control', label: 'Show Control', key: 'sbd.showControl.v1', document: 'Document', field: 'Run title' },
-  'show-ops': { route: 'show-ops', label: 'Show Ops', key: 'sbd.showOps.document.v1', document: 'Document', field: 'Show name' },
+  audio: { route: 'av-audio', label: 'Audio', key: 'sbd.avAudio.v1', document: 'Project', field: 'Plan title' },
+  'show-control': { route: 'show-control', label: 'Show Control', key: 'sbd.showControl.v1', document: 'Project', field: 'Run title' },
+  'show-ops': { route: 'show-ops', label: 'Show Ops', key: 'sbd.showOps.document.v1', document: 'Project', field: 'Show name' },
   'front-office': { route: 'front-office', label: 'Front Office', key: 'sbd.frontOffice.document.v1', document: 'Clients', field: 'Client name' },
-  shop: { route: 'the-shop', label: 'The Shop', key: 'sbd.shop.v1', document: 'Document', field: 'Plan name' },
-  infrastructure: { route: 'infrastructure', label: 'Infrastructure', key: 'sbd.infrastructure.v1', document: 'Document', field: 'Plan name' },
-  lighting: { route: 'av-lighting', label: 'Lighting', key: 'sbd.avLighting.v1', document: 'Document', field: 'Show name' },
+  shop: { route: 'the-shop', label: 'The Shop', key: 'sbd.shop.v1', document: 'Project', field: 'Plan name' },
+  infrastructure: { route: 'infrastructure', label: 'Power, Network & Cable', key: 'sbd.infrastructure.v1', document: 'Project', field: 'Plan name' },
+  lighting: { route: 'av-lighting', label: 'Lighting', key: 'sbd.avLighting.v1', document: 'Project', field: 'Show name' },
 };
 const ROOT = resolve(import.meta.dirname, '..');
 const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.mjs': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.svg': 'image/svg+xml', '.png': 'image/png', '.woff2': 'font/woff2' };

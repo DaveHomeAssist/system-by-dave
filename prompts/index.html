@@ -1,35 +1,41 @@
 <!DOCTYPE html>
 <html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#0c0d13">
+<meta name="theme-color" content="#f5f4ee">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; object-src 'none'; base-uri 'self'; form-action 'none'">
 <title>Prompt Library — System by Dave</title>
 <meta name="robots" content="index,follow">
 <meta property="og:site_name" content="System by Dave">
-<meta property="og:image" content="https://systembydave.com/img/card-cover-banner-wide.png">
+<meta property="og:image" content="https://systembydave.com/img/prompt-library-share.jpg">
+<meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Prompt Library title over an Envision render of a city street under a sculpted skybridge.">
 <meta name="twitter:title" content="Prompt Library — System by Dave">
 <meta name="twitter:description" content="A browsable, copy-ready library of 228 AI prompts and templates — search, filter, fill variables, and copy in one click. For ChatGPT, Claude, Gemini, and Notion AI.">
-<meta name="twitter:image" content="https://systembydave.com/img/card-cover-banner-wide.png">
+<meta name="twitter:image" content="https://systembydave.com/img/prompt-library-share.jpg">
+<meta name="twitter:image:alt" content="Prompt Library title over an Envision render of a city street under a sculpted skybridge.">
 <meta name="description" content="A browsable, copy-ready library of 228 AI prompts and templates — search, filter, fill variables, and copy in one click. For ChatGPT, Claude, Gemini, and Notion AI.">
 <link rel="canonical" href="https://systembydave.com/prompts/">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Prompt Library — System by Dave">
 <meta property="og:description" content="228 copy-ready AI prompts and templates. Search, filter, fill, and copy in one click.">
 <meta property="og:url" content="https://systembydave.com/prompts/">
-<meta name="twitter:card" content="summary">
+<meta name="twitter:card" content="summary_large_image">
+<script src="../envision/brief-download.js" defer></script>
 <style>
-:root{--bg:#0c0d13;--surface:#14161f;--raised:#1b1e2a;--border:#272a39;--text:#e8eaf2;--dim:#8b90a6;--mut:#646a82;
---violet:#a78bfa;--violet-d:rgba(167,139,250,.14);--teal:#2dd4bf;--teal-d:rgba(45,212,191,.13);--amber:#fbbf24;--green:#34d399;}
+:root{color-scheme:light;--bg:#f5f4ee;--surface:#fffefa;--raised:#eeeee8;--border:#c5cbc2;--text:#202a25;--dim:#46554d;--mut:#526058;
+--violet:#514485;--violet-d:#ede9f5;--teal:#12634e;--teal-d:#e0efe8;--amber:#845014;--green:#216046;--code:#f5f6f0;--highlight:#f4da96;}
+:root[data-theme="dark"]{color-scheme:dark;--bg:#111916;--surface:#1a2420;--raised:#24312b;--border:#48594e;--text:#f0f4ed;--dim:#bdc9be;--mut:#a6b6a8;
+--violet:#c4b9f3;--violet-d:#302f43;--teal:#91ddbb;--teal-d:#203d32;--amber:#f3bd70;--green:#9be2b5;--code:#131c18;--highlight:#604d29;}
 *{box-sizing:border-box;margin:0;padding:0}
-body{background:var(--bg);color:var(--text);font:14px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+html,body{height:100%;overflow:hidden}
+body{height:100dvh;display:flex;flex-direction:column;background:var(--bg);color:var(--text);font:14px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
 a{color:var(--teal);text-decoration:none}a:hover{text-decoration:underline}
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
 :focus-visible{outline:2px solid var(--violet);outline-offset:2px;border-radius:6px}
-.bar{position:sticky;top:0;z-index:20;background:rgba(12,13,19,.93);backdrop-filter:blur(10px);border-bottom:1px solid var(--border);padding:14px 20px}
-.bar h1{font-size:16px;font-weight:700;letter-spacing:-.3px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-.bar h1 .logo{width:22px;height:22px;border-radius:6px;background:linear-gradient(135deg,var(--violet),var(--teal));display:inline-flex;align-items:center;justify-content:center;font-size:13px}
-.bar h1 .count{margin-left:auto;font-size:12px;font-weight:500;color:var(--dim)}
-.home{font-size:12px;color:var(--dim)}
+.bar{border-bottom:1px solid var(--border);padding:18px 0;margin-bottom:14px}
+.masthead{display:flex;align-items:center;justify-content:space-between;gap:14px}
+.bar h1{font-size:clamp(26px,3vw,44px);line-height:1.12;font-weight:650;letter-spacing:-.045em}
+.result-count{color:var(--dim);font-size:12px;font-variant-numeric:tabular-nums;margin:12px 0}
 .controls{display:flex;flex-wrap:wrap;gap:8px;margin-top:11px;align-items:center}
 #q{flex:1;min-width:200px;min-height:44px;background:var(--raised);border:1px solid var(--border);color:var(--text);border-radius:9px;padding:9px 13px;font-size:14px;outline:none}
 #q:focus{border-color:var(--violet)}
@@ -37,13 +43,17 @@ select{min-height:44px;background:var(--raised);border:1px solid var(--border);c
 select:focus{border-color:var(--violet)}
 .tog{display:inline-flex;align-items:center;gap:6px;min-height:44px;background:var(--raised);border:1px solid var(--border);border-radius:8px;padding:7px 11px;font-size:12.5px;color:var(--dim);cursor:pointer;user-select:none}
 .tog.on{color:var(--text);border-color:var(--violet);background:var(--violet-d)}
-.tog input{display:none}
 .btn{min-height:44px;background:none;border:1px solid var(--border);color:var(--dim);border-radius:8px;padding:7px 11px;font-size:12.5px;cursor:pointer}
 .btn:hover{color:var(--text);border-color:var(--violet)}
 .hint{font-size:11px;color:var(--mut);margin-left:auto}
-.wrap{max-width:1040px;margin:0 auto;padding:18px 20px 80px}
-.intro{color:var(--dim);font-size:13px;margin:2px 2px 16px}
-.card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 18px;margin-bottom:13px;scroll-margin-top:150px}
+.wrap{flex:1;min-height:0;width:100%;overflow:auto;overscroll-behavior:contain;scrollbar-gutter:stable;padding:0 max(16px,calc((100% - 1100px)/2)) 28px}
+.filters{margin-top:8px}.filters summary,.example-link{display:inline-flex;align-items:center;min-height:44px;padding:0 10px;color:var(--teal);font-weight:600;cursor:pointer}
+.filters summary{list-style:none}.filters summary::-webkit-details-marker{display:none}
+.filters summary::after{content:'▾';margin-left:8px}.filters[open] summary::after{content:'▴'}
+.filter-list,.browse-links,.image-actions{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.browse-links{display:flex;align-items:flex-start;justify-content:space-between}.example-link{margin-top:8px}
+.filter-list{margin:4px 0 12px}.filter-list select{min-width:0}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 18px;margin-bottom:13px;scroll-margin:14px}
 .card.active{border-color:var(--violet);box-shadow:0 0 0 1px var(--violet)}
 .card.flash{animation:flash 1.8s ease-out}
 @keyframes flash{0%{background:var(--violet-d);border-color:var(--violet)}100%{background:var(--surface)}}
@@ -62,8 +72,8 @@ select:focus{border-color:var(--violet)}
 .b{font-size:11px;padding:2.5px 8px;border-radius:999px;border:1px solid var(--border);color:var(--dim);background:var(--raised);white-space:nowrap}
 .b.click{cursor:pointer}.b.click:hover{color:var(--text);border-color:var(--violet)}
 .b.area{color:var(--violet);background:var(--violet-d);border-color:rgba(167,139,250,.3)}
-.b.pack{color:#c4b5fd}.b.fav{color:var(--amber)}
-mark{background:rgba(251,191,36,.32);color:#fde68a;border-radius:3px;padding:0 1px}
+.b.pack{color:var(--violet)}.b.fav{color:var(--amber)}
+mark{background:var(--highlight);color:var(--text);border-radius:3px;padding:0 1px}
 .desc{color:var(--mut);font-size:12.5px;margin-top:9px;font-style:italic}
 pre.body{background:#0a0b10;border:1px solid var(--border);border-radius:9px;padding:12px 14px;margin-top:11px;font:12.5px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;white-space:pre-wrap;word-break:break-word;color:#cdd2e4}
 .morebtn{min-height:44px;background:none;border:none;color:var(--violet);font-size:12px;cursor:pointer;margin-top:7px;padding:0;font-weight:600}
@@ -88,7 +98,23 @@ footer{max-width:1040px;margin:0 auto;padding:0 20px 60px;color:var(--mut);font-
 .prow.muted{color:var(--mut);cursor:default}
 kbd{background:var(--raised);border:1px solid var(--border);border-radius:4px;padding:1px 6px;font-size:11px;font-family:monospace}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important;scroll-behavior:auto!important}}
-@media (max-width:680px){.vrow span{min-width:80px}.bar h1 .count{margin-left:0}}
+pre.body,.vprev{background:var(--code);color:var(--text)}
+.image-panel{margin-top:8px}.image-actions{margin:8px 0}.image-panel figure{margin-top:10px}
+.image-panel figure img{width:min(100%,540px);height:auto;display:block;border-radius:8px}
+.image-panel figcaption,.export-message{font-size:13px;color:var(--dim);margin-top:5px}
+.export-image{border:1px solid var(--teal);background:var(--teal-d);color:var(--teal)}
+.copy-dialog{width:min(460px,calc(100% - 32px));margin:auto;padding:20px;border:1px solid var(--border);border-radius:12px;background:var(--surface);color:var(--text)}
+.copy-dialog::backdrop{background:rgba(10,18,14,.65)}.copy-dialog p{margin:8px 0}
+.copy-dialog textarea{width:100%;min-height:100px;max-height:35dvh;margin-bottom:8px;padding:8px;background:var(--code);color:var(--text);font:inherit}
+body .sbd-section-nav{width:100%;padding:2px max(12px,calc((100% - 1100px)/2));background:var(--surface);border-color:var(--border)}
+body .sbd-section-nav a{color:var(--dim)}body .sbd-section-nav a:is(:hover,[aria-current="page"]){color:var(--teal);background:var(--teal-d)}
+body .sbd-site-return{padding-block:0}body .sbd-site-return a{min-height:44px}
+@media (min-width:2000px){.wrap{padding-inline:8vw}#list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:start}.card{margin:0}}
+@media (max-width:680px){body .sbd-section-nav{grid-template-columns:repeat(5,minmax(0,1fr))}
+  .wrap{padding-inline:12px}.card{padding:13px}.chead{flex-wrap:wrap}.cname{flex-basis:100%}
+  .controls #q{width:100%;min-width:0;flex-basis:100%}.vrow{flex-direction:column;align-items:stretch}.vrow span{text-align:left}
+  .bar{padding-block:12px}.filters[open]{width:100%}.browse-links{flex-wrap:wrap;gap:0}.filter-list select{max-width:100%}
+}
 </style><link rel="stylesheet" href="../css/sbd-public-nav.css">
 </head>
 <body>
@@ -107,26 +133,34 @@ kbd{background:var(--raised);border:1px solid var(--border);border-radius:4px;pa
   <a href="/widgets.html">Widgets</a>
   <a href="/prompts/" aria-current="page">Prompts</a>
 </nav>
-<div class="bar">
-  <h1><span class="logo">⌘</span> Prompt Library <span class="home">· <a href="https://systembydave.com/">System by Dave</a></span> <span class="count" id="cnt" role="status" aria-live="polite"></span></h1>
+<main class="wrap" id="prompt-library" tabindex="-1">
+<header class="bar">
+  <div class="masthead"><h1>Prompt Library</h1><button type="button" class="btn" id="theme">Dark theme</button></div>
   <div class="controls">
     <label for="q" class="sr-only">Search prompts</label>
-    <input id="q" placeholder="Search prompts…  ( / to focus,  ⌘K palette )" autocomplete="off" aria-label="Search prompts" aria-describedby="qhint">
+    <input id="q" placeholder="Search prompts" autocomplete="off" aria-label="Search prompts" aria-describedby="qhint">
     <span id="qhint" class="sr-only">Press slash to focus search, Command or Control K for the command palette, j and k to move between results.</span>
+    <button class="tog" id="t-img" aria-pressed="false">Image prompts</button>
+    <button class="tog" id="t-fav" aria-pressed="false">Favorites</button>
+  </div>
+  <div class="browse-links"><details class="filters"><summary>Filters and sort</summary><div class="filter-list">
     <select id="f-src" aria-label="Filter by collection"></select><select id="f-area" aria-label="Filter by area"></select><select id="f-pack" aria-label="Filter by pack"></select>
     <select id="f-fmt" aria-label="Filter by format"></select><select id="f-plat" aria-label="Filter by platform"></select>
     <select id="sort" aria-label="Sort results"><option value="name">Sort: Name</option><option value="rel">Sort: Best match</option><option value="pack">Sort: Pack</option><option value="len">Sort: Length</option></select>
-    <label class="tog" id="t-fav" role="button" tabindex="0" aria-pressed="false"><input type="checkbox">★ Favorites</label>
-    <label class="tog" id="t-img" role="button" tabindex="0" aria-pressed="false"><input type="checkbox">🎨 Has image</label>
-    <button id="viewlink" class="btn" title="Copy a link to this filtered view">🔗 View link</button>
-    <button id="clear" class="btn">Clear</button>
-  </div>
-</div>
-<main class="wrap" id="prompt-library" tabindex="-1">
-  <p class="intro">Copy-ready AI prompts &amp; templates — click <strong>Copy</strong> on any card. Prompts with <code>{{variables}}</code> get a <strong>Fill ✎</strong> button. Works with ChatGPT, Claude, Gemini, Notion AI, and more.</p>
+    <button id="viewlink" class="btn" title="Copy a link to this filtered view">Copy view link</button>
+    <button id="clear" class="btn">Clear filters</button>
+  </div></details><a class="example-link" href="#p=35&amp;view=image">See rendered example</a></div>
+</header>
+  <div class="result-count" id="cnt" role="status" aria-live="polite"></div>
   <div id="list"></div>
+  <noscript><p>Enable JavaScript to search the library and export a prompt.</p></noscript>
+  <footer id="foot"></footer>
 </main>
-<footer id="foot"></footer>
+<dialog class="copy-dialog" id="manual-copy" aria-labelledby="copy-title">
+  <h2 id="copy-title">Copy manually</h2><p>Clipboard access is unavailable. Use your device’s Copy command on the selected text.</p>
+  <textarea id="manual-text" readonly aria-label="Text to copy"></textarea>
+  <form method="dialog"><button class="btn">Done</button></form>
+</dialog>
 <div class="pal" id="pal" role="dialog" aria-modal="true" aria-label="Command palette">
   <div class="palbox"><input id="pinput" placeholder="Type a command or prompt name…  (↑↓ to move, Enter to run, Esc to close)" aria-label="Command palette input"><div id="presults" role="listbox"></div></div>
 </div>
@@ -135,8 +169,19 @@ kbd{background:var(--raised);border:1px solid var(--border);border-radius:4px;pa
 <script>
 const DATA=JSON.parse(document.getElementById('prompt-data').textContent);
 const PREVIEW=320;
-const esc=s=>(s||'').replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const $=id=>document.getElementById(id);
+function setTheme(theme) {
+  document.documentElement.dataset.theme=theme;
+  $('theme').textContent=theme==='dark'?'Light theme':'Dark theme';
+  document.querySelector('meta[name="theme-color"]').content=theme==='dark'?'#111916':'#f5f4ee';
+}
+try { setTheme(localStorage.getItem('sbd-theme')==='dark'?'dark':'light'); } catch { setTheme('light'); }
+$('theme').addEventListener('click',()=>{
+  const theme=document.documentElement.dataset.theme==='dark'?'light':'dark';
+  setTheme(theme);
+  try { localStorage.setItem('sbd-theme',theme); } catch {}
+});
 const reduce=matchMedia('(prefers-reduced-motion:reduce)').matches;
 const scrollOpt=reduce?{block:'nearest'}:{block:'nearest',behavior:'smooth'};
 const TOKEN=/\{\{\s*([\w .\-\/]+?)\s*\}\}/g;
@@ -144,13 +189,13 @@ const TOKEN=/\{\{\s*([\w .\-\/]+?)\s*\}\}/g;
 DATA.forEach(d=>{
   d._lname=(d.name||'').toLowerCase();d._lpack=(d.pack||'').toLowerCase();d._larea=(d.area||'').toLowerCase();
   d._ltags=(d.tags||[]).join(' ').toLowerCase();d._ldesc=(d.desc||'').toLowerCase();d._lbody=(d.text||'').toLowerCase();
-  d._hay=d._lname+' '+d._ltags+' '+d._lpack+' '+d._larea+' '+d._ldesc+' '+d._lbody;
+  d._hay=[d._lname,d._ltags,d._lpack,d._larea,d._ldesc,d._lbody,(d.img||'').toLowerCase()].join(' ');
   const vs=new Set();let m;const src=(d.text||'')+'\n'+(d.img||'');TOKEN.lastIndex=0;
   while((m=TOKEN.exec(src)))vs.add(m[1].trim());
   d._vars=[...vs];d._score=0;
 });
 const VARKEY=d=>(d.src||'')+'·'+(d.name||'');
-let store={};try{store=JSON.parse(localStorage.getItem('plb_vars')||'{}')}catch(e){}
+let store={};try{const saved=JSON.parse(localStorage.getItem('plb_vars')||'{}');if(saved&&typeof saved==='object'&&!Array.isArray(saved))store=saved;}catch(e){}
 const state={q:'',src:'',area:'',pack:'',fmt:'',plat:'',sort:'name',fav:false,img:false};
 let userSorted=false,pinned=false,R=[],active=-1,lastQ=null;
 
@@ -176,7 +221,7 @@ function sortFn(a,b){const s=state.sort;
   if(s==='len')return b.text.length-a.text.length;
   if(s==='pack')return (a.pack||'~').localeCompare(b.pack||'~')||a.name.localeCompare(b.name);
   return a.name.localeCompare(b.name);}
-function hl(str,ts){let h=esc(str);if(!ts||!ts.length)return h;const p=ts.map(t=>t.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')).filter(Boolean);if(!p.length)return h;return h.replace(new RegExp('('+p.join('|')+')','gi'),'<mark>$1</mark>');}
+function hl(str,ts){if(!ts||!ts.length)return esc(str);const p=ts.map(t=>t.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')).filter(Boolean);if(!p.length)return esc(str);return str.split(new RegExp('('+p.join('|')+')','gi')).map((part,i)=>i%2?'<mark>'+esc(part)+'</mark>':esc(part)).join('');}
 function card(d){
   const ts=state.q?terms():[];const long=d.text.length>PREVIEW;const prev=long?esc(d.text.slice(0,PREVIEW))+'…':esc(d.text);
   let bd='';
@@ -195,7 +240,7 @@ function card(d){
     +(d.desc?'<div class="desc">'+hl(d.desc,ts)+'</div>':'')
     +'<pre class="body" data-body="'+d.id+'">'+prev+'</pre>'
     +(long?'<button class="morebtn" data-more="'+d.id+'" aria-expanded="false">Show full ▾</button>':'')
-    +(d.img?'<div><button class="imgtog" data-img="'+d.id+'" aria-expanded="false">🎨 Image prompt ▾</button></div>':'')
+    +(d.img?'<div><button class="imgtog" data-img="'+d.id+'" aria-expanded="false">Image prompt ▾</button></div>':'')
     +'</div>';
 }
 function render(){
@@ -203,12 +248,106 @@ function render(){
   if(!state.q)lastQ=null;
   R=DATA.filter(match).sort(sortFn);active=-1;
   $('list').innerHTML=R.length?R.map(card).join(''):'<div class="empty">No prompts match those filters.</div>';
-  $('cnt').textContent=R.length+' / '+DATA.length;
+  $('cnt').textContent=R.length===DATA.length?DATA.length+' prompts':R.length+' of '+DATA.length+' prompts';
+  const filters=['src','area','pack','fmt','plat'].filter(key=>state[key]).length;
+  document.querySelector('.filters summary').textContent=filters?'Filters and sort ('+filters+')':'Filters and sort';
   updateHash();
 }
-function flash(b,t){const o=b.textContent;b.textContent=t;b.classList.add('done');$('sr').textContent=t;setTimeout(()=>{b.textContent=o;b.classList.remove('done')},1300);}
-function doCopy(text,b){const ok=()=>flash(b,'✓ Copied');if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(text).then(ok,()=>fb(text,ok));}else fb(text,ok);}
-function fb(text,ok){const ta=document.createElement('textarea');ta.value=text;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();try{document.execCommand('copy');ok();}catch(e){$('sr').textContent='Copy failed';}document.body.removeChild(ta);}
+const flashes=new WeakMap();
+function flash(button,label) {
+  const previous=flashes.get(button);
+  const original=previous?.original??button.textContent;
+  clearTimeout(previous?.timer);
+  button.textContent=label;
+  button.classList.add('done');
+  $('sr').textContent=label;
+  const timer=setTimeout(()=>{
+    button.textContent=original;
+    button.classList.remove('done');
+    flashes.delete(button);
+  },1300);
+  flashes.set(button,{original,timer});
+}
+async function doCopy(text,button) {
+  try {
+    await navigator.clipboard.writeText(text);
+    flash(button,'Copied');
+    return;
+  } catch {}
+  if (!button.isConnected) return;
+  const previousFocus=document.activeElement;
+  const temporary=document.createElement('textarea');
+  temporary.value=text;
+  temporary.style.cssText='position:fixed;left:0;top:0;opacity:0;pointer-events:none';
+  document.body.append(temporary);
+  temporary.focus({preventScroll:true});
+  temporary.select();
+  let copied=false;
+  try { copied=document.execCommand('copy'); } catch {}
+  temporary.remove();
+  if(previousFocus?.isConnected) previousFocus.focus({preventScroll:true});
+  if(copied) { flash(button,'Copied'); return; }
+  const dialog=$('manual-copy');
+  $('manual-text').value=text;
+  if(!dialog.open) dialog.showModal();
+  $('manual-text').focus();
+  $('manual-text').select();
+}
+$('manual-copy').addEventListener('close',()=>{ $('manual-text').value=''; });
+
+function toggleImage(button) {
+  const parent=button.parentElement;
+  const previous=parent.querySelector('.image-panel');
+  if(previous) {
+    previous.remove();
+    button.setAttribute('aria-expanded','false');
+    button.textContent='Image prompt ▾';
+    return;
+  }
+  const entry=DATA[Number(button.dataset.img)];
+  const panel=document.createElement('section');
+  panel.className='image-panel';
+  const prompt=document.createElement('pre');
+  prompt.className='body';
+  prompt.textContent=entry.img;
+  const actions=document.createElement('div');
+  actions.className='image-actions';
+  const copy=document.createElement('button');
+  copy.className='copy';
+  copy.textContent='Copy image prompt';
+  copy.addEventListener('click',()=>doCopy(entry.img,copy));
+  const download=document.createElement('button');
+  download.className='copy export-image';
+  download.textContent='Export for Envision';
+  const message=document.createElement('p');
+  message.className='export-message';
+  message.setAttribute('role','status');
+  download.addEventListener('click',()=>{
+    try {
+      window.downloadEnvisionBrief({kind:'image',title:entry.name,prompt:entry.img});
+      message.textContent='Open the .brief.json file with Import project in Envision.';
+    } catch {
+      message.textContent='The download could not start. Use Copy image prompt to keep this brief.';
+    }
+  });
+  actions.append(copy,download);
+  panel.append(prompt,actions,message);
+  if(entry.id===35) {
+    const figure=document.createElement('figure');
+    const image=document.createElement('img');
+    image.src='./urban-architecture.webp';
+    image.width=768;
+    image.height=432;
+    image.alt='A sculpted skybridge crosses a city street between glass towers at dusk.';
+    const caption=document.createElement('figcaption');
+    caption.textContent='Urban architecture. Generated in Envision from this prompt.';
+    figure.append(image,caption);
+    panel.prepend(figure);
+  }
+  parent.append(panel);
+  button.setAttribute('aria-expanded','true');
+  button.textContent='Image prompt ▴';
+}
 
 // ---- #1 variable fill-in ----
 function toggleFill(id,btn){
@@ -229,13 +368,26 @@ function toggleFill(id,btn){
 
 // ---- #3 permalinks + view-link hash router ----
 function serializeStr(){const p=new URLSearchParams();if(state.q)p.set('q',state.q);['src','area','pack','fmt','plat'].forEach(k=>{if(state[k])p.set(k,state[k]);});if(state.sort!=='name'&&state.sort!=='rel')p.set('sort',state.sort);if(state.fav)p.set('fav','1');if(state.img)p.set('img','1');return p.toString();}
-let hashT;function updateHash(){if(pinned)return;clearTimeout(hashT);hashT=setTimeout(()=>{const s=serializeStr();try{history.replaceState(null,'',s?('#'+s):location.pathname+location.search);}catch(_){}},300);}
+let hashT;function updateHash(){clearTimeout(hashT);if(pinned)return;hashT=setTimeout(()=>{const s=serializeStr();try{history.replaceState(null,'',s?('#'+s):location.pathname+location.search);}catch(_){}},300);}
 function resetState(){Object.assign(state,{q:'',src:'',area:'',pack:'',fmt:'',plat:'',sort:'name',fav:false,img:false});userSorted=false;syncControls();}
 function syncControls(){$('q').value=state.q;$('f-src').value=state.src;$('f-area').value=state.area;$('f-pack').value=state.pack;$('f-fmt').value=state.fmt;$('f-plat').value=state.plat;$('sort').value=state.sort;setTog('t-fav',state.fav);setTog('t-img',state.img);}
-function setTog(id,on){$(id).classList.toggle('on',on);$(id).setAttribute('aria-pressed',on?'true':'false');$(id).querySelector('input').checked=on;}
+function setTog(id,on){$(id).classList.toggle('on',on);$(id).setAttribute('aria-pressed',String(on));}
 function parseHash(){
   const pr=new URLSearchParams(location.hash.replace(/^#/,''));
-  if(pr.has('p')){pinned=true;resetState();render();const id=pr.get('p');const el=document.getElementById('p-'+id);if(el)requestAnimationFrame(()=>{el.scrollIntoView(reduce?{block:'center'}:{block:'center',behavior:'smooth'});el.classList.add('flash');setTimeout(()=>el.classList.remove('flash'),1900);});return;}
+  if(pr.has('p')){
+    pinned=true;resetState();render();
+    const card=document.getElementById('p-'+pr.get('p'));
+    if(!card){pinned=false;$('cnt').textContent='Prompt unavailable. Browse all '+DATA.length+' prompts.';updateHash();return;}
+    const button=pr.get('view')==='image'?card.querySelector('[data-img]'):null;
+    if(button)toggleImage(button);
+    requestAnimationFrame(()=>{
+      (button||card).scrollIntoView({block:'start',behavior:reduce?'instant':'smooth'});
+      (button||card.querySelector('[data-copy]')).focus({preventScroll:true});
+      card.classList.add('flash');
+      setTimeout(()=>card.classList.remove('flash'),1900);
+    });
+    return;
+  }
   pinned=false;resetState();
   if(pr.get('q'))state.q=pr.get('q');
   ['src','area','pack','fmt','plat'].forEach(k=>{if(pr.get(k))state[k]=pr.get(k);});
@@ -262,25 +414,29 @@ $('list').addEventListener('click',e=>{
   const cp=e.target.closest('[data-copy]');if(cp){doCopy(DATA[+cp.dataset.copy].text,cp);return;}
   const lk=e.target.closest('[data-link]');if(lk){doCopy(location.href.split('#')[0]+'#p='+lk.dataset.link,lk);return;}
   const mo=e.target.closest('[data-more]');if(mo){const id=+mo.dataset.more,d=DATA[id],pre=document.querySelector('[data-body="'+id+'"]');if(mo.dataset.open){pre.textContent=d.text.slice(0,PREVIEW)+'…';mo.textContent='Show full ▾';mo.setAttribute('aria-expanded','false');delete mo.dataset.open;}else{pre.textContent=d.text;mo.textContent='Show less ▴';mo.setAttribute('aria-expanded','true');mo.dataset.open='1';}return;}
-  const ig=e.target.closest('[data-img]');if(ig){const id=+ig.dataset.img,d=DATA[id];if(ig.dataset.open){const x=ig.parentNode.querySelector('.imgbox');if(x)x.remove();ig.textContent='🎨 Image prompt ▾';ig.setAttribute('aria-expanded','false');delete ig.dataset.open;}else{const pre=document.createElement('pre');pre.className='body imgbox';pre.textContent=d.img;const b=document.createElement('button');b.className='copy';b.style.marginTop='8px';b.textContent='Copy image prompt';b.onclick=()=>doCopy(d.img,b);ig.parentNode.appendChild(pre);ig.parentNode.appendChild(b);ig.textContent='🎨 Image prompt ▴';ig.setAttribute('aria-expanded','true');ig.dataset.open='1';}return;}
-  const fl=e.target.closest('[data-filter]');if(fl){const k=fl.dataset.filter;pinned=false;state[k]=fl.dataset.val;$('f-'+k).value=fl.dataset.val;render();window.scrollTo(reduce?{top:0}:{top:0,behavior:'smooth'});}
+  const ig=e.target.closest('[data-img]');if(ig){toggleImage(ig);return;}
+  const fl=e.target.closest('[data-filter]');if(fl){const k=fl.dataset.filter;pinned=false;state[k]=fl.dataset.val;$('f-'+k).value=fl.dataset.val;render();$('prompt-library').scrollTo(reduce?{top:0}:{top:0,behavior:'smooth'});}
 });
 $('list').addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){const f=e.target.closest('[data-filter]');if(f){e.preventDefault();f.click();}}});
 let t;$('q').addEventListener('input',e=>{clearTimeout(t);t=setTimeout(()=>{pinned=false;state.q=e.target.value;if(state.q&&!userSorted){state.sort='rel';$('sort').value='rel';}else if(!state.q&&!userSorted){state.sort='name';$('sort').value='name';}render();},110);});
 [['f-src','src'],['f-area','area'],['f-pack','pack'],['f-fmt','fmt'],['f-plat','plat']].forEach(([id,k])=>$(id).addEventListener('change',e=>{pinned=false;state[k]=e.target.value;render();}));
 $('sort').addEventListener('change',e=>{pinned=false;userSorted=true;state.sort=e.target.value;render();});
-[['t-fav','fav'],['t-img','img']].forEach(([id,k])=>{const h=()=>{pinned=false;state[k]=!state[k];setTog(id,state[k]);render();};$(id).addEventListener('click',h);$(id).addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();h();}});});
+[['t-fav','fav'],['t-img','img']].forEach(([id,k])=>{$(id).addEventListener('click',()=>{pinned=false;state[k]=!state[k];setTog(id,state[k]);render();});});
 $('clear').addEventListener('click',()=>{pinned=false;resetState();render();});
 $('viewlink').addEventListener('click',e=>{const s=serializeStr();doCopy(location.href.split('#')[0]+(s?('#'+s):''),e.currentTarget);});
 window.addEventListener('hashchange',parseHash);
+document.querySelector('.example-link').addEventListener('click',e=>{if(location.hash===e.currentTarget.hash){e.preventDefault();parseHash();}});
 pinput.addEventListener('input',e=>palRender(e.target.value));
 pal.addEventListener('keydown',e=>{if(e.key==='Escape'){e.preventDefault();closePalette();}else if(e.key==='ArrowDown'){e.preventDefault();palMove(1);}else if(e.key==='ArrowUp'){e.preventDefault();palMove(-1);}else if(e.key==='Enter'){e.preventDefault();const it=palItems[palActive];if(it){closePalette();it.run();}}});
 pal.addEventListener('click',e=>{const r=e.target.closest('[data-i]');if(r){const it=palItems[+r.dataset.i];if(it){closePalette();it.run();}}else if(e.target===pal)closePalette();});
 document.addEventListener('keydown',e=>{
+  if(e.defaultPrevented||$('manual-copy').open)return;
   if((e.metaKey||e.ctrlKey)&&(e.key==='k'||e.key==='K')){e.preventDefault();openPalette();return;}
   if(pal.classList.contains('open'))return;
   const tag=(document.activeElement&&document.activeElement.tagName)||'';
   if(tag==='INPUT'||tag==='TEXTAREA'){if(e.key==='Escape'&&document.activeElement===$('q')){$('q').value='';pinned=false;state.q='';if(!userSorted){state.sort='name';$('sort').value='name';}render();$('q').blur();}return;}
+  if(e.metaKey||e.ctrlKey||e.altKey||e.target.closest('select,[contenteditable="true"]'))return;
+  if(e.key==='Enter'&&e.target.closest('button,a,summary,[role="button"]'))return;
   if(e.key==='/'){e.preventDefault();$('q').focus();}
   else if(e.key==='j'||e.key==='ArrowDown'){e.preventDefault();move(1);}
   else if(e.key==='k'||e.key==='ArrowUp'){e.preventDefault();move(-1);}
@@ -294,4 +450,5 @@ ACTIONS=buildActions();
 parseHash();
 </script>
 <script src="../js/sbd-public-nav.js" defer></script>
+<script src="../js/sbd-shortcuts.js" defer></script>
 </body></html>

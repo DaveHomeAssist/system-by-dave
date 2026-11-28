@@ -5,12 +5,15 @@
 // Checks:
 //   1. /field-kit/ returns 200, is noindex, shows the $12 label and loads the
 //      launch config and checkout scripts.
-//   2. The checkout url in /js/sbd-launch-config.js matches ^https://buy\.stripe\.com/
-//      and that Payment Link answers 200 (redirects followed).
+//   2. Checkout is open only when checkoutOpen is true and the checkout url in
+//      /js/sbd-launch-config.js matches ^https://buy\.stripe\.com/. That Payment
+//      Link must answer 200 (redirects followed). checkoutOpen false keeps
+//      checkout closed even when the url is already a Payment Link.
 //   3. /field-kit/thanks/ returns 200, is noindex and loads thanks.js and the
 //      launch config; once checkout is live, a download link hash is registered.
 // Exit codes: 0 all pass (checkout live), 2 pages fine but checkout not
-// configured yet (Payment Link still a placeholder), 1 a check failed.
+// configured yet (switch off, or the Payment Link is still a placeholder),
+// 1 a check failed.
 const BASE = (process.argv[2] || 'https://avbydave.com').replace(/\/+$/, '');
 const PRICE = '$12';
 const STRIPE = /^https:\/\/buy\.stripe\.com\//;
@@ -38,7 +41,7 @@ try {
   for (const s of ['sbd-launch-config.js', 'sbd-checkout.js', 'field-kit.js']) {
     if (!new RegExp(`<script[^>]+src=["'][^"']*${s.replace('.', '\\.')}["']`).test(kit.text)) fail(`page does not load ${s}`);
   }
-  if (kit.status === 200 && noindex(kit.text)) notes.push('note /field-kit/ is noindex (expected while it is a draft)');
+  if (kit.status === 200 && noindex(kit.text)) notes.push('note /field-kit/ source is noindex (publish swaps it to index,follow while checkout is open)');
 
   const cfg = await get(`${BASE}/js/sbd-launch-config.js`);
   if (cfg.status !== 200) fail(`/js/sbd-launch-config.js returned HTTP ${cfg.status}`);
@@ -48,9 +51,10 @@ try {
   if (!priceCfg || priceCfg[2] !== PRICE) fail(`config priceLabel is ${priceCfg ? JSON.stringify(priceCfg[2]) : 'missing'}, expected ${PRICE}`);
   else ok(`config priceLabel ${PRICE}`);
   const checkoutUrl = urlMatch ? urlMatch[2].trim() : '';
-  if (!STRIPE.test(checkoutUrl)) {
+  const checkoutOpen = /\bcheckoutOpen\s*:\s*true\b/.test(cfg.text);
+  if (!checkoutOpen || !STRIPE.test(checkoutUrl)) {
     notConfigured = true;
-    notes.push(`WAIT checkout not configured: fieldKit.checkout.url is ${JSON.stringify(checkoutUrl)} (needs ^https://buy.stripe.com/)`);
+    notes.push(`WAIT checkout not configured: checkoutOpen is ${checkoutOpen}, fieldKit.checkout.url is ${JSON.stringify(checkoutUrl)}`);
   } else {
     ok(`checkout url is a Stripe Payment Link (${new URL(checkoutUrl).pathname.length - 1} char id)`);
     const pay = await get(checkoutUrl);

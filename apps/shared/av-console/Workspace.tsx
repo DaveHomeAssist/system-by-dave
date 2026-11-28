@@ -1,7 +1,7 @@
 import { TopicMenu } from "./TopicMenu";
 import { ReactNode, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import type { LayoutState } from "./drafts";
-import { clone, COLS, deleteView, firstFree, fits, nudge, Panel, PanelDef, Rect, renameView, ROWS, sameLayout, sanitizeView, split, storeAsNew, suggest, trim, updateView, View } from "./layout";
+import { clone, COLS, deleteView, findSpace, firstFree, fits, nudge, Panel, PanelDef, Rect, renameView, ROWS, sameLayout, sanitizeView, split, STEP, storeAsNew, suggest, trim, updateView, View } from "./layout";
 
 /* Console workspace: grandMA-style panel host shared by AV by Dave consoles.
    The owning console supplies its panel library, its stored views (which live
@@ -10,7 +10,11 @@ import { clone, COLS, deleteView, firstFree, fits, nudge, Panel, PanelDef, Rect,
 
 export type Mode = "phone" | "tablet" | "desktop";
 export type PanelRender = { body: ReactNode; context?: string; title?: string; actions?: ReactNode };
-type Chooser = { mode: "add" | "replace" | "nospace"; rect?: Rect; panelId?: string; left: number; top: number };
+type Chooser = { mode: "add" | "replace" | "nospace"; rect?: Rect; panelId?: string; left: number; top: number; auto?: boolean };
+/* A new panel from "Add panel" takes the largest of these sizes (each raised to the panel's own
+   minimum) that fits in a free spot: half the workspace when it is empty, so the panel is big enough
+   to use and to split, then a quarter, then the old 4x4 tile, then its minimum. */
+const ADD_SIZES = [{ w: 6, h: 8 }, { w: 6, h: 4 }, { w: 4, h: 4 }];
 type Menu = { kind: "panel" | "view"; id: string; left: number; top: number; sub?: "move" | "rename" };
 type Drag = { id: string; kind: "move" | "resize"; px: number; py: number; orig: Panel; rect?: Rect; valid?: boolean };
 
@@ -102,21 +106,27 @@ export function ConsoleWorkspace({ ws, label, quick, render, onViewsChange, noti
   const visibleViewTabs = viewTabs || ws.views;
   const maxId = view ? ws.max[view.id] || null : null;
   const def = (type: string) => ws.library.find(d => d.type === type);
-  const apps = Array.from(new Set(ws.library.map(d => d.app).filter((app): app is string => Boolean(app))));
+  const menuLibrary = ws.library.filter(d => d.chooser !== false);
+  const apps = Array.from(new Set(menuLibrary.map(d => d.app).filter((app): app is string => Boolean(app))));
   const groupOf = (d: PanelDef) => apps.length ? d.app : d.group;
   // Only groups that hold a panel: a tile never opens onto an empty list.
-  const groups: string[] = (apps.length ? apps : ["Common", "Planning", "Utilities"]).filter(g => ws.library.some(d => groupOf(d) === g));
+  const groups: string[] = (apps.length ? apps : ["Common", "Planning", "Utilities"]).filter(g => menuLibrary.some(d => groupOf(d) === g));
   // One group needs no first step; its panels show straight away.
   const activeGroup = groups.length > 1 ? group : groups[0] ?? null;
   const drilled = Boolean(group) && groups.length > 1 && !query;
   const stored = view ? sanitizeView(view).panels : [];
   const changed = view ? !sameLayout(ws.live[view.id] || stored, stored) : false;
 
+  /* Layout before a split, put back if the chooser closes without adding a panel. */
+  const splitUndo = useRef<{ viewId: string; panels: Panel[] } | null>(null);
+  const setLive = ws.setLive;
   const close = useCallback(() => {
+    const undo = splitUndo.current; splitUndo.current = null;
+    if (undo) setLive(l => ({ ...l, [undo.viewId]: undo.panels }));
     setChooser(null); setMenu(null);
     const t = trigger.current; trigger.current = null;
     if (t && document.contains(t)) setTimeout(() => t.focus(), 0);
-  }, []);
+  }, [setLive]);
   /* A pointer press outside an options menu dismisses it and leaves focus where
      the press landed. The menu's own trigger is left to its click, which toggles. */
   const menuOpen = Boolean(menu);
@@ -180,7 +190,8 @@ export function ConsoleWorkspace({ ws, label, quick, render, onViewsChange, noti
   function cellAt(clientX: number, clientY: number) {
     const box = grid.current!.getBoundingClientRect();
     const sx = box.width / COLS, sy = box.height / ROWS;
-    return { x: Math.max(0, Math.min(COLS - 1, Math.floor((clientX - box.left) / sx))), y: Math.max(0, Math.min(ROWS - 1, Math.floor((clientY - box.top) / sy))), sx, sy };
+    const at = (offset: number, size: number, max: number) => Math.max(0, Math.min(max - STEP, Math.floor(offset / size / STEP) * STEP));
+    return { x: at(clientX - box.left, sx, COLS), y: at(clientY - box.top, sy, ROWS), sx, sy };
   }
   function openChooser(c: Omit<Chooser, "left" | "top">, left: number, top: number) {
     if (!trigger.current || !document.contains(trigger.current)) trigger.current = (document.activeElement as HTMLElement) || null;
@@ -190,7 +201,7 @@ export function ConsoleWorkspace({ ws, label, quick, render, onViewsChange, noti
   function addPanelButton(e: React.MouseEvent<HTMLButtonElement>) {
     trigger.current = e.currentTarget;
     const r = firstFree(panels); const p = at(e.currentTarget);
-    openChooser(r ? { mode: "add", rect: r } : { mode: "nospace" }, p.left - 200, p.top);
+    openChooser(r ? { mode: "add", rect: r, auto: true } : { mode: "nospace" }, p.left - 200, p.top);
   }
   function place(type: string) {
     const c = chooser; if (!c || !view) return;
@@ -202,9 +213,12 @@ export function ConsoleWorkspace({ ws, label, quick, render, onViewsChange, noti
     }
     if (existing) { ws.setFocus(existing.id); notify(`${d?.name || type} is already open in this view. It now has focus.`); close(); return; }
     if (!c.rect) return;
-    const rect = { ...c.rect, w: Math.max(c.rect.w, Math.min(d?.minW || 1, COLS - c.rect.x)), h: Math.max(c.rect.h, Math.min(d?.minH || 1, ROWS - c.rect.y)) };
+    const minW = d?.minW || 1, minH = d?.minH || 1;
+    const sizes = [...ADD_SIZES.map(z => ({ w: Math.min(COLS, Math.max(minW, z.w)), h: Math.min(ROWS, Math.max(minH, z.h)) })), { w: Math.min(COLS, minW), h: Math.min(ROWS, minH) }];
+    const sized = c.auto ? sizes.reduce<Rect | null>((found, z) => found || findSpace(panels, z), null) : null;
+    const rect = sized || { ...c.rect, w: Math.max(c.rect.w, Math.min(d?.minW || 1, COLS - c.rect.x)), h: Math.max(c.rect.h, Math.min(d?.minH || 1, ROWS - c.rect.y)) };
     const target = fits(rect, panels) ? rect : c.rect;
-    const id = `p-${uid()}`;
+    const id = `p-${uid()}`; splitUndo.current = null;
     ws.setPanels(ps => [...ps, { id, type, ...target }]); ws.setFocus(id); ws.setPhoneType(type);
     notify(`${d?.name || type} added. Store the view to keep this arrangement in the plan.`);
     close();
@@ -223,7 +237,7 @@ export function ConsoleWorkspace({ ws, label, quick, render, onViewsChange, noti
     if (!draw) return;
     if (Math.abs(e.clientX - draw.px) + Math.abs(e.clientY - draw.py) < 6) return;
     const c = cellAt(e.clientX, e.clientY);
-    setDraw({ ...draw, rect: { x: Math.min(draw.anchor.x, c.x), y: Math.min(draw.anchor.y, c.y), w: Math.abs(c.x - draw.anchor.x) + 1, h: Math.abs(c.y - draw.anchor.y) + 1 } });
+    setDraw({ ...draw, rect: { x: Math.min(draw.anchor.x, c.x), y: Math.min(draw.anchor.y, c.y), w: Math.abs(c.x - draw.anchor.x) + STEP, h: Math.abs(c.y - draw.anchor.y) + STEP } });
   }
   function gridUp(e: React.PointerEvent<HTMLDivElement>) {
     if (!draw) return; const d = draw; setDraw(null);
@@ -243,11 +257,14 @@ export function ConsoleWorkspace({ ws, label, quick, render, onViewsChange, noti
   function dragMove(e: React.PointerEvent<HTMLElement>) {
     if (!drag || !grid.current) return;
     const c = cellAt(e.clientX, e.clientY);
-    const dx = Math.round((e.clientX - drag.px) / c.sx), dy = Math.round((e.clientY - drag.py) / c.sy);
+    const dx = Math.round((e.clientX - drag.px) / (c.sx * STEP)) * STEP, dy = Math.round((e.clientY - drag.py) / (c.sy * STEP)) * STEP;
     const o = drag.orig; const d = def(o.type) || { minW: 1, minH: 1 };
     const r = drag.kind === "move" ? { x: o.x + dx, y: o.y + dy, w: o.w, h: o.h } : { x: o.x, y: o.y, w: Math.max(d.minW, o.w + dx), h: Math.max(d.minH, o.h + dy) };
     setDrag({ ...drag, rect: r, valid: fits(r, panels, o.id) });
   }
+  /* The browser can take the pointer away mid-gesture (a scroll, a system gesture, a
+     lost capture). Nothing is committed; the outline and drag state just clear. */
+  function pointerAbort() { setDrag(null); setDraw(null); }
   function dragEnd() {
     const d = drag; setDrag(null); if (!d || !d.rect) return;
     if (d.valid) ws.setPanels(ps => ps.map(p => p.id === d.id ? { ...p, ...d.rect } : p));
@@ -265,8 +282,9 @@ export function ConsoleWorkspace({ ws, label, quick, render, onViewsChange, noti
     if (r) ws.setPanels(ps => ps.map(p => p.id === menuPanel.id ? { ...p, ...r } : p)); else notify("No room. Panels never overlap.");
   }
   function doSplit(direction: "h" | "v") {
-    if (!menuPanel) return; const s = split(menuPanel, direction);
+    if (!menuPanel) return; const md = def(menuPanel.type); const s = split(menuPanel, direction, { w: md?.minW || STEP, h: md?.minH || STEP });
     if (!s) { notify("This panel is too small to split."); return; }
+    splitUndo.current = view ? { viewId: view.id, panels: clone(panels) } : null;
     ws.setPanels(ps => ps.map(p => p.id === menuPanel.id ? { ...p, ...s.keep } : p));
     const pos = { left: menu!.left - 240, top: menu!.top }; setMenu(null);
     openChooser({ mode: "add", rect: s.rest }, pos.left, pos.top);
@@ -307,14 +325,20 @@ export function ConsoleWorkspace({ ws, label, quick, render, onViewsChange, noti
   const area = (p: Panel) => {
     if (maxId || mode === "phone" || singleTabletPanel) return { gridColumn: "1 / -1", gridRow: "1 / -1" };
     if (mode === "tablet") { const i = ordered.findIndex(x => x.id === p.id); return { gridColumn: String(i % 2 + 1), gridRow: String(Math.floor(i / 2) + 1) }; }
-    return { gridColumn: `${p.x + 1} / ${p.x + p.w + 1}`, gridRow: `${p.y + 1} / ${p.y + p.h + 1}` };
+    return { gridColumn: `${p.x / STEP + 1} / ${(p.x + p.w) / STEP + 1}`, gridRow: `${p.y / STEP + 1} / ${(p.y + p.h) / STEP + 1}` };
   };
   const gridStyle = maxId || mode === "phone" || singleTabletPanel ? { gridTemplateColumns: "minmax(0,1fr)", gridTemplateRows: "minmax(0,1fr)" }
     : mode === "tablet" ? { gridTemplateColumns: "repeat(2,minmax(0,1fr))", gridTemplateRows: `repeat(${Math.max(1, Math.ceil(panels.length / 2))},minmax(0,1fr))` }
-    : { gridTemplateColumns: `repeat(${COLS},minmax(0,1fr))`, gridTemplateRows: `repeat(${ROWS},minmax(0,1fr))` };
+    : { gridTemplateColumns: `repeat(${COLS / STEP},minmax(0,1fr))`, gridTemplateRows: `repeat(${ROWS / STEP},minmax(0,1fr))` };
   const shownTypes = new Set((mode === "phone" ? visible : panels).map(p => p.type));
-  const choices = query ? ws.library.filter(d => `${d.name} ${d.app || ""} ${d.description}`.toLowerCase().includes(query.toLowerCase()))
-    : activeGroup ? ws.library.filter(d => groupOf(d) === activeGroup) : [];
+  const needle = query.toLowerCase();
+  const choices = query ? menuLibrary.filter(d => `${d.name} ${d.app || ""} ${d.description} ${d.keywords || ""}`.toLowerCase().includes(needle))
+    : activeGroup ? menuLibrary.filter(d => groupOf(d) === activeGroup) : [];
+  const menuRegistry = typeof window === "undefined" ? undefined : (window as Window & { SBD_REGISTRY?: { guides?: { id: string; name: string; href: string; blurb?: string; keywords?: string[]; external?: boolean }[]; featuredPanels?: string[] } }).SBD_REGISTRY;
+  const registryGuides = menuRegistry?.guides || [];
+  const guideHits = query ? registryGuides.filter(guide => `${guide.name} ${guide.blurb || ""} ${(guide.keywords || []).join(" ")}`.toLowerCase().includes(needle)) : [];
+  const featuredTypes = menuRegistry?.featuredPanels || [];
+  const featured = featuredTypes.map(type => ws.library.find(d => d.type === type)).filter((d): d is PanelDef => Boolean(d));
   const ghost = drag?.rect || draw?.rect || (chooser?.rect && chooser.mode !== "replace" ? chooser.rect : undefined);
   /* The chooser opens where it was asked for and rises when its options need the room, so a
      group is never cut short while the screen has space above. Phones and short screens place
@@ -354,7 +378,7 @@ export function ConsoleWorkspace({ ws, label, quick, render, onViewsChange, noti
       </div>
     </div>
     {ws.hidden > 0 && <p className="console-notice">{ws.hidden} panel{ws.hidden === 1 ? " is" : "s are"} hidden because {ws.hidden === 1 ? "its module is" : "their modules are"} off. The view keeps {ws.hidden === 1 ? "it" : "them"} for when the module returns.</p>}
-    <div ref={grid} className="console-grid" style={gridStyle} onPointerDown={gridDown} onPointerMove={gridMove} onPointerUp={gridUp} aria-label={`${label} workspace. Tap empty space to add a panel.`}>
+    <div ref={grid} className="console-grid" style={gridStyle} onPointerDown={gridDown} onPointerMove={gridMove} onPointerUp={gridUp} onPointerCancel={pointerAbort} onLostPointerCapture={pointerAbort} aria-label={`${label} workspace. Tap empty space to add a panel.`}>
       {!visible.length && <div className="console-empty"><p>This view is empty.</p><button type="button" onClick={addPanelButton}>＋ Add panel</button></div>}
       {visible.map(p => {
         const d = def(p.type); if (!d) return null;
@@ -362,7 +386,7 @@ export function ConsoleWorkspace({ ws, label, quick, render, onViewsChange, noti
         const focused = ws.focus === p.id; const isMax = maxId === p.id;
         const canDrag = !locked && !maxId && mode === "desktop";
         return <section key={p.id} className={`console-panel ${d.lit ? "is-lit" : ""} ${focused ? "is-focused" : ""} ${drag?.id === p.id ? "is-dragging" : ""}`} style={area(p)} data-panel={d.key || p.type} data-app={d.app} onPointerDownCapture={() => { if (!focused) ws.setFocus(p.id); }}>
-          <header className={`console-bar ${canDrag ? "can-drag" : ""}`} onPointerDown={dragStart(p, "move")} onPointerMove={dragMove} onPointerUp={dragEnd}>
+          <header className={`console-bar ${canDrag ? "can-drag" : ""}`} onPointerDown={dragStart(p, "move")} onPointerMove={dragMove} onPointerUp={dragEnd} onPointerCancel={pointerAbort} onLostPointerCapture={pointerAbort}>
             <strong className="console-title">{out.title || d.name}</strong>{out.context && <span className="console-context">{out.context}</span>}
             <span className="console-bar-actions">{out.actions}
               <button type="button" className="console-icon" aria-label={`${d.name} options`} aria-haspopup="menu" aria-expanded={menu?.kind === "panel" && menu.id === p.id} onClick={e => { if (menu?.kind === "panel" && menu.id === p.id) { close(); return; } trigger.current = e.currentTarget; const r = e.currentTarget.getBoundingClientRect(); setChooser(null); setMenu({ kind: "panel", id: p.id, ...clampPos(r.right - 280, r.bottom + 6, 280, 380) }); }}>⋯</button>
@@ -370,10 +394,10 @@ export function ConsoleWorkspace({ ws, label, quick, render, onViewsChange, noti
             </span>
           </header>
           <div className="console-body">{out.body}</div>
-          {canDrag && <span className="console-resize" aria-hidden="true" onPointerDown={dragStart(p, "resize")} onPointerMove={dragMove} onPointerUp={dragEnd} />}
+          {canDrag && <span className="console-resize" aria-hidden="true" onPointerDown={dragStart(p, "resize")} onPointerMove={dragMove} onPointerUp={dragEnd} onPointerCancel={pointerAbort} onLostPointerCapture={pointerAbort} />}
         </section>;
       })}
-      {ghost && mode === "desktop" && !maxId && <div className={`console-ghost ${drag && drag.valid === false ? "is-invalid" : ""}`} style={{ gridColumn: `${ghost.x + 1} / ${ghost.x + ghost.w + 1}`, gridRow: `${ghost.y + 1} / ${ghost.y + ghost.h + 1}` }} aria-hidden="true" />}
+      {ghost && mode === "desktop" && !maxId && <div className={`console-ghost ${drag && drag.valid === false ? "is-invalid" : ""}`} style={{ gridColumn: `${ghost.x / STEP + 1} / ${(ghost.x + ghost.w) / STEP + 1}`, gridRow: `${ghost.y / STEP + 1} / ${(ghost.y + ghost.h) / STEP + 1}` }} aria-hidden="true" />}
     </div>
     {mode === "phone" && quickBar}
 
@@ -382,19 +406,25 @@ export function ConsoleWorkspace({ ws, label, quick, render, onViewsChange, noti
       <header className="console-chooser-bar">
         {drilled && <button type="button" className="console-bar-icon console-back" aria-label="Back" onClick={backToGroups}><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M15 5l-7 7 7 7" /></svg></button>}
         <h3>{chooser.mode === "nospace" ? "No room for another panel" : drilled ? activeGroup : chooser.mode === "replace" ? "Change panel" : "Add panel"}</h3>
-        {chooser.mode !== "nospace" && <label className="console-search"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M10.5 4a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13z" /><path d="M15.5 15.5l4.5 4.5" /></svg><input type="search" aria-label="Search panels" placeholder="Search" value={query} autoFocus onChange={e => setQuery(e.target.value)} /></label>}
+        {chooser.mode !== "nospace" && <label className="console-search"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M10.5 4a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13z" /><path d="M15.5 15.5l4.5 4.5" /></svg><input type="search" aria-label="Search panels" placeholder="Search: edid, sync, throw" value={query} autoFocus onChange={e => setQuery(e.target.value)} /></label>}
         <button type="button" className="console-bar-icon console-close" aria-label="Close" onClick={close}><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 6l12 12M18 6L6 18" /></svg></button>
       </header>
       {chooser.mode === "nospace" ? <>
         <p>Nothing is covered silently. Choose how to make space.</p>
         <div className="console-choice-actions">
           <button type="button" onClick={() => { const p = panels.find(x => x.id === ws.focus) || panels[0]; if (!p) return; setChooser(c => c && { ...c, mode: "replace", panelId: p.id }); }}>Replace the focused panel</button>
-          <button type="button" onClick={() => { const p = panels.find(x => x.id === ws.focus) || panels[0]; if (!p) return; const s = split(p, p.w >= p.h ? "h" : "v"); if (!s) { notify("The focused panel is too small to split."); return; } ws.setPanels(ps => ps.map(x => x.id === p.id ? { ...x, ...s.keep } : x)); setChooser(c => c && { ...c, mode: "add", rect: s.rest }); }}>Split the focused panel</button>
+          <button type="button" onClick={() => { const p = panels.find(x => x.id === ws.focus) || panels[0]; if (!p) return; const pd = def(p.type); const s = split(p, p.w >= p.h ? "h" : "v", { w: pd?.minW || STEP, h: pd?.minH || STEP }); if (!s) { notify("The focused panel is too small to split."); return; } splitUndo.current = view ? { viewId: view.id, panels: clone(panels) } : null; ws.setPanels(ps => ps.map(x => x.id === p.id ? { ...x, ...s.keep } : x)); setChooser(c => c && { ...c, mode: "add", rect: s.rest }); }}>Split the focused panel</button>
           <button type="button" onClick={() => { if (!view) return; const id = `v-${uid()}`; onViewsChange(storeAsNew(ws.views, [], "New view", id), "New empty view created. Save to keep it."); ws.setViewId(id); setChooser(c => c && { ...c, mode: "add", rect: { x: 0, y: 0, w: COLS, h: ROWS } }); }}>Create a new view</button>
         </div>
-      </> : !query && !activeGroup ? <div className={`console-groups ${groupIcons ? "is-tiles" : ""}`} role="group" aria-label="Panel categories">{groups.map(g => <button key={g} type="button" data-group={g} aria-current={g === currentGroup || undefined} onClick={() => openGroup(g)}>{groupIcons?.[g] && <svg className="console-group-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">{groupIcons[g].map((d, i) => <path key={i} d={d} />)}</svg>}<span>{g}</span></button>)}</div>
+      </> : !query && !activeGroup ? <div className="console-menu-scroll">
+        {featured.length > 0 && <div className="console-featured"><p className="console-sec">Featured panels</p><div className="console-featured-row">{featured.map(d => <button key={d.type} type="button" onClick={() => place(d.type)}><strong>{d.name}</strong><span>{d.description}</span></button>)}</div></div>}
+        <div className={`console-groups ${groupIcons ? "is-tiles" : ""}`} role="group" aria-label="Panel categories">{groups.map(g => { const count = menuLibrary.filter(d => groupOf(d) === g).length; return <button key={g} type="button" data-group={g} aria-label={g} aria-current={g === currentGroup || undefined} onClick={() => openGroup(g)}>{groupIcons?.[g] && <svg className="console-group-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">{groupIcons[g].map((d, i) => <path key={i} d={d} />)}</svg>}<span>{g}</span><small>{count === 1 ? "1 panel" : `${count} panels`}</small></button>; })}</div>
+      </div>
         : <div className="console-choices">
-          {choices.length ? choices.map(d => <button key={d.type} type="button" onClick={() => place(d.type)}><strong>{d.name}{panels.some(p => p.type === d.type) && <small> · open</small>}</strong><span>{d.description}</span></button>) : <p>No panels match.</p>}
+          {choices.length || guideHits.length ? <>
+            {choices.map(d => <button key={d.type} type="button" onClick={() => place(d.type)}><strong>{d.name}{panels.some(p => p.type === d.type) && <small> · open</small>}</strong><span>{d.description}</span></button>)}
+            {guideHits.map(guide => <button key={guide.id} type="button" onClick={() => { if (guide.external) window.open(guide.href, "_blank", "noopener"); else location.href = guide.href; }}><strong>{guide.name}</strong><span>Opens page</span></button>)}
+          </> : <p>No panels match.</p>}
         </div>}
     </dialog>}
 
@@ -402,8 +432,8 @@ export function ConsoleWorkspace({ ws, label, quick, render, onViewsChange, noti
       <div className="console-menu-head"><p className="console-menu-title">{menuTitle}</p><button type="button" className="console-menu-x" aria-label="Close menu" onClick={close}><span aria-hidden="true">✕</span></button></div>
       {menu.kind === "panel" && menuPanel && (menu.sub === "move" ? <>
         <div className="console-pad">
-          <button type="button" role="menuitem" aria-label="Move left" onClick={() => doNudge({ x: -1 })}>←</button><button type="button" role="menuitem" aria-label="Move up" onClick={() => doNudge({ y: -1 })}>↑</button><button type="button" role="menuitem" aria-label="Move down" onClick={() => doNudge({ y: 1 })}>↓</button><button type="button" role="menuitem" aria-label="Move right" onClick={() => doNudge({ x: 1 })}>→</button>
-          <button type="button" role="menuitem" onClick={() => doNudge({ w: 1 })}>Wider</button><button type="button" role="menuitem" onClick={() => doNudge({ w: -1 })}>Narrower</button><button type="button" role="menuitem" onClick={() => doNudge({ h: 1 })}>Taller</button><button type="button" role="menuitem" onClick={() => doNudge({ h: -1 })}>Shorter</button>
+          <button type="button" role="menuitem" aria-label="Move left" onClick={() => doNudge({ x: -STEP })}>←</button><button type="button" role="menuitem" aria-label="Move up" onClick={() => doNudge({ y: -STEP })}>↑</button><button type="button" role="menuitem" aria-label="Move down" onClick={() => doNudge({ y: STEP })}>↓</button><button type="button" role="menuitem" aria-label="Move right" onClick={() => doNudge({ x: STEP })}>→</button>
+          <button type="button" role="menuitem" onClick={() => doNudge({ w: STEP })}>Wider</button><button type="button" role="menuitem" onClick={() => doNudge({ w: -STEP })}>Narrower</button><button type="button" role="menuitem" onClick={() => doNudge({ h: STEP })}>Taller</button><button type="button" role="menuitem" onClick={() => doNudge({ h: -STEP })}>Shorter</button>
         </div>
         <button type="button" role="menuitem" onClick={() => setMenu({ ...menu, sub: undefined })}>Done</button>
       </> : <>

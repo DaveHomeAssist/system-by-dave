@@ -126,6 +126,18 @@ export function App() {
     ws.setViewId(target.id); setStatus({ app: tool.label, text: `${tool.label} opened as a panel. Open full for its own page.`, error: false }); return true;
   }
   useEffect(() => {
+    (window as Window & { SBD_PANEL_INDEX?: { type: string; name: string; description: string; keywords?: string; app?: string }[] }).SBD_PANEL_INDEX = library.map(def => ({ type: def.type, name: def.name, description: def.description, keywords: def.keywords, app: def.app }));
+  }, [library]);
+  useEffect(() => {
+    const openPanel = (event: Event) => {
+      const type = (event as CustomEvent<{ type?: string }>).detail?.type;
+      if (!type) return;
+      if (ws.show(type)) event.preventDefault();
+    };
+    window.addEventListener("sbd:rail-open-panel", openPanel);
+    return () => window.removeEventListener("sbd:rail-open-panel", openPanel);
+  }, [ws]);
+  useEffect(() => {
     const select = (event: Event) => {
       const detail = (event as CustomEvent<{ ref?: string }>).detail;
       const ref = detail?.ref || "";
@@ -162,6 +174,12 @@ export function App() {
     document.documentElement.dataset.avTheme = value; setTheme(value);
     for (const meta of Array.from(document.querySelectorAll<HTMLMetaElement>("meta[data-av-theme-color]"))) meta.media = value === "system" ? (["light", "dark"].includes(meta.dataset.avThemeColor || "") ? `(prefers-color-scheme: ${meta.dataset.avThemeColor})` : "not all") : meta.dataset.avThemeColor === value ? "all" : "not all";
     try { localStorage.setItem("av-theme-mode.v1", value); } catch { setStatus({ app: "", text: "Theme changed for this visit; browser preferences could not be saved.", error: true }); }
+  }
+  /* One tap between light and dark, beside Menu. White and Black swap with each other; Follow system stays in Appearance. */
+  const shownPalette: Palette = theme === "system" ? systemPalette : theme;
+  const lightShown = shownPalette === "light" || shownPalette === "white";
+  function toggleLight() {
+    changeTheme(shownPalette === "white" ? "black" : shownPalette === "black" ? "white" : lightShown ? "dark" : "light");
   }
   function toggleFocus() {
     const next = !focusMode;
@@ -217,9 +235,10 @@ export function App() {
   };
   return <div className="suite-app" data-active-app={activeApp}>
     <header className="suite-header">
-      <div className="suite-identity"><span className="suite-mark" aria-hidden="true">AV</span><div><h1>{activeTitle}</h1><p className="suite-plan" title={activePack?.title}>{activePack ? `${activePack.title} · ${activePack.dirty ? "Unsaved" : "Saved"}` : activeTool ? "Specialist tool · own saved data" : "Empty workspace · add any panel"}</p></div></div>
+      <div className="suite-identity"><span className="suite-mark" aria-hidden="true">AV</span><div><h1>{activeTitle}</h1><p className="suite-plan" title={activePack?.title}>{activePack ? `${activePack.title} · ${activePack.dirty ? "Unsaved" : "Saved"}` : activeTool ? "Specialist tool · own saved data" : ws.panels.length ? `${ws.panels.length} ${ws.panels.length === 1 ? "panel" : "panels"} open` : "Empty workspace · add any panel"}</p></div></div>
       {context && <span className="suite-context" aria-label="Read-only show context">{context}</span>}
       <div className="suite-actions">
+        <span className="suite-theme-toggle"><button type="button" aria-label={lightShown ? "Switch to dark mode" : "Switch to light mode"} title={lightShown ? "Dark mode" : "Light mode"} onClick={toggleLight}><svg aria-hidden="true" viewBox="0 0 24 24">{lightShown ? <path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z" /> : <><circle cx="12" cy="12" r="4" /><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" /></>}</svg></button></span>
         <TopicMenu label="Menu" topics={[
           { name: "Project", description: "Save, export and edit history", content: <>{activePack?.actions}
             <button type="button" className="primary" disabled={!activePack || activePack.blocked} onClick={() => void activePack?.save()}>Save{activePack?.dirty ? " •" : ""}</button>
@@ -241,7 +260,7 @@ export function App() {
     <main id="workspace" tabIndex={-1} className="workspace-host">
       {storageState === "blocked" && <div className="console-notice" role="note">This browser is blocking site storage, so nothing can be saved here. Your work lasts for this visit only. Export anything you need before you leave.</div>}
       {ws.hidden > 0 && <div className="console-notice" role="note">{ws.hidden} unavailable saved slot{ws.hidden === 1 ? " is" : "s are"} retained in this layout. Add panels here; the saved view changes only when you store or update it.</div>}
-      <ConsoleWorkspace compact ws={panelWorkspace} label="AV Suite" quick={quick} render={render} onViewsChange={storeViews} notify={text => setStatus({ app: "", text, error: false })} viewTabs={viewTabs} defaultGroup={activePack?.label || (activeApp === TOOL_PREFIX ? "Tools" : undefined)} groupIcons={chooserIcons} />
+      <ConsoleWorkspace compact ws={panelWorkspace} label="AV Suite" quick={quick} render={render} onViewsChange={storeViews} notify={text => setStatus({ app: "", text, error: false })} viewTabs={viewTabs} defaultGroup={activePack?.label || (activeApp === TOOL_PREFIX ? "Show tools" : undefined)} groupIcons={chooserIcons} />
     </main>
     <footer role="status" className={`message ${status.error || activePack?.problem ? "error" : ""}`}>{[...(activePack?.recovery.errors || []), status.app ? `${status.app}: ${status.text}` : status.text].join(" ")}</footer>
     {packs.map(pack => <div key={pack.id} data-pack-dialogs={pack.id}>{pack.dialogs}</div>)}

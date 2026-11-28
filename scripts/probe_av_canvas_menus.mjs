@@ -14,6 +14,16 @@ try {
  assert.ok(metrics.gridTop<=160,JSON.stringify(metrics));
  assert.ok(metrics.canvasHeight/metrics.panelHeight>.75,JSON.stringify(metrics));
  if (process.env.AV_MENU_EVIDENCE) await page.screenshot({path:process.env.AV_MENU_EVIDENCE});
+ // One tap light toggle beside Menu, on the Gaffer and Call Sheet palette: the accent is the ink, not orange.
+ const toggle=page.locator('.suite-theme-toggle button');
+ const before=await page.evaluate(()=>document.documentElement.dataset.avTheme);
+ await toggle.click();
+ const after=await page.evaluate(()=>document.documentElement.dataset.avTheme);
+ assert.notEqual(after,before);
+ assert.ok(['light','dark','white','black'].includes(after));
+ assert.equal(await page.evaluate(()=>localStorage.getItem('av-theme-mode.v1')),after);
+ const accent=await page.evaluate(()=>getComputedStyle(document.documentElement).getPropertyValue('--av-accent').trim().toLowerCase());
+ assert.ok(['#141412','#f2f0e9'].includes(accent),`console accent is the ink, not ${accent}`);
  await suiteTopic(page,'Appearance');
  await page.getByLabel('Palette',{exact:true}).selectOption('light');
  await page.getByRole('button',{name:'Back to Menu',exact:true}).click();
@@ -27,6 +37,13 @@ try {
  await page.locator('dialog[open]').getByRole('button',{name:'Add device',exact:true}).click();
  // Gear choices: device types, then the Gear Reference library. One fills the name and role; a typed name is kept.
  const addDevice=page.getByRole('dialog',{name:'Add device',exact:true});
+ // One top bar: the title and its only close. No second Cancel at the bottom.
+ assert.equal(await addDevice.getByRole('button',{name:'Cancel',exact:true}).count(),0);
+ await addDevice.locator('header').getByRole('button',{name:'Close',exact:true}).click();
+ await addDevice.waitFor({state:'hidden'});
+ await page.getByRole('button',{name:/^Diagram/}).click();
+ await page.locator('dialog[open]').getByRole('button',{name:/^Devices/}).click();
+ await page.locator('dialog[open]').getByRole('button',{name:'Add device',exact:true}).click();
  const gear=addDevice.getByLabel('Gear'), deviceName=addDevice.getByLabel('Device name',{exact:true}), deviceRole=addDevice.getByLabel('Device role');
  await gear.locator('optgroup[label^="Gear Reference"] option').first().waitFor({state:'attached'});
  assert.deepEqual(await gear.locator('optgroup').evaluateAll(groups=>groups.slice(0,4).map(group=>group.label)),['Sources','Converters','Routing and processing','Destinations']);
@@ -75,7 +92,7 @@ try {
  const chooser=page.getByRole('dialog',{name:'Add panel',exact:true});
  // The first step is a two-column grid of icon tiles, one per group.
  const tiles=chooser.getByRole('group',{name:'Panel categories'}).getByRole('button');
- assert.equal(await tiles.count(),12);
+ assert.equal(await tiles.count(),11);
  assert.ok(await tiles.evaluateAll(buttons=>buttons.every(button=>button.querySelector('svg path')&&button.getBoundingClientRect().height>=44&&button.scrollWidth<=button.clientWidth+1)),'every group tile has its icon and fits its name');
  assert.equal(await chooser.getByRole('group',{name:'Panel categories'}).evaluate(group=>getComputedStyle(group).gridTemplateColumns.split(' ').length),2);
  await chooser.getByRole('button',{name:'Lighting',exact:true}).click();

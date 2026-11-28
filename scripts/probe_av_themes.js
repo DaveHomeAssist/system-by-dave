@@ -488,9 +488,14 @@ async function main() {
           fs.writeFileSync(path.join(captureDir, `${target.id}-${preference}-${viewportWidth}.png`), Buffer.from(screenshot.data, 'base64'));
         }
         const throwlineStandalone = target.id === 'throwline';
+        // The AV by Dave console (and the family routes that open in it) wears
+        // Gaffer and Call Sheet; every other tool keeps Stage Slate and Warm Paper.
+        const avByDaveConsole = (target.themeId || target.id) === 'av-suite';
         const expectedBg = throwlineStandalone
           ? '#f4f1ea'
-          : (preference === 'dark' ? '#0c1016' : '#eee8df');
+          : avByDaveConsole
+            ? (preference === 'dark' ? '#0f0f0e' : '#f3f2ec')
+            : (preference === 'dark' ? '#0c1016' : '#eee8df');
         const ratios = {
           text: contrast(value.tokens.text, value.tokens.bg),
           muted: contrast(value.tokens.muted, value.tokens.surface),
