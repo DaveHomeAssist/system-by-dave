@@ -223,6 +223,7 @@ tr:has(.entry[aria-pressed="true"]) {background:var(--surface-raised)}
 @media(max-height:330px) {.calendarCount {display:none}.calendarNumber {font-size:10px}.calendarDay,.calendarBlank {padding:1px 4px}.calendarFooter {display:none}.calendarShell {grid-template-rows:auto auto minmax(0,1fr)}}
 @media print {.calendarShell {display:none!important}}
 @media(max-height:330px) {.labTabs button {white-space:nowrap}.labBar {gap:4px;padding:2px 4px}.labControls .buttonRow {gap:2px}.labGuide {padding:4px 6px;gap:3px}.labGuide h3 {font-size:14px}.labGuide p {font-size:11px;line-height:1.3}.labGuide .guideFooter {gap:4px}}
+.illustration [fill][font-size]{fill:inherit; font-size:15px}.illustration text[fill="#eff8fa"]{fill:#eff8fa}.illustration text[fill="#8be9f6"]{fill:#8be9f6}.illustration text[fill="#9bf6cb"]{fill:#9bf6cb}.illustration text[fill="#ffbf78"]{fill:#ffbf78}.illustration text[fill="#b8cbd4"]{fill:#b8cbd4}
 
 
 .app button,.app select,.app input {min-height:44px;min-width:44px}
@@ -348,6 +349,25 @@ noscript {position:fixed;inset:0;z-index:200;background:var(--surface);color:var
 <script id="archive-data" type="application/json">
 [
   {
+    "id": 42,
+    "date": "2026-11-28",
+    "track": "SDI, HDMI, DisplayPort, and signal transport",
+    "trackShort": "Transport",
+    "title": "Four SDI inputs must agree",
+    "fact": "On the AJA 12GM, Auto selects Quad Link only when all four SDI inputs agree on the required signal parameters, including frame rate, raster, bit depth and pixel mapping.",
+    "why": "Four connected cables can still fail Quad Link detection. One input at 60p while the other three run at 59.94p is enough to break the match.",
+    "takeaway": "Open Mini-Config’s Input Details tab. Compare all four inputs and correct mismatched settings at the source before swapping cables.",
+    "sourceLabel": "AJA 12GM Manual v1.16, Input SDI and Input Details, pp. 12 and 15",
+    "sourceUrl": "https://www.aja.com/support/item-download/9586/AJA_12GM_Manual_v1.16.pdf",
+    "basis": "Manufacturer documentation",
+    "current": true,
+    "illustration": {
+      "caption": "In this example, SDI 4 runs at 60p. Auto cannot select Quad Link until all four input formats match.",
+      "body": "<rect width=\"240\" height=\"400\" rx=\"8\" fill=\"#101d25\"/><text x=\"16\" y=\"34\" fill=\"#8be9f6\" font-size=\"15\" font-weight=\"700\">12GM INPUT CHECK</text><rect x=\"16\" y=\"60\" width=\"208\" height=\"40\" rx=\"4\" fill=\"#21333e\"/><circle cx=\"29\" cy=\"80\" r=\"4\" fill=\"#9bf6cb\"/><text x=\"42\" y=\"85\" fill=\"#eff8fa\" font-size=\"15\">SDI 1</text><text x=\"106\" y=\"85\" fill=\"#9bf6cb\" font-size=\"15\">59.94p</text><rect x=\"16\" y=\"112\" width=\"208\" height=\"40\" rx=\"4\" fill=\"#21333e\"/><circle cx=\"29\" cy=\"132\" r=\"4\" fill=\"#9bf6cb\"/><text x=\"42\" y=\"137\" fill=\"#eff8fa\" font-size=\"15\">SDI 2</text><text x=\"106\" y=\"137\" fill=\"#9bf6cb\" font-size=\"15\">59.94p</text><rect x=\"16\" y=\"164\" width=\"208\" height=\"40\" rx=\"4\" fill=\"#21333e\"/><circle cx=\"29\" cy=\"184\" r=\"4\" fill=\"#9bf6cb\"/><text x=\"42\" y=\"189\" fill=\"#eff8fa\" font-size=\"15\">SDI 3</text><text x=\"106\" y=\"189\" fill=\"#9bf6cb\" font-size=\"15\">59.94p</text><rect x=\"16\" y=\"216\" width=\"208\" height=\"40\" rx=\"4\" fill=\"#21333e\"/><circle cx=\"29\" cy=\"236\" r=\"4\" fill=\"#ffbf78\"/><text x=\"42\" y=\"241\" fill=\"#eff8fa\" font-size=\"15\">SDI 4</text><text x=\"106\" y=\"241\" fill=\"#ffbf78\" font-size=\"15\">60p mismatch</text><path d=\"M120 266v26m-6-7 6 7 6-7\" stroke=\"#ffbf78\" fill=\"none\"/><rect x=\"16\" y=\"302\" width=\"208\" height=\"48\" rx=\"4\" fill=\"#21333e\"/><text x=\"30\" y=\"331\" fill=\"#ffbf78\" font-size=\"15\" font-weight=\"700\">Auto: no Quad Link</text><text x=\"16\" y=\"375\" fill=\"#b8cbd4\" font-size=\"15\">Illustrative format mismatch</text>",
+      "viewBox": "0 0 240 400"
+    }
+  },
+  {
     "id": 40,
     "date": "2026-11-27",
     "track": "Signal troubleshooting and system design",
@@ -359,7 +379,7 @@ noscript {position:fixed;inset:0;z-index:200;background:var(--surface);color:var
     "sourceLabel": "Telestream SPG9000 User Manual, SDI Checkfield",
     "sourceUrl": "https://primary.telestream.net/pdfs/user-guides/SPG9000-User-Manual-D00013571G.pdf",
     "basis": "Manufacturer documentation",
-    "current": true,
+    "current": false,
     "illustration": {
       "caption": "The upper field tests the equalizer. The lower field tests clock recovery. Use a pattern supported at your SDI format.",
       "body": "<rect width=\"240\" height=\"400\" rx=\"8\" class=\"canvas\"/><text x=\"18\" y=\"30\" class=\"diagram-index\">40</text><text x=\"52\" y=\"30\" class=\"diagram-heading\">SDI CHECKFIELD</text><rect x=\"20\" y=\"66\" width=\"200\" height=\"115\" rx=\"8\" class=\"panel\"/><text x=\"36\" y=\"108\" class=\"diagram-heading\">Upper field</text><text x=\"36\" y=\"144\">Equalizer test</text><rect x=\"20\" y=\"196\" width=\"200\" height=\"115\" rx=\"8\" class=\"panel\"/><text x=\"36\" y=\"238\" class=\"diagram-heading\">Lower field</text><text x=\"36\" y=\"274\">Clock recovery test</text><text x=\"24\" y=\"359\" class=\"note\">HD-SDI example</text>",
