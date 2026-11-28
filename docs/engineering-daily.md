@@ -23,3 +23,5 @@ The parent demos hub uses the existing public subject reader for Daily, Frame sy
 ## AV by Dave Blog
 
 The blog gives AV by Dave readers the same edition library, calendar, diagrams and Signal lab at https://avbydave.com/blog/. Pages stages this view from the verified daily snapshot, so the existing authoring command and schedule feed both addresses. Edition data and card bytes are shared. The existing System by Dave archive continues to serve old edition links. Acceptance checks both routes, archive and asset parity, and the standard responsive reader checks.
+
+For regular editions, put the initial illustration in `body` and the changed state in `alternateBody`. Supply `alternateCaption`, `toggleLabel`, and `resetLabel`. Both drawings use the same viewBox and SVG allowlist. Verify both states using the keyboard and show both in the story card with a practical takeaway.

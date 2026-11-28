@@ -1,7 +1,7 @@
 {
   "schema": 1,
-  "sourceSha256": "c18d34f70be66666ff46ec18ff382c03ce606d1cceb608299397ef7ee2a510e9",
-  "publicSha256": "51d8f1c9b56d6a4a01a4cf80b9c7ed9b29a6df3a10d537f398023a000c82bde4",
+  "sourceSha256": "4d61a51f12fd34c6d3c0d089d40ebff830a40fe099b3db101a4d2ff69c6fa55c",
+  "publicSha256": "a75446bf1a807b2452eb2070c91a2a3e1804f705e379d8163c417b40fe30a4fa",
   "editions": 42,
   "files": [
     {
@@ -9,14 +9,14 @@
       "id": 42,
       "date": "2026-11-28",
       "title": "Four SDI inputs must agree",
-      "sha256": "6ec80a59131a8e83a24537c690d5b2566d63355ef4360e19798222c0ba730e33"
+      "sha256": "3b856cda8c122d6b340bb4800e53c1061e05d57f5d412505d3902616b3eced70"
     },
     {
       "name": "Edition 042.png",
       "id": 42,
       "date": "2026-11-28",
       "title": "Four SDI inputs must agree",
-      "sha256": "ba402f3de8e8bb1d5d090ba4f0be32e712fc8a0e8efbab37da676cf4fcedea27"
+      "sha256": "9d87a9f8217e37cbf5ef3ec32d26702ad6d3730f17dad8121d6b1577f8b90cd8"
     },
     {
       "name": "Edition 040.svg",

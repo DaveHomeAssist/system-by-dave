@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-11-28 | Interactive Edition 042
+
+- Edition 042 adds a reversible SDI input monitor and a before-and-after story card.
+
 ## November 28, 2026. Cross-Pollinate header at large phone text sizes
 
 - Keeps the Cross-Pollinate title, date card and top bar fully on screen when a phone's system text size is enlarged. The title no longer cuts off at "Words in bloc", and the date card moves to its own row instead of running past the right edge.
