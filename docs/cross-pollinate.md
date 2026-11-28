@@ -6,7 +6,7 @@ playtest preview. The page includes up-front site navigation, a skip link,
 social metadata, and a CSP pinning the inline game script.
 
 The build owner is the Cross-Pollinate repository. The export was built
-from revision `5eaa0ee02b4f70874771a3dedd4c97ba5fd3851f` with
+from revision `803948d5a5e0776cb9e671830fc08ec10754e6b4` with
 `npm run build -- --system-by-dave`. Copy its
 `dist/system-by-dave/index.html` into `puzzle/index.html` for updates. Changes
 to the game or its hosted markup belong in the source repository.
@@ -16,3 +16,9 @@ The November 27 phone repair keeps all 27 in-game keyboard controls inside
 the Galaxy Note 20 class viewport reported in the physical playtest. It also
 contains the date card and Garden bed progress label without changing saved
 attempt keys or requiring the phone keyboard or stylus.
+
+The November 28 large-text repair keeps the title, date card, top bar and all 27
+keyboard controls inside the same three viewports when every font is scaled
+1.3x and 1.5x, which mimics an enlarged Android system text size. The source
+probe fails on the previous build and passes on this one. Normal-size text
+keeps the one-row header, and saved attempt keys are unchanged.
