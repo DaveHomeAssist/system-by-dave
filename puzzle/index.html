@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en" data-theme="light">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-EKKDVd6WJ0zHIAu015VVpMInVJ923QFYSiV2m/Mf2IU='; style-src 'unsafe-inline'; img-src 'self' data:; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-H7O5J+z6Pd6ha2uHLcxoViJZvigKJX7kq5SoKxU1SWE='; style-src 'unsafe-inline'; img-src 'self' data:; base-uri 'none'; form-action 'none'">
 <meta name="description" content="Solve the daily garden crossword, grow plants and use wildcard seeds for a nearby clue.">
 <meta name="robots" content="noindex, follow">
 <link rel="canonical" href="https://systembydave.com/puzzle/">
@@ -1154,6 +1154,7 @@ WRY|Like a remark delivered with an arched eyebrow|speech emotion
   }
   var challengeEntries = readClues(challengeClues);
   var hasChallengeGrid = (day2) => day2 === challengeGridDate;
+  var latestChallengeDate = (today2) => challengeGridDate <= today2 ? challengeGridDate : void 0;
   function challengeForDay(day2) {
     if (!hasChallengeGrid(day2)) throw new Error(`No challenge grid for ${day2}`);
     const puzzle2 = authoredPuzzle(challengeEdition, true, day2, challengeEntries);
@@ -1796,7 +1797,8 @@ WRY|Like a remark delivered with an arched eyebrow|speech emotion
   directionButtons.forEach((button) => button.addEventListener("click", () => changeDirection(button.dataset.direction)));
   slideButtons.forEach((button) => button.addEventListener("click", () => throwSeed(button.dataset.slide)));
   setTheme(read("cross-pollinate:theme") === "dark");
-  openDay(day, false, location.hash === "#challenge");
+  var linkedChallenge = location.hash === "#challenge" ? latestChallengeDate(today) : void 0;
+  openDay(linkedChallenge ?? day, false, Boolean(linkedChallenge));
   new ResizeObserver(draw).observe(byId("board"));
   var hooks = window;
   hooks.render_game_to_text = () => JSON.stringify({

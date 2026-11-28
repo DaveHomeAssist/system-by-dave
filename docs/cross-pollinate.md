@@ -6,7 +6,7 @@ playtest preview. The page includes up-front site navigation, a skip link,
 social metadata, and a CSP pinning the inline game script.
 
 The build owner is the Cross-Pollinate repository. The export was built
-from revision `37fd7d65a2a9d1fad3999468bb55788254d46a8f` with
+from revision `6f03b68b112c2605c7423155a598a990540572d1` with
 `npm run build -- --system-by-dave`. Copy its
 `dist/system-by-dave/index.html` into `puzzle/index.html` for updates. Changes
 to the game or its hosted markup belong in the source repository.
@@ -26,4 +26,4 @@ keeps the one-row header, and saved attempt keys are unchanged.
 The November 28 challenge grid is a second, harder puzzle for that date. The
 scheduled puzzle stays the default with its existing save key. The date picker
 offers **Open challenge grid**, and a link ending in `#challenge` opens it
-directly on November 28 UTC. It saves under its own key.
+directly on November 28 UTC and afterwards. It saves under its own key.
