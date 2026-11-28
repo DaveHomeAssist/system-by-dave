@@ -8,6 +8,7 @@ import json
 import math
 import os
 from pathlib import Path
+import signal
 import subprocess
 import sys
 import tempfile
@@ -34,6 +35,12 @@ def boot_id():
 
 def digest(value):
     return hashlib.sha256(json.dumps(value, sort_keys=True).encode()).hexdigest()
+
+
+def profile_digest(profile):
+    # The watch settings (interval, relay, thresholds) do not change what startup approved, so they
+    # stay out of the digest. Editing them must not invalidate a receipt or a crew confirmation.
+    return digest({k: v for k, v in profile.items() if k != 'watch'})
 
 
 def validate_profile(profile):
@@ -200,12 +207,25 @@ class FixtureBridge:
     """In-memory bridge used by offline demonstrations and regression tests."""
     def __init__(self, snapshot):
         self.snapshot = copy.deepcopy(snapshot)
+        # Synthetic read-only readings for offline watch demonstrations. Kept out of the observation.
+        self.watch = self.snapshot.pop('watch', None)
         self.calls = []
+
+    def watch_reading(self):
+        if self.watch is None:
+            raise StartupError('Unsupported fixture operation.')
+        reading = copy.deepcopy(self.watch)
+        reading['displays'] = [{'id': d['id'], 'name': d.get('name', ''), 'active': d.get('active') is True,
+                                'identity': copy.deepcopy(d.get('identity')),
+                                'mode': {k: v for k, v in d['mode'].items() if k != 'colorMode'}} for d in self.snapshot['displays']]
+        return reading
 
     def call(self, action, payload):
         self.calls.append(action)
         if action == 'capabilities':
-            return {'startup': True, 'routingReadback': True}
+            return {'startup': True, 'routingReadback': True, 'watch': self.watch is not None}
+        if action == 'watch':
+            return self.watch_reading()
         if action == 'observe':
             return copy.deepcopy(self.snapshot)
         if action == 'restore':
@@ -221,12 +241,12 @@ class FixtureBridge:
         return {}
 
 
-def run(profile, bridge, warm=False, timeout=60, interval=1, stable_samples=3, clock=time.monotonic, sleep=time.sleep, emit=None):
+def run(profile, bridge, warm=False, timeout=60, interval=1, stable_samples=3, clock=time.monotonic, sleep=time.sleep, emit=None, on_ready=None):
     validate_profile(profile)
     if timeout <= 0 or interval <= 0 or stable_samples < 2:
         raise StartupError('Invalid wait settings.')
     receipt = {'schemaVersion': 1, 'runID': str(uuid.uuid4()), 'createdAt': datetime.now(timezone.utc).isoformat(),
-               'bootID': boot_id(), 'profileSHA256': digest(profile), 'mode': 'warm' if warm else 'startup', 'events': [], 'computerReady': False,
+               'bootID': boot_id(), 'profileSHA256': profile_digest(profile), 'mode': 'warm' if warm else 'startup', 'events': [], 'computerReady': False,
                'showNightReady': False}
 
     def record(action):
@@ -347,6 +367,11 @@ def run(profile, bridge, warm=False, timeout=60, interval=1, stable_samples=3, c
         elif snapshot.get('millumin', {}).get('fullscreen') is not True:
             raise StartupError('Check fullscreen output.')
         receipt.update(computerReady=True, snapshotSHA256=digest(snapshot), message='Computer checks passed. Complete the crew visual check.')
+        if on_ready is not None:
+            try:
+                on_ready(snapshot, receipt)  # sets up watch mode; it can never change the startup result
+            except Exception as error:  # noqa: BLE001 - watch setup is best effort by design
+                record('Watch baseline was not captured: %s' % type(error).__name__)
         passed('fullscreen', '4 output windows confirmed')
     except StartupError as error:
         receipt['message'] = str(error)
@@ -379,7 +404,7 @@ def readiness(receipt, evidence, snapshot, profile, now=None):
     try:
         age = (now - datetime.fromisoformat(receipt['completedAt'])).total_seconds()
         valid = (receipt.get('computerReady') is True and receipt.get('bootID') == boot_id() and 0 <= age <= READY_SECONDS
-                 and receipt['profileSHA256'] == digest(profile)
+                 and receipt['profileSHA256'] == profile_digest(profile)
                  and receipt.get('snapshotSHA256') == digest(snapshot)
                  and evidence.get('runID') == receipt['runID']
                  and bool(evidence.get('operator', '').strip())
@@ -430,6 +455,68 @@ def save(path, value):
             os.unlink(temporary)
 
 
+def baseline_hook(profile, bridge, state_dir, watchmod):
+    """When the profile has watch settings, capture the baseline the watch compares against: one read-only reading."""
+    if 'watch' not in profile:
+        return None
+
+    def capture(snapshot, receipt):
+        lanes = {lane: d['id'] for lane, d in resolve(profile, snapshot).items()}
+        watchmod.capture_baseline(profile, bridge, state_dir, run_id=receipt['runID'], lanes=lanes, boot=receipt['bootID'])
+    return capture
+
+
+def startup_reporting(profile, emit, watchmod):
+    """Also report the startup phase to the relay when the profile names one (never for offline fixtures)."""
+    if 'watch' not in profile:
+        return emit
+    try:
+        cfg = watchmod.watch_config(profile)
+    except StartupError:
+        return emit
+    if not cfg['report']:
+        return emit
+    return watchmod.tee(emit, watchmod.StartupReporter(watchmod.Reporter(cfg, 'mac'), emit))
+
+
+def watch_main(args, emit):
+    """Read-only mid-show watch. Holds its own lock, never the receipt lock, and writes no receipt."""
+    import watch as watchmod
+    stopping = {'now': False}
+    try:
+        profile = json.loads(Path(args.profile).read_text())
+        watchmod.load_profile(profile, watch=True)
+        cfg = watchmod.watch_config(profile)
+        state_dir = Path(args.receipt).parent
+        state_dir.mkdir(parents=True, exist_ok=True)
+        lock = open(state_dir / '.frozen-startup-watch.lock', 'a')
+        try:
+            fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except BlockingIOError as error:
+            raise StartupError('Another watch is running in this receipt directory.') from error
+        bridge = FixtureBridge(json.loads(Path(args.fixture).read_text())) if args.fixture else Bridge(args.bridge)
+        # An offline demonstration never reports: a fixture must not appear on the Rig page as a Mac.
+        reporter = None if args.fixture or not cfg['report'] else watchmod.Reporter(cfg, 'mac')
+        for number in (signal.SIGTERM, signal.SIGINT):
+            signal.signal(number, lambda *_: stopping.update(now=True))
+        watchmod.run_watch(profile, bridge, cfg, state_dir, emit=emit, reporter=reporter, max_cycles=args.max_cycles,
+                           stop=lambda: stopping['now'], sleep=time.sleep)
+        return 0
+    except BrokenPipeError:
+        return 0  # the window that was reading the stream has gone
+    except watchmod.WatchNotConfigured as error:
+        if emit:
+            emit({'schema': STREAM_SCHEMA, 'type': 'watch-state', 'state': 'not-configured', 'message': str(error), 'at': datetime.now(timezone.utc).isoformat()})
+        print(str(error), file=sys.stderr)
+        return 4
+    except (StartupError, OSError, ValueError) as error:
+        if emit:
+            emit({'schema': STREAM_SCHEMA, 'type': 'watch-state', 'state': 'unavailable', 'message': 'Watch mode unavailable: %s' % error,
+                  'at': datetime.now(timezone.utc).isoformat()})
+        print('Watch mode unavailable: %s' % error, file=sys.stderr)
+        return 3
+
+
 def main():
     parser = argparse.ArgumentParser(description='Frozen Startup offline coordinator')
     parser.add_argument('--profile', required=True)
@@ -441,8 +528,14 @@ def main():
     parser.add_argument('--crew-evidence')
     parser.add_argument('--verify-ready', action='store_true', help='Verify crew evidence against an existing receipt and current snapshot')
     parser.add_argument('--events', help='Write the live check stream as JSON lines to this path; use - for stdout')
+    parser.add_argument('--watch', action='store_true', help='Read-only mid-show watch; runs until stopped. Changes nothing on the Mac.')
+    parser.add_argument('--max-cycles', type=int, help='Stop the watch after this many cycles (diagnostics and tests)')
     args = parser.parse_args()
+    if args.watch and (args.warm or args.verify_ready or args.crew_evidence):
+        parser.error('--watch cannot be combined with --warm, --verify-ready or --crew-evidence')
     emit = event_writer(args.events)
+    if args.watch:
+        return watch_main(args, emit)
     result = None
     lock_owned = False
     try:
@@ -456,8 +549,12 @@ def main():
             raise StartupError('Another startup check is running in this receipt directory.') from error
         if args.verify_ready:
             result = json.loads(Path(args.receipt).read_text())
-        profile = validate_profile(json.loads(Path(args.profile).read_text()))
+        import watch as watchmod
+        raw_profile = json.loads(Path(args.profile).read_text())
+        profile = watchmod.load_profile(raw_profile) if not args.verify_ready else validate_profile(raw_profile)
         bridge = FixtureBridge(json.loads(Path(args.fixture).read_text())) if args.fixture else Bridge(args.bridge)
+        if not args.verify_ready and not args.fixture:
+            emit = startup_reporting(profile, emit, watchmod)
         if args.crew_evidence and not args.verify_ready:
             raise StartupError('Use --verify-ready to attach crew evidence to a completed run.')
         if args.verify_ready:
@@ -465,7 +562,8 @@ def main():
                 raise StartupError('Crew evidence is required.')
             result = json.loads(Path(args.receipt).read_text())
         else:
-            result = run(profile, bridge, warm=args.warm, timeout=0.1 if args.fixture else 60, interval=0.001 if args.fixture else 1, emit=emit)
+            result = run(profile, bridge, warm=args.warm, timeout=0.1 if args.fixture else 60, interval=0.001 if args.fixture else 1, emit=emit,
+                         on_ready=baseline_hook(profile, bridge, receipt_path.parent, watchmod))
         execution = 'offline fixture' if args.fixture else 'local bridge'
         if args.verify_ready and result.get('execution') != execution:
             raise StartupError('Receipt and current observation use different execution modes.')
@@ -497,4 +595,7 @@ def main():
 
 
 if __name__ == '__main__':
+    # watch.py imports this module by name. Register the running script under that name so both
+    # share one StartupError class instead of loading the file twice.
+    sys.modules.setdefault('startup', sys.modules[__name__])
     sys.exit(main())

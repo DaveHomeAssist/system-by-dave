@@ -27,7 +27,7 @@ button is hidden there and Home is the way in. Styles live in `public/monitor-li
 | --- | --- | --- |
 | Monitor (`index.html`) | Per-lane state, input, signal, shutter, reply age, intake air and heat; a lamp error when the relay reports one; the command log; health-report timing; Show Lock | Alerts from the Nov 12–13 records, the theatre checklist, lane identity, lamp notes labeled `Recorded:` with their snapshot date |
 | Cues | Show Lock on the relay node; which slot each lane uses | Cue path, cue map, listener forms (from `server/osc.js`), checks |
-| Rig | Addresses, controller slots, model, Show Lock, power schedules, Stop lens | Lanes, lenses, plotted rasters, acceptance grid, power notes |
+| Rig | Addresses, controller slots, model, Show Lock, power schedules, Stop lens; **Show Macs**: one tile per show Mac (M5 projectors, m1 pixel strips) from the reports each Mac sends, green, red or stale with the last report time and the failing check ([contract](mac-status.md)) | Lanes, lenses, plotted rasters, acceptance grid, power notes |
 | Network | Projector addresses and state, this relay's address, poll interval | Control and picture maps, device details, link health |
 | Notes | Shared team tasks (public Frozen workspace service) | Documents and Notion records |
 | Calendar | — | `workspace/tech-schedule.json` (the Planning calendar's file), milestones |

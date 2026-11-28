@@ -23,6 +23,13 @@ export const LANES = [
     lens: 'ET-DLE170 · 1.80–2.54:1 (projection plot record)', light: 'Both lamps on · Nov 13 snapshot' },
 ];
 
+// The two show Macs whose checks apps report to this relay (docs/mac-status.md). Names and roles are
+// recorded from the Nov 19, 2026 decisions; the state of each Mac is never recorded, only reported.
+export const MACS = [
+  { host: 'm5', name: 'M5', role: 'Projectors', machine: 'Production\u2019s Mac Studio (2)', does: 'Millumin projector show on lanes A to D, and this relay' },
+  { host: 'm1', name: 'm1', role: 'Pixel strips', machine: 'Production\u2019s Mac Studio', does: 'Millumin pixel strips' },
+];
+
 export const ALERTS = [
   { st: 'blocked', title: 'A · Lamp 2 FAILED', detail: 'Lamp 1 on, Lamp 2 off with DUAL selected.', when: 'Self test snapshot · Nov 13, 2:26 PM EST' },
   { st: 'waiting', title: 'A and D · Horizontal tilt warning', detail: 'Fan and temperature self tests passed.', when: 'Same snapshot · Nov 13, 2:26 PM EST' },

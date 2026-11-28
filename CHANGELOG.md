@@ -302,6 +302,27 @@
 - Added a source-only projector check planner with synthetic fixtures, explicit
   timing constraints and no relay integration or diagnostic lamp retry.
 
+## November 20, 2026. Frozen mid-show watch and Show Mac status (Phase 1, offline)
+
+- Added a read-only **watch mode** to Frozen Startup (`apps/frozen-startup`). After the computer checks pass it
+  re-reads the Mac about every 60 seconds (displays with identity, resolution and refresh; the Millumin process;
+  the show file's fingerprint, where a save is `CHANGED` and not a fault; sleep and keep-awake; disk, thermal and
+  memory pressure; the media folder; the Projctl relay; projector power and shutter on the M5; a pixel-output stub
+  for the m1) and shows a red banner in the checks window on a fault. It cannot reach the Millumin readback,
+  BetterDisplay, OSC, any projector or pixel command, or a relaunch or repair; the bridge guard, the command
+  allowlist and the tests enforce that.
+- Every watch check is profile driven. Added `example-m1-profile.json` with clearly marked `REPLACE-` placeholders:
+  the m1 has not been inspected, so watch mode refuses to start on it until they are filled in.
+- Added **Mac status reports** to the Projctl relay: `POST /api/mac-status`, `GET /api/mac-status` and a read-only
+  projector summary, behind a new write-only `PROJCTL_STATUS_TOKEN`. A report is validated, size capped, kept in
+  memory (latest per Mac) and never triggers a command. Frozen Monitor's Rig page gains a **Show Macs** row: one
+  tile per Mac, green, red or stale (no report in about three minutes), with the last report time and the
+  failing check. Red only: no sound, nothing on the projectors.
+- Not installed anywhere. The relay release and the Studio and m1 acceptance are separate, approved work.
+  Built to the recommended options for MF-1, MF-2 and MF-3, and Dave confirmed MF-1 to MF-5 on 2026-11-21 (MF-4 is
+  the write-only status token, MF-5 the projector power rule).
+
+
 ## November 20, 2026. Frozen workspace navigation
 
 - Published Sites version 60 from managed source `1c50b07`, preserving the newer

@@ -128,5 +128,54 @@
       "CH4": 12,
       "boost": 12
     }
+  },
+  "watch": {
+    "schemaVersion": 1,
+    "millumin": {
+      "processes": [
+        {
+          "pid": 4242,
+          "startedAt": "Fri Nov 20 18:02:11 2026"
+        }
+      ]
+    },
+    "show": {
+      "exists": true,
+      "size": 1048576,
+      "mtimeNs": 1763679600000000000,
+      "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    },
+    "power": {
+      "systemWide": {
+        "PreventUserIdleSystemSleep": 1
+      },
+      "owners": [
+        {
+          "pid": 4300,
+          "process": "caffeinate",
+          "type": "PreventUserIdleSystemSleep"
+        }
+      ]
+    },
+    "disk": {
+      "path": "/",
+      "totalBytes": 994662584320,
+      "freeBytes": 612000000000
+    },
+    "thermal": {
+      "limits": {
+        "CPU_Speed_Limit": 100
+      }
+    },
+    "memory": {
+      "pressureLevel": 1
+    },
+    "media": {
+      "path": "/fixture/media",
+      "exists": true,
+      "isDir": true,
+      "readable": true
+    },
+    "errors": {}
   }
 }

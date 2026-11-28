@@ -22,3 +22,38 @@ body.collapsed .ready-banner{margin:12px;min-height:calc(100dvh - 24px)}
 .section-head{margin-bottom:6px}.display{padding:8px 12px}.monitor{height:24px;margin-bottom:6px;font-size:18px}.monitor:after{display:none}.pill{margin-top:6px}
 .action{padding:10px 18px}.crew{padding:10px 20px}footer{padding-block:8px}
 }
+
+/* Mid-show watch banner. Read only: it reports, it never asks for a repair. Red means a fault; the words say which check. */
+.watch-banner{display:flex;align-items:flex-start;gap:16px;margin:12px 28px 0;padding:14px 20px;border:1px solid var(--line);border-left:6px solid var(--good);border-radius:12px;background:var(--surface)}
+.watch-banner[hidden]{display:none}
+.watch-mark{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;font-size:24px;font-weight:700;color:var(--good);background:var(--goodbg);flex-shrink:0}
+.watch-text{flex:1;min-width:0}.watch-text h2{font-size:clamp(20px,2.4vw,28px);letter-spacing:.02em;overflow-wrap:anywhere}
+.watch-text p:not(.eyebrow){margin-top:4px;color:var(--muted);line-height:1.4;overflow-wrap:anywhere}
+.watch-chips{list-style:none;margin:8px 0 0;padding:0;display:none;flex-wrap:wrap;gap:6px}
+body.collapsed .watch-chips,.watch-banner.open .watch-chips{display:flex}
+.watch-toggle{align-self:center;flex-shrink:0}body.collapsed .watch-toggle{display:none}
+.watch-chips .chip{display:inline-flex;align-items:center;gap:6px;padding:3px 9px 3px 6px;border:1px solid var(--line);border-radius:999px;font-size:12px;line-height:18px;background:var(--raised);color:var(--ink)}
+.watch-chips .sym{display:inline-grid;place-items:center;width:18px;height:18px;border-radius:50%;font-size:11px;font-weight:700;color:var(--good);background:var(--goodbg)}
+.watch-chips .fail{border-color:var(--bad);background:var(--badbg);font-weight:650}.watch-chips .fail .sym{color:var(--on);background:var(--bad)}
+.watch-chips .note .sym{color:var(--warn);background:var(--warnbg)}.watch-chips .off{color:var(--muted)}.watch-chips .off .sym{color:var(--muted);background:var(--raised)}
+.watch-chips .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.watch-report{font-size:12px}.watch-report.warn{color:var(--warn)}
+.watch-banner[data-state=fault]{border-color:var(--bad);border-left-color:var(--bad);background:var(--badbg)}
+.watch-banner[data-state=fault] .watch-mark{color:var(--on);background:var(--bad)}.watch-banner[data-state=fault] h2{color:var(--bad)}
+.watch-banner[data-state=fault] .watch-text p:not(.eyebrow){color:var(--ink)}
+.watch-banner[data-state=paused],.watch-banner[data-state=starting],.watch-banner[data-state=off]{border-left-color:var(--line)}
+.watch-banner[data-state=paused] .watch-mark,.watch-banner[data-state=starting] .watch-mark,.watch-banner[data-state=off] .watch-mark{color:var(--muted);background:var(--raised)}
+body.collapsed .watch-banner{margin:12px 12px 0;flex:1 1 auto;min-height:0}
+body.collapsed.watching .ready-banner{min-height:0;flex:0 0 auto}
+@media(max-width:680px){.watch-banner{margin:12px;padding:12px}.watch-mark{width:36px;height:36px;font-size:20px}}
+/* Expanded window: the banner stays compact so the startup results below still fit the 1280 x 832 page without scrolling. */
+body:not(.collapsed) .watch-banner{margin:8px 28px 0;padding:8px 16px;gap:12px;align-items:center}
+body:not(.collapsed) .watch-mark{width:34px;height:34px;font-size:20px}
+body:not(.collapsed) .watch-text .eyebrow{display:none}
+body:not(.collapsed) .watch-text h2{font-size:18px}
+body:not(.collapsed) .watch-text p:not(.eyebrow){margin-top:2px;font-size:13px;line-height:1.35;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
+body:not(.collapsed) .watch-report{display:none}
+body:not(.collapsed) .watch-banner.open .watch-report{display:-webkit-box}
+body:not(.collapsed) .watch-banner.open .watch-text p:not(.eyebrow){-webkit-line-clamp:unset;display:block}
+body.collapsed .watch-text p:not(.eyebrow){display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden}
+body.collapsed .watch-banner{overflow:hidden}

@@ -26,6 +26,7 @@ const browserTests = [
   'anticipatory-browser.cjs',
   'details-controls-browser.cjs',
   'monitor-browser.cjs',
+  'rig-macs-browser.cjs',
   'monitor-notes-browser.cjs',
   'software-checks-browser.cjs',
   'thermal-browser.cjs',

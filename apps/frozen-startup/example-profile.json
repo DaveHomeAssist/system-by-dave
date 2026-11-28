@@ -120,5 +120,14 @@
         "colorMode": "fixture-rgb8"
       }
     }
-  ]
+  ],
+  "watch": {
+    "host": "m5",
+    "hostName": "Example projector Mac (synthetic)",
+    "intervalSeconds": 60,
+    "mediaFolder": "/fixture/media",
+    "keepAwake": {
+      "process": "caffeinate"
+    }
+  }
 }

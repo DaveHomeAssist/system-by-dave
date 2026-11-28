@@ -8,7 +8,7 @@
     control: ['BenQ', 'Control', '#7894a6'], A: ['A', 'SL Portal', '#d754c8'], B: ['B', 'Top Portal', '#20b8c4'],
     C: ['C', 'Stage', '#c2b700'], D: ['D', 'SR Portal', '#56ad72']
   };
-  const state = { run: null, checks: [], results: {}, displays: [], result: null, readiness: null, busy: false, unavailable: null, expiryTimer: null };
+  const state = { run: null, checks: [], results: {}, displays: [], result: null, readiness: null, busy: false, unavailable: null, expiryTimer: null, watch: null };
 
   function post(message) {
     try { window.webkit.messageHandlers.frozen.postMessage(message); return true; } catch (e) { return false; }
@@ -74,6 +74,68 @@
     const button = $('#next'); text(button, label); button.disabled = !enabled; button.dataset.action = action || '';
   }
 
+  // ---- Mid-show watch. Read-only: this page only shows what the watch process reports. It never asks for a check,
+  // a repair or a command; a fault is a red banner here and a red tile on the Frozen Monitor Rig page, nothing more.
+  const SYMBOL = { PASS: '✓', FAIL: '!', CHANGED: '◆', WARN: '◆', 'NOT CONFIGURED': '–' };
+  const CHIP = { PASS: 'pass', FAIL: 'fail', CHANGED: 'note', WARN: 'note', 'NOT CONFIGURED': 'off' };
+  function watchView() {
+    const w = state.watch;
+    if (!w) return null;
+    if (w.notConfigured) return { kind: 'off', mark: '–', title: 'WATCH OFF', copy: w.notConfigured };
+    if (w.stopped) return { kind: 'fault', mark: '!', title: 'WATCH STOPPED', copy: w.stopped + ' This Mac is not being watched.' };
+    const last = w.last;
+    if (!last) return { kind: 'starting', mark: '…', title: 'WATCH STARTING', copy: 'Waiting for the first reading.' };
+    const interval = last.intervalSeconds || 60;
+    const age = (Date.now() - w.lastAt) / 1000;
+    if (age > Math.max(3 * interval, 150)) {
+      return { kind: 'fault', mark: '!', title: 'WATCH NOT UPDATING', copy: 'Last check ' + time(last.at) + '. This Mac is not being watched right now.', checks: last.checks };
+    }
+    const failed = (last.checks || []).filter(c => c.status === 'FAIL');
+    const noted = (last.checks || []).filter(c => c.status === 'CHANGED' || c.status === 'WARN');
+    const next = Math.max(0, Math.round(interval - age));
+    if (failed.length) {
+      return { kind: 'fault', mark: '!', title: 'FAULT · ' + failed.map(c => c.label).join(', '),
+        copy: failed.slice(0, 2).map(c => c.label + ': ' + c.observed).join(' · ') + (failed.length > 2 ? ' · and ' + (failed.length - 2) + ' more' : ''),
+        meta: 'Last check ' + time(last.at) + ' · next in ' + next + ' s', checks: last.checks };
+    }
+    const counted = (last.checks || []).filter(c => c.status === 'PASS' || c.status === 'CHANGED' || c.status === 'WARN').length;
+    return { kind: 'ok', mark: '✓', title: 'WATCHING · ALL CLEAR',
+      copy: counted + ' checks pass' + (noted.length ? ' · ' + noted.map(c => c.label + ': ' + c.observed.split(' · ')[0]).join(' · ') : ''),
+      meta: 'Last check ' + time(last.at) + ' · next in ' + next + ' s', checks: last.checks };
+  }
+
+  function renderWatch() {
+    const banner = $('#watch-banner');
+    const v = watchView();
+    document.body.classList.toggle('watching', !!v);
+    if (!v) { banner.hidden = true; return; }
+    banner.hidden = false;
+    banner.dataset.state = v.kind;
+    const toggle = $('#watch-toggle');
+    toggle.hidden = !(v.checks && v.checks.length);
+    text(toggle, banner.classList.contains('open') ? 'Hide checks' : 'Show checks');
+    banner.title = '';
+    text($('#watch-mark'), v.mark);
+    text($('#watch-eyebrow'), 'Mid-show watch' + (state.watch && state.watch.last ? ' · every ' + (state.watch.last.intervalSeconds || 60) + ' s · read only' : ' · read only'));
+    text($('#watch-title'), v.title);
+    text($('#watch-copy'), [v.copy, v.meta].filter(Boolean).join(' · '));
+    $('#watch-chips').replaceChildren(...(v.checks || []).map(c => {
+      const li = document.createElement('li');
+      li.className = 'chip ' + (CHIP[c.status] || 'off');
+      li.title = c.label + ': ' + c.observed;
+      const sym = document.createElement('span'); sym.className = 'sym'; sym.setAttribute('aria-hidden', 'true'); sym.textContent = SYMBOL[c.status] || '–';
+      const name = document.createElement('span'); name.textContent = c.label;
+      const word = document.createElement('span'); word.className = 'sr'; word.textContent = ' ' + c.status;
+      li.append(sym, name, word);
+      return li;
+    }));
+    const r = state.watch && state.watch.report;
+    const reportLine = $('#watch-report');
+    reportLine.classList.toggle('warn', !!(r && !r.ok));
+    text(reportLine, !state.watch || !state.watch.last ? '' : !r ? 'Not sending reports to the Frozen Monitor (none configured).'
+      : r.ok ? 'Frozen Monitor: report sent ' + time(r.at) + '.' : 'Frozen Monitor not reached: ' + (r.message || 'report not sent') + '.');
+  }
+
   function renderBanner() {
     const banner = $('#ready-banner');
     const r = state.readiness;
@@ -127,13 +189,13 @@
     else if (r) { text(crew, 'FAIL · ' + (r.message || 'Crew check not accepted')); crew.style.color = 'var(--bad)'; }
     else { text(crew, 'NOT CHECKED · Crew confirmation required'); crew.style.color = 'var(--muted)'; }
     text($('#footer-run'), state.run ? 'Run ' + state.run.runID.slice(0, 8) + ' · ' + (state.run.mode === 'warm' ? 'warm check' : 'startup') : 'No run yet');
-    renderBanner();
+    renderBanner(); renderWatch();
   }
 
   function receive(event) {
     if (!event || typeof event !== 'object') return;
     if (event.type === 'run') {
-      Object.assign(state, { run: event, checks: event.checks || [], results: {}, displays: [], result: null, readiness: null, unavailable: null, busy: true, expiredNotified: false });
+      Object.assign(state, { run: event, checks: event.checks || [], results: {}, displays: [], result: null, readiness: null, unavailable: null, busy: true, expiredNotified: false, watch: null });
       text($('#mode-badge'), event.mode === 'warm' ? 'WARM CHECK' : 'STARTUP CHECK');
       document.body.classList.remove('collapsed'); post({ action: 'expand' });
     } else if (event.type === 'check') {
@@ -144,11 +206,21 @@
       state.result = event; state.busy = false;
     } else if (event.type === 'readiness') {
       state.readiness = event; state.busy = false;
-      if (event.showNightReady) { document.body.classList.add('collapsed'); post({ action: 'collapse' }); }
+      if (event.showNightReady) { document.body.classList.add('collapsed'); post({ action: 'collapse', watching: !!state.watch }); }
     } else if (event.type === 'unavailable') {
       state.unavailable = event.message || 'The startup check could not run.'; state.busy = false;
     } else if (event.type === 'busy') {
       state.busy = !!event.busy;
+    } else if (event.type === 'watch') {
+      const keep = state.watch || {};
+      state.watch = { report: keep.report || null, last: event, lastAt: Date.now() };
+    } else if (event.type === 'report') {
+      state.watch = Object.assign(state.watch || {}, { report: event });
+    } else if (event.type === 'watch-state') {
+      const keep = state.watch || {};
+      if (event.state === 'running' || event.state === 'starting') state.watch = Object.assign(keep, { stopped: null, notConfigured: null });
+      else if (event.state === 'not-configured') state.watch = { notConfigured: event.message || 'Watch mode is not configured in this profile.' };
+      else state.watch = Object.assign(keep, { stopped: event.message || 'The watch process stopped.' });
     }
     render();
   }
@@ -161,9 +233,10 @@
     else if (action === 'retry') retry();
   });
   $('#ready-rerun').addEventListener('click', retry);
+  $('#watch-toggle').addEventListener('click', () => { $('#watch-banner').classList.toggle('open'); renderWatch(); });
   $('#ready-details').addEventListener('click', () => {
     const collapse = !document.body.classList.contains('collapsed');
-    document.body.classList.toggle('collapsed', collapse); post({ action: collapse ? 'collapse' : 'expand' }); renderBanner();
+    document.body.classList.toggle('collapsed', collapse); post({ action: collapse ? 'collapse' : 'expand', watching: !!state.watch }); renderBanner();
   });
   const boxes = [...document.querySelectorAll('[data-crew]')];
   const validate = () => { $('#confirm').disabled = !(boxes.every(b => b.checked) && $('#operator').value.trim()); };
@@ -184,7 +257,7 @@
     const v = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark'; theme(v);
     try { localStorage.setItem('frozenStartupChecks.theme', v); } catch (e) { /* storage unavailable */ }
   });
-  state.expiryTimer = setInterval(() => { if (state.readiness) renderBanner(); }, 1000);
+  state.expiryTimer = setInterval(() => { if (state.readiness) renderBanner(); renderWatch(); }, 1000);
 
   window.frozenStartup = { receive };
   render();

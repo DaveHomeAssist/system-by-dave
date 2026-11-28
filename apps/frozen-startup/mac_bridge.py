@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 """Mac application adapter. Direct invocation is inert until a request arrives."""
 import hashlib
+import ipaddress
 import json
 import os
 from pathlib import Path
 import re
+import shutil
 import subprocess
 import sys
 import socket
@@ -191,13 +193,208 @@ def restore(rows):
     return {}
 
 
+# ---- Read-only watch reading ---------------------------------------------------------------------
+# Everything below is what mid-show watch mode may do on the Mac, and nothing else. It never calls the
+# Millumin readback (millumin_ui), BetterDisplay, OSC (send_millumin), restore, openShow or the
+# native tool's layout and windows commands. Every program it runs goes through read_command(), which
+# refuses anything outside WATCH_PROGRAMS or with arguments outside the shapes listed there.
+# test_mac_bridge.py checks this at runtime and in the source.
+
+NAME_RE = re.compile(r'^[A-Za-z0-9._-]{1,64}$')
+IFACE_RE = re.compile(r'^[a-z]{2,8}[0-9]{1,3}$')
+
+
+def _pgrep_ok(args):
+    return len(args) == 3 and args[1] == '-x' and bool(NAME_RE.match(args[2]))
+
+
+def _ps_ok(args):
+    return len(args) == 5 and args[1:4] == ['-o', 'lstart=', '-p'] and args[4].isdigit()
+
+
+def _pmset_ok(args):
+    return args[1:] in (['-g', 'assertions'], ['-g', 'therm'])
+
+
+def _sysctl_ok(args):
+    return args[1:] == ['-n', 'kern.memorystatus_vm_pressure_level']
+
+
+def _ifconfig_ok(args):
+    return len(args) == 2 and bool(IFACE_RE.match(args[1]))
+
+
+def _private(value):
+    try:
+        address = ipaddress.ip_address(value)
+    except ValueError:
+        return False
+    return address.is_private or address.is_link_local
+
+
+def _ping_ok(args):
+    return len(args) == 6 and args[1:5] == ['-c', '1', '-t', '2'] and _private(args[5])
+
+
+def _native_ok(args):
+    return len(args) == 2 and args[1] == 'watch'
+
+
+WATCH_PROGRAMS = {
+    '/usr/bin/pgrep': _pgrep_ok,
+    '/bin/ps': _ps_ok,
+    '/usr/bin/pmset': _pmset_ok,
+    '/usr/sbin/sysctl': _sysctl_ok,
+    '/sbin/ifconfig': _ifconfig_ok,
+    '/sbin/ping': _ping_ok,
+    'native': _native_ok,
+}
+
+
+def read_command(args, timeout=6):
+    """Run one allowed read-only program. Returns (exit status, stdout). Raises ValueError for anything else."""
+    key = 'native' if args and args[0] == NATIVE else (args[0] if args else '')
+    allowed = WATCH_PROGRAMS.get(key)
+    if allowed is None or not allowed(list(args)):
+        raise ValueError('Watch mode may not run that command.')
+    done = subprocess.run(list(args), capture_output=True, text=True, timeout=timeout, check=False)
+    return done.returncode, done.stdout
+
+
+def parse_assertions(text):
+    """pmset -g assertions: system-wide counts and the processes that hold them."""
+    counts, owners, section = {}, [], None
+    for line in text.splitlines():
+        if line.startswith('Assertion status system-wide'):
+            section = 'counts'
+        elif line.startswith('Listed by owning process'):
+            section = 'owners'
+        elif section == 'counts':
+            found = re.match(r'^\s+([A-Za-z]+)\s+(\d+)\s*$', line)
+            if found:
+                counts[found.group(1)] = int(found.group(2))
+        elif section == 'owners':
+            found = re.match(r'^\s+pid (\d+)\(([^)]+)\): \[[^\]]+\] \S+ ([A-Za-z]+) named:', line)
+            if found:
+                owners.append({'pid': int(found.group(1)), 'process': found.group(2), 'type': found.group(3)})
+    return {'systemWide': counts, 'owners': owners}
+
+
+def parse_thermal(text):
+    limits = {m.group(1): int(m.group(2)) for m in re.finditer(r'^\s*([A-Za-z_]*Limit)\s*=\s*(\d+)', text, re.M)}
+    return {'limits': limits}
+
+
+def processes_named(name):
+    status, out = read_command(['/usr/bin/pgrep', '-x', name])
+    if status not in (0, 1):
+        raise ValueError('pgrep failed')
+    found = []
+    for pid in [line.strip() for line in out.splitlines() if line.strip().isdigit()]:
+        code, started = read_command(['/bin/ps', '-o', 'lstart=', '-p', pid])
+        if code == 0 and started.strip():
+            found.append({'pid': int(pid), 'startedAt': ' '.join(started.split())})
+    return found
+
+
+def watch_displays():
+    rows = json.loads(read_command([NATIVE, 'watch'])[1])
+    result = []
+    for row in rows:
+        mode = {k: v for k, v in row.items() if k not in ('id', 'active', 'name', 'vendor', 'model', 'serial')}
+        result.append({'id': row['id'], 'name': row.get('name', ''), 'active': row.get('active') is True,
+                       'identity': {k: row.get(k) for k in ('vendor', 'model', 'serial')}, 'mode': mode})
+    return result
+
+
+def show_fingerprint(path, known):
+    """Size and modified time every time; the SHA-256 only when either changed since the last reading."""
+    stat = os.stat(path)
+    if not os.path.isfile(path):
+        raise ValueError('The show path is not a file')
+    if isinstance(known, dict) and known.get('size') == stat.st_size and known.get('mtimeNs') == stat.st_mtime_ns and known.get('sha256'):
+        sha = known['sha256']
+    else:
+        digest = hashlib.sha256()
+        with open(path, 'rb') as handle:
+            for chunk in iter(lambda: handle.read(1 << 20), b''):
+                digest.update(chunk)
+        sha = digest.hexdigest()
+    return {'exists': True, 'size': stat.st_size, 'mtimeNs': stat.st_mtime_ns, 'sha256': sha}
+
+
+def pixel_reading(config):
+    """Interface state and a ping to each listed controller. Never sends pixel data (MF-3, option A)."""
+    iface = config['interface']
+    if not IFACE_RE.match(iface):
+        raise ValueError('Invalid interface')
+    status, out = read_command(['/sbin/ifconfig', iface])
+    exists = status == 0
+    up = exists and bool(re.search(r'flags=[0-9a-f]+<[^>]*\bUP\b[^>]*\bRUNNING\b', out)) and not re.search(r'status:\s*inactive', out)
+    controllers = []
+    for item in config.get('controllers', []):
+        reachable = False
+        if up and _private(item.get('address')):
+            reachable = read_command(['/sbin/ping', '-c', '1', '-t', '2', item['address']], timeout=6)[0] == 0
+        controllers.append({'name': item.get('name'), 'address': item.get('address'), 'reachable': reachable})
+    return {'interface': {'name': iface, 'exists': exists, 'up': up}, 'controllers': controllers}
+
+
+def watch_observe(payload):
+    """One read-only reading. A section that cannot be read reports its error instead of stopping the others."""
+    payload = payload if isinstance(payload, dict) else {}
+    errors, reading = {}, {'schemaVersion': 1}
+
+    def section(name, read):
+        try:
+            reading[name] = read()
+        except (OSError, ValueError, KeyError, TypeError, subprocess.SubprocessError) as error:
+            errors[name] = str(error)[:160] or type(error).__name__
+    section('displays', watch_displays)
+    section('millumin', lambda: {'processes': processes_named('Millumin5')})
+
+    def show():
+        try:
+            return show_fingerprint(payload['showPath'], payload.get('knownShow'))
+        except FileNotFoundError:
+            return {'exists': False}
+    section('show', show)
+
+    def power():
+        found = parse_assertions(read_command(['/usr/bin/pmset', '-g', 'assertions'])[1])
+        name = payload.get('keepAwakeProcess')
+        if name:
+            if not NAME_RE.match(str(name)):
+                raise ValueError('Invalid keep-awake process name')
+            found['keepAwakeProcesses'] = processes_named(name)
+        return found
+    section('power', power)
+
+    def disk():
+        usage = shutil.disk_usage(payload.get('diskPath') or '/')
+        return {'path': payload.get('diskPath') or '/', 'totalBytes': usage.total, 'freeBytes': usage.free}
+    section('disk', disk)
+    section('thermal', lambda: parse_thermal(read_command(['/usr/bin/pmset', '-g', 'therm'])[1]))
+    section('memory', lambda: {'pressureLevel': int(read_command(['/usr/sbin/sysctl', '-n', 'kern.memorystatus_vm_pressure_level'])[1].strip())})
+    folder = payload.get('mediaFolder')
+    if folder:
+        section('media', lambda: {'path': folder, 'exists': os.path.exists(folder), 'isDir': os.path.isdir(folder),
+                                  'readable': os.access(folder, os.R_OK | os.X_OK)})
+    if isinstance(payload.get('pixel'), dict):
+        section('pixel', lambda: pixel_reading(payload['pixel']))
+    reading['errors'] = errors
+    return reading
+
+
 def main():
     request = json.load(sys.stdin)
     if request.get('schemaVersion') != 1:
         raise ValueError('Unsupported request')
     action, payload = request.get('action'), request.get('payload', {})
     if action == 'capabilities':
-        result = {'startup': True, 'routingReadback': True}
+        result = {'startup': True, 'routingReadback': True, 'watch': True}
+    elif action == 'watch':
+        result = watch_observe(payload)
     elif action == 'observe':
         displays = observe_displays()
         result = {'schemaVersion': 1, 'displays': displays, 'millumin': observe_millumin(displays)}
