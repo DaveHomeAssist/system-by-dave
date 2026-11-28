@@ -177,19 +177,47 @@ def route_text(profile):
     return ' · '.join('%s → %s' % (canvas, lane) for canvas, lane in order)
 
 
+BRIDGE_TIMEOUT = 45
+# openShow may have to launch Millumin and load the full show after a restart. mac_bridge.open_show waits
+# up to OPEN_TIMEOUT (90 s) for the document, plus one slow Accessibility read, so allow it longer.
+BRIDGE_TIMEOUTS = {'openShow': 150}
+BRIDGE_STEPS = {'capabilities': 'check the Mac integration', 'observe': 'read the displays and Millumin',
+                'restore': 'restore the approved display modes', 'openShow': 'open the approved show',
+                'fullscreen': 'turn on fullscreen output'}
+
+
+def bridge_detail(text):
+    """The bridge's own error as one short readable line, or None."""
+    if not isinstance(text, str):
+        return None
+    return ' '.join(text.split())[:300] or None
+
+
 class Bridge:
     def __init__(self, executable):
         self.executable = str(Path(executable).resolve(strict=True))
 
     def call(self, action, payload):
+        step = BRIDGE_STEPS.get(action, action)
+        limit = BRIDGE_TIMEOUTS.get(action, BRIDGE_TIMEOUT)
         try:
-            result = subprocess.run([self.executable], input=json.dumps({'schemaVersion': 1, 'action': action, 'payload': payload}),
-                                    capture_output=True, text=True, timeout=45, check=True)
-            reply = json.loads(result.stdout)
-        except (OSError, subprocess.SubprocessError, ValueError) as error:
+            done = subprocess.run([self.executable], input=json.dumps({'schemaVersion': 1, 'action': action, 'payload': payload}),
+                                  capture_output=True, text=True, timeout=limit)
+        except subprocess.TimeoutExpired as error:
+            raise StartupError('The Mac bridge did not finish within %d seconds while trying to %s.' % (limit, step)) from error
+        except (OSError, subprocess.SubprocessError) as error:
             raise StartupError('The local application bridge failed.') from error
-        if not isinstance(reply, dict) or reply.get('ok') is not True:
-            raise StartupError('The local application bridge could not complete %s.' % action)
+        # The bridge exits non-zero when it reports ok: false, so read its reply before looking at the exit
+        # status. Its error text is what tells the operator what to correct.
+        try:
+            reply = json.loads(done.stdout)
+        except ValueError:
+            reply = None
+        if not isinstance(reply, dict):
+            raise StartupError('The local application bridge failed (exit %d).' % done.returncode)
+        if reply.get('ok') is not True or done.returncode != 0:
+            detail = bridge_detail(reply.get('error'))
+            raise StartupError('Could not %s: %s' % (step, detail) if detail else 'The local application bridge could not complete %s.' % action)
         result = reply.get('result', {})
         if not isinstance(result, dict):
             raise StartupError('The bridge returned an invalid observation.')
@@ -266,11 +294,14 @@ def run(profile, bridge, warm=False, timeout=60, interval=1, stable_samples=3, c
         return snapshot
 
     def wait_for(check):
+        # observe only reads, so a failed observe is retried until the deadline. At login the displays and
+        # BetterDisplay are still coming up and the first reads can fail. A bridge error from any action that
+        # changes something (restore, openShow, fullscreen) still stops the run.
         deadline = clock() + timeout
         previous, count, issue = None, 0, 'Waiting for displays.'
         while clock() < deadline:
-            snapshot = observing(bridge.call('observe', {}))
             try:
+                snapshot = observing(bridge.call('observe', {}))
                 resolve(profile, snapshot)
                 errors = check(snapshot)
                 if errors:

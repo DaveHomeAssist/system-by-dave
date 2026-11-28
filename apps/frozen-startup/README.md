@@ -29,8 +29,11 @@ python3 apps/frozen-startup/package.py /tmp/frozen-startup-package
 The Mac adapter is selected explicitly with `--bridge /absolute/path`.
 The executable receives one JSON request on stdin and emits one JSON response
 on stdout. Every request has `schemaVersion: 1`, `action` and `payload`.
-Responses have `ok: true` and `result`, or `ok: false`. Calls time out after
-45 seconds. There is no shell evaluation. The bridge is trusted local code.
+Responses have `ok: true` and `result`, or `ok: false` with an `error` line,
+which the window shows to the operator. Calls time out after 45 seconds, except
+`openShow`, which allows 150 seconds because after a restart it has to launch
+Millumin and load the full show. There is no shell evaluation. The bridge is
+trusted local code.
 This release supplies an offline bridge and a native Mac adapter tested with
 Millumin 5.14.l on the development Mac. The native adapter reads the Output
 setup sheet and CoreGraphics output windows. The Studio remains a separate
@@ -68,7 +71,9 @@ Startup waits for three identical observations. It preserves a desktop that
 already matches the approved profile. If the layout needs restoration and
 readback still differs after settling, it may apply the approved layout once
 more after all five physical display identities settle again. The receipt
-records the retry. An explicit bridge error stops the run. Startup verifies
+records the retry. A failed `observe` during a wait is retried until that
+wait's deadline, since displays and BetterDisplay can still be coming up after
+login. An explicit bridge error from any other action stops the run. Startup verifies
 the approved show and its routing before enabling fullscreen. An operator can
 retry after correcting a persistent fault.
 

@@ -1,4 +1,5 @@
 import unittest
+import subprocess
 import tempfile
 import hashlib
 from pathlib import Path
@@ -67,6 +68,48 @@ class MacTests(unittest.TestCase):
             with patch.object(mac, 'millumin_ui', return_value={'document': 'file:///other.millumin'}), patch.object(mac, 'command') as command:
                 with self.assertRaises(ValueError): mac.open_show(payload)
                 command.assert_not_called()
+
+    def open_show_after(self, ui):
+        """Run open_show with a fake clock. Returns (result or raised error, seconds waited, command mock)."""
+        folder = tempfile.TemporaryDirectory()
+        self.addCleanup(folder.cleanup)
+        path = Path(folder.name) / 'approved.millumin'
+        path.write_bytes(b'approved')
+        payload = {'showPath': str(path), 'showSHA256': hashlib.sha256(b'approved').hexdigest(), 'controlDisplayID': 1}
+        now = [0.0]
+        not_running = subprocess.CompletedProcess(['/usr/bin/pgrep'], 1)
+        with patch.object(mac, 'millumin_ui', side_effect=lambda action, payload=None: ui(action, path)), \
+                patch.object(mac, 'command') as command, \
+                patch.object(mac.subprocess, 'run', return_value=not_running), \
+                patch.object(mac, 'observe_displays', return_value=[{'id': 1, 'mode': {'x': 0, 'y': 0}}]), \
+                patch.object(mac.time, 'monotonic', side_effect=lambda: now[0]), \
+                patch.object(mac.time, 'sleep', side_effect=lambda seconds: now.__setitem__(0, now[0] + seconds)):
+            try:
+                outcome = mac.open_show(payload)
+            except ValueError as error:
+                outcome = error
+        return outcome, now[0], command, path
+
+    def test_open_show_waits_for_a_cold_millumin_launch(self):
+        reads = []
+        def ui(action, path):
+            if action == 'position':
+                return {}
+            reads.append(action)
+            if len(reads) == 1:
+                raise subprocess.CalledProcessError(1, 'osascript')  # Millumin is not running after a restart
+            return {'document': path.as_uri() if len(reads) > 40 else None}  # the show takes about 40 s to load
+        outcome, waited, command, path = self.open_show_after(ui)
+        self.assertEqual(outcome, {})
+        self.assertGreaterEqual(waited, 39)
+        command.assert_called_once_with(['/usr/bin/open', '-a', 'Millumin5', str(path.resolve())])
+
+    def test_open_show_gives_up_after_its_deadline(self):
+        outcome, waited, command, _ = self.open_show_after(lambda action, path: {'document': None})
+        self.assertIsInstance(outcome, ValueError)
+        self.assertIn('within %d seconds' % mac.OPEN_TIMEOUT, str(outcome))
+        self.assertLessEqual(waited, mac.OPEN_TIMEOUT + mac.OPEN_POLL)
+        self.assertEqual(command.call_count, 1)
 
     def test_identity_change_prevents_any_restore_command(self):
         from test_startup import fixture
