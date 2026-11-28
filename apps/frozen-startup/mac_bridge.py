@@ -13,6 +13,10 @@ from urllib.parse import unquote, urlparse
 
 BETTERDISPLAY = '/Applications/BetterDisplay.app/Contents/MacOS/BetterDisplay'
 NATIVE = os.environ.get('FROZEN_NATIVE_DISPLAY_TOOL', str(Path(__file__).with_name('mac-displays')))
+# After a restart Millumin is closed, so openShow launches it and waits for the full show to load. That takes
+# much longer than reopening a document in a running Millumin. startup.BRIDGE_TIMEOUTS allows for this.
+OPEN_TIMEOUT = 90
+OPEN_POLL = 1
 
 
 def command(args, payload=None):
@@ -131,16 +135,17 @@ def open_show(payload):
         raise ValueError('Another Millumin document is open')
     if current is None or not current.get('document'):
         command(['/usr/bin/open', '-a', 'Millumin5', str(path)])
-    for _ in range(10):
+    deadline = time.monotonic() + OPEN_TIMEOUT
+    while True:
         try:
             current = millumin_ui('document')
             if current.get('document') and Path(unquote(urlparse(current['document']).path)).resolve() == path:
                 break
         except subprocess.SubprocessError:
-            pass
-        time.sleep(.2)
-    else:
-        raise ValueError('Millumin did not open the approved project')
+            pass  # Millumin is still launching and does not answer Accessibility yet.
+        if time.monotonic() >= deadline:
+            raise ValueError('Millumin did not open the approved project within %d seconds' % OPEN_TIMEOUT)
+        time.sleep(OPEN_POLL)
     displays = observe_displays()
     targets = [d for d in displays if d['id'] == payload['controlDisplayID']]
     if len(targets) != 1:

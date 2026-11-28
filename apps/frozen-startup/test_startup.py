@@ -9,7 +9,7 @@ from pathlib import Path
 import tempfile
 import unittest
 from datetime import datetime, timedelta, timezone
-from startup import FixtureBridge, StartupError, display_problems, readiness, resolve, run, save, validate_profile
+from startup import Bridge, FixtureBridge, StartupError, display_problems, readiness, resolve, run, save, validate_profile
 
 
 def fixture():
@@ -126,6 +126,90 @@ class Tests(unittest.TestCase):
         class Broken(FixtureBridge):
             def call(self, action, payload): raise StartupError('Bridge unavailable.')
         self.assertEqual(self.execute(Broken(self.snapshot))['message'], 'Bridge unavailable.')
+
+    def test_failed_observe_is_retried_until_the_deadline(self):
+        class SlowLogin(FixtureBridge):
+            """The first reads fail, as when BetterDisplay is still starting after login."""
+            def call(self, action, payload):
+                if action == 'observe' and self.calls.count('observe') < 2:
+                    self.calls.append(action)
+                    raise StartupError('Could not read the displays and Millumin: Native and BetterDisplay identities disagree')
+                return super().call(action, payload)
+        b = SlowLogin(self.snapshot)
+        self.assertTrue(self.execute(b)['computerReady'])
+        self.assertGreater(b.calls.count('observe'), 2)
+
+    def test_observe_that_keeps_failing_reports_its_own_error(self):
+        class NoBetterDisplay(FixtureBridge):
+            def call(self, action, payload):
+                if action == 'observe':
+                    self.calls.append(action)
+                    raise StartupError('Could not read the displays and Millumin: BetterDisplay is not running')
+                return super().call(action, payload)
+        b = NoBetterDisplay(self.snapshot)
+        receipt = self.execute(b)
+        self.assertFalse(receipt['computerReady'])
+        self.assertEqual(receipt['message'], 'Could not read the displays and Millumin: BetterDisplay is not running')
+        self.assertGreater(b.calls.count('observe'), 1)
+        self.assertNotIn('restore', b.calls)
+
+    def test_failed_change_still_stops_the_run(self):
+        class RestoreFails(FixtureBridge):
+            def call(self, action, payload):
+                if action == 'restore':
+                    self.calls.append(action)
+                    raise StartupError('Could not restore the approved display modes: BetterDisplay refused the mode')
+                return super().call(action, payload)
+        self.snapshot['displays'][1]['mode']['pixelHeight'] = 1080
+        b = RestoreFails(self.snapshot)
+        receipt = self.execute(b)
+        self.assertFalse(receipt['computerReady'])
+        self.assertEqual(b.calls.count('restore'), 1)
+        self.assertIn('BetterDisplay refused the mode', receipt['message'])
+        self.assertNotIn('openShow', b.calls)
+
+    def bridge_script(self, folder, stdout, status, name='bridge'):
+        path = Path(folder) / name
+        path.write_text("#!/bin/sh\ncat >/dev/null\ncat <<'EOF'\n%s\nEOF\nexit %d\n" % (stdout, status))
+        path.chmod(0o755)
+        return Bridge(path)
+
+    def test_bridge_error_text_reaches_the_operator(self):
+        with tempfile.TemporaryDirectory() as folder:
+            bridge = self.bridge_script(folder, json.dumps({'ok': False, 'error': 'Approved show file hash changed'}), 1)
+            with self.assertRaises(StartupError) as raised:
+                bridge.call('openShow', {})
+            self.assertEqual(str(raised.exception), 'Could not open the approved show: Approved show file hash changed')
+
+    def test_bridge_replies_without_error_text_or_json(self):
+        with tempfile.TemporaryDirectory() as folder:
+            ok = self.bridge_script(folder, json.dumps({'ok': True, 'result': {'startup': True}}), 0, 'ok')
+            self.assertEqual(ok.call('capabilities', {}), {'startup': True})
+            bare = self.bridge_script(folder, json.dumps({'ok': False}), 1, 'bare')
+            with self.assertRaises(StartupError) as raised:
+                bare.call('fullscreen', {})
+            self.assertEqual(str(raised.exception), 'The local application bridge could not complete fullscreen.')
+            broken = self.bridge_script(folder, 'Traceback (most recent call last):', 2, 'broken')
+            with self.assertRaises(StartupError) as raised:
+                broken.call('observe', {})
+            self.assertEqual(str(raised.exception), 'The local application bridge failed (exit 2).')
+            mixed = self.bridge_script(folder, json.dumps({'ok': True, 'result': {}}), 3, 'mixed')
+            with self.assertRaises(StartupError):
+                mixed.call('observe', {})
+
+    def test_open_show_gets_a_longer_bridge_timeout(self):
+        with tempfile.TemporaryDirectory() as folder:
+            bridge = self.bridge_script(folder, json.dumps({'ok': True, 'result': {}}), 0)
+            seen = []
+            def slow(*args, **kwargs):
+                seen.append(kwargs['timeout'])
+                raise subprocess.TimeoutExpired(args[0], kwargs['timeout'])
+            with patch('startup.subprocess.run', side_effect=slow):
+                for action in ('openShow', 'observe'):
+                    with self.assertRaises(StartupError) as raised:
+                        bridge.call(action, {})
+                    self.assertIn('did not finish within', str(raised.exception))
+            self.assertEqual(seen, [150, 45])
 
     def test_unstable_ids_timeout(self):
         class Unstable(FixtureBridge):
